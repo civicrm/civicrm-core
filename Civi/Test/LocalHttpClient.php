@@ -103,7 +103,45 @@ class LocalHttpClient implements ClientInterface {
     }
   }
 
+  /**
+   * Simulate an HTTP request. Setup globals ($_GET, $_POST, ...) and then invoke the route.
+   *
+   * @param \Psr\Http\Message\RequestInterface $request
+   * @return \Psr\Http\Message\ResponseInterface
+   * @throws \CRM_Core_Exception
+   */
   public function sendRequest(RequestInterface $request): ResponseInterface {
+    return $this->useRequest($request, function() {
+      try {
+        $var = \CRM_Core_Config::singleton()->userFrameworkURLVar;
+        $result = $this->invoke($_GET[$var]);
+        // FIXME: There's probably a way to instrument CRM_Utils_System_UnitTests to do this better.
+        return $result instanceof ResponseInterface ? $result : new Response(200, [], $result);
+      }
+      catch (\CRM_Core_Exception_PrematureExitException $e) {
+        if (isset($e->errorData['response'])) {
+          return $e->errorData['response'];
+        }
+        // FIXME: There are some things which emit PrematureExitException but don't provide the $response object.
+        // We should probably revise \CRM_Utils_System::redirect() and returnJsonResponse()
+        else {
+          throw $e;
+        }
+      }
+    });
+  }
+
+  /**
+   * Simulate an HTTP request. Setup globals ($_GET, $_POST, ...) and invoke $callback.
+   *
+   * This may be useful when testing a specific HTTP-aware piece (such as CRM_Utils_Pager)
+   * without running an entire route.
+   *
+   * @param \Psr\Http\Message\RequestInterface $request
+   * @param callable $callback
+   * @return mixed
+   */
+  public function useRequest(RequestInterface $request, callable $callback): mixed {
     $backup = $this->getAllValues();
     try {
       $this->initScopes($request);
@@ -112,19 +150,7 @@ class LocalHttpClient implements ClientInterface {
       if (!isset($_GET[$var])) {
         $_GET[$var] = ltrim($request->getUri()->getPath(), '/');
       }
-      $result = $this->invoke($_GET[$var]);
-      // FIXME: There's probably a way to instrument CRM_Utils_System_UnitTests to do this better.
-      return $result instanceof ResponseInterface ? $result : new Response(200, [], $result);
-    }
-    catch (\CRM_Core_Exception_PrematureExitException $e) {
-      if (isset($e->errorData['response'])) {
-        return $e->errorData['response'];
-      }
-      // FIXME: There are some things which emit PrematureExitException but don't provide the $response object.
-      // We should probably revise \CRM_Utils_System::redirect() and returnJsonResponse()
-      else {
-        throw $e;
-      }
+      return $callback();
     }
     finally {
       $this->restoreAllValues($backup);
