@@ -1,6 +1,5 @@
 (function (CRM, angular) {
 
-
   class AfToken extends HTMLElement {
 
     constructor() {
