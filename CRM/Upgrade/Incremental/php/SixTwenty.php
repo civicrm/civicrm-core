@@ -344,7 +344,7 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Set contribution_status default', 'setContributionStatusDefault');
     $this->addTask('Remove index civicrm_country.UI_name_iso_code', 'dropIndex', 'civicrm_country', 'UI_name_iso_code');
-    $this->addTask('Add index civicrm_country.UI_name', 'addIndex', 'civicrm_country', 'name', 'UI');
+    $this->addTask('Ensure Country.name is unique and indexed', 'ensureCountryNameUnique');
     $this->addTask('Add index civicrm_msg_template.index_workflow_name', 'addIndex', 'civicrm_msg_template', 'workflow_name');
   }
 
@@ -366,6 +366,55 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
 
   public static function forceRebuildFtsIndices(): bool {
     Civi::service('civi.schema.fts')->createIndices(TRUE);
+    return TRUE;
+  }
+
+  /**
+   * Deduplicate Country.name if needed and add unique index UI_name.
+   */
+  public static function ensureCountryNameUnique(CRM_Queue_TaskContext $ctx): bool {
+    if (Civi::schemaHelper()->indexExists('civicrm_country', 'UI_name')) {
+      return TRUE;
+    }
+
+    // Ensure all country names are unique before adding index.
+    $dupNames = CRM_Core_DAO::executeQuery("
+      SELECT name
+      FROM civicrm_country
+      GROUP BY name
+      HAVING COUNT(*) > 1
+    ", i18nRewrite: FALSE);
+    while ($dupNames->fetch()) {
+      $rows = CRM_Core_DAO::executeQuery("
+        SELECT id
+        FROM civicrm_country
+        WHERE name = %1
+        ORDER BY is_active DESC, id ASC
+      ", [1 => [$dupNames->name, 'String']], i18nRewrite: FALSE);
+      $keepId = NULL;
+      $renameIds = [];
+      while ($rows->fetch()) {
+        if ($keepId === NULL) {
+          $keepId = (int) $rows->id;
+        }
+        else {
+          $renameIds[] = (int) $rows->id;
+        }
+      }
+      if ($renameIds) {
+        $idList = implode(',', $renameIds);
+        CRM_Core_DAO::executeQuery(
+          "UPDATE civicrm_country SET name = CONCAT(LEFT(name, 60 - LENGTH(id)), ' (', id, ')') WHERE id IN ({$idList})",
+          i18nRewrite: FALSE
+        );
+      }
+    }
+
+    Civi::schemaHelper()->createIndex('civicrm_country', 'UI_name', [
+      'fields' => ['name' => TRUE],
+      'unique' => TRUE,
+    ]);
+
     return TRUE;
   }
 
