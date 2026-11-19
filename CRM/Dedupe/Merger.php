@@ -19,6 +19,27 @@ use Civi\Api4\Contact;
 class CRM_Dedupe_Merger {
 
   /**
+   * Replace the contact placeholders in a relTables url template.
+   *
+   * Templates are built with CRM_Utils_System::url(), which URL-encodes its input,
+   * so the placeholders are plain tokens that survive encoding. The legacy
+   * '$cid' / '%ufid' forms (e.g. from hook_civicrm_merge) and their encoded forms are also honoured.
+   *
+   * @param string|null $urlTemplate
+   * @param int|string $contactID
+   * @param int|string|null $ufID
+   *
+   * @return string
+   */
+  public static function fillRelTableUrl(?string $urlTemplate, $contactID, $ufID = NULL): string {
+    return str_replace(
+      ['__CID__', '%24cid', '$cid', '__UFID__', '%25ufid', '%ufid'],
+      [$contactID, $contactID, $contactID, $ufID ?? '', $ufID ?? '', $ufID ?? ''],
+      (string) $urlTemplate
+    );
+  }
+
+  /**
    * FIXME: consider creating a common structure with cidRefs() and eidRefs()
    * FIXME: the sub-pages references by the URLs should
    * be loaded dynamically on the merge form instead
@@ -39,7 +60,7 @@ class CRM_Dedupe_Merger {
       $config = CRM_Core_Config::singleton();
       // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
       if ($config->userSystem->is_drupal) {
-        $userRecordUrl = CRM_Utils_System::url('user/%ufid');
+        $userRecordUrl = CRM_Utils_System::url('user/__UFID__');
         $title = ts('%1 User: %2; user id: %3', [
           1 => $config->userFramework,
           2 => '$ufname',
@@ -47,7 +68,7 @@ class CRM_Dedupe_Merger {
         ]);
       }
       elseif ($config->userFramework === 'Joomla') {
-        $userRecordUrl = $config->userFrameworkBaseURL . 'index.php?option=com_users&view=user&task=user.edit&id=%ufid';
+        $userRecordUrl = $config->userFrameworkBaseURL . 'index.php?option=com_users&view=user&task=user.edit&id=__UFID__';
         $title = ts('%1 User: %2; user id: %3', [
           1 => $config->userFramework,
           2 => '$ufname',
@@ -63,12 +84,12 @@ class CRM_Dedupe_Merger {
             'civicrm_contribution_recur',
             'civicrm_contribution_soft',
           ],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=contribute'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=contribute'),
         ],
         'rel_table_contribution_page' => [
           'title' => ts('Contribution Pages'),
           'tables' => ['civicrm_contribution_page'],
-          'url' => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1&cid=$cid'),
+          'url' => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1&cid=__CID__'),
         ],
         'rel_table_memberships' => [
           'title' => ts('Memberships'),
@@ -77,27 +98,27 @@ class CRM_Dedupe_Merger {
             'civicrm_membership_log',
             'civicrm_membership_type',
           ],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=member'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=member'),
         ],
         'rel_table_participants' => [
           'title' => ts('Participants'),
           'tables' => ['civicrm_participant'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=participant'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=participant'),
         ],
         'rel_table_events' => [
           'title' => ts('Events'),
           'tables' => ['civicrm_event'],
-          'url' => CRM_Utils_System::url('civicrm/event/manage', 'reset=1&cid=$cid'),
+          'url' => CRM_Utils_System::url('civicrm/event/manage', 'reset=1&cid=__CID__'),
         ],
         'rel_table_activities' => [
           'title' => ts('Activities'),
           'tables' => ['civicrm_activity', 'civicrm_activity_contact'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=activity'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=activity'),
         ],
         'rel_table_relationships' => [
           'title' => ts('Relationships'),
           'tables' => ['civicrm_relationship', 'civicrm_relationship_cache'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=rel'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=rel'),
         ],
         'rel_table_custom_groups' => [
           'title' => ts('Custom Groups'),
@@ -112,17 +133,17 @@ class CRM_Dedupe_Merger {
         'rel_table_groups' => [
           'title' => ts('Groups'),
           'tables' => ['civicrm_group_contact'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=group'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=group'),
         ],
         'rel_table_notes' => [
           'title' => ts('Notes'),
           'tables' => ['civicrm_note'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=note'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=note'),
         ],
         'rel_table_tags' => [
           'title' => ts('Tags'),
           'tables' => ['civicrm_entity_tag'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=tag'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=tag'),
         ],
         'rel_table_mailings' => [
           'title' => ts('Mailings'),
@@ -131,17 +152,17 @@ class CRM_Dedupe_Merger {
             'civicrm_mailing_event_queue',
             'civicrm_mailing_event_subscribe',
           ],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=mailing'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=mailing'),
         ],
         'rel_table_cases' => [
           'title' => ts('Cases'),
           'tables' => ['civicrm_case_contact'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=case'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=case'),
         ],
         'rel_table_grants' => [
           'title' => ts('Grants'),
           'tables' => ['civicrm_grant'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=grant'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=grant'),
         ],
         'rel_table_pcp' => [
           'title' => ts('PCPs'),
@@ -151,7 +172,7 @@ class CRM_Dedupe_Merger {
         'rel_table_pledges' => [
           'title' => ts('Pledges'),
           'tables' => ['civicrm_pledge', 'civicrm_pledge_payment'],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=pledge'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__&selectedChild=pledge'),
         ],
         'rel_table_users' => [
           'title' => $title,
@@ -309,7 +330,7 @@ class CRM_Dedupe_Merger {
         $data['relTables']['rel_table_custom_' . $custom['id']] = [
           'title' => $custom['title'],
           'tables' => [$custom['table_name']],
-          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid' . $urlSuffix),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=__CID__' . $urlSuffix),
         ];
       }
 
@@ -1344,15 +1365,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     foreach ($relTables as $name => $null) {
       $migrationInfo["move_$name"] = 1;
 
-      $relTables[$name]['main_url'] = str_replace('$cid', $mainID, $relTables[$name]['url']);
-      $relTables[$name]['other_url'] = str_replace('$cid', $otherID, $relTables[$name]['url']);
       $relTables[$name]['has_operation'] = 0;
+      $mainUFID = $name === 'rel_table_users' ? CRM_Core_BAO_UFMatch::getUFId($mainID) : NULL;
+      $otherUFID = $name === 'rel_table_users' ? CRM_Core_BAO_UFMatch::getUFId($otherID) : NULL;
+      $relTables[$name]['main_url'] = self::fillRelTableUrl($relTables[$name]['url'], $mainID, $mainUFID);
+      $relTables[$name]['other_url'] = self::fillRelTableUrl($relTables[$name]['url'], $otherID, $otherUFID);
 
-      if ($name === 'rel_table_users') {
-        // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
-        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainID) ?? '', $relTables[$name]['url']);
-        $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherID) ?? '', $relTables[$name]['url']);
-      }
       if ($name === 'rel_table_memberships') {
         //Enable 'add new' checkbox if main contact does not contain any membership similar to duplicate contact.
         $attributes = ['checked' => 'checked'];

@@ -786,6 +786,53 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * The "Move related" rows should link to real contact ids, not placeholders.
+   */
+  public function testGetRowsElementsAndInfoRelatedTableUrls(): void {
+    $mainID = $this->individualCreate();
+    $otherID = $this->individualCreate();
+    $this->createTestEntity('Note', [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $otherID,
+      'note' => 'A note',
+    ]);
+    $relTables = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainID, $otherID)['rel_tables'];
+    $this->assertArrayHasKey('move_rel_table_notes', $relTables);
+    $noteRow = $relTables['move_rel_table_notes'];
+    $this->assertStringContainsString("cid=$mainID", $noteRow['main_url']);
+    $this->assertStringContainsString("cid=$otherID", $noteRow['other_url']);
+    $this->assertStringContainsString('selectedChild=note', $noteRow['other_url']);
+    foreach ($relTables as $row) {
+      $this->assertStringNotContainsString('__CID__', $row['main_url']);
+      $this->assertStringNotContainsString('__CID__', $row['other_url']);
+    }
+  }
+
+  /**
+   * Templates must not contain raw `$cid`/`%ufid`, which CMS url() may encode.
+   */
+  public function testRelTablesUrlTemplatesUseEncodingSafeTokens(): void {
+    foreach (CRM_Dedupe_Merger::relTables() as $name => $relTable) {
+      $this->assertStringNotContainsString('$cid', $relTable['url'] ?? '', $name);
+      $this->assertStringNotContainsString('%ufid', $relTable['url'] ?? '', $name);
+    }
+  }
+
+  /**
+   * Placeholders are filled in whether raw, tokenised or already URL-encoded.
+   */
+  public function testFillRelTableUrl(): void {
+    $this->assertSame('x?cid=12&a=1', CRM_Dedupe_Merger::fillRelTableUrl('x?cid=__CID__&a=1', 12));
+    $this->assertSame('x?cid=12', CRM_Dedupe_Merger::fillRelTableUrl('x?cid=$cid', 12));
+    $this->assertSame('x?cid=12', CRM_Dedupe_Merger::fillRelTableUrl('x?cid=%24cid', 12));
+    $this->assertSame('user/34', CRM_Dedupe_Merger::fillRelTableUrl('user/__UFID__', 12, 34));
+    $this->assertSame('user/34', CRM_Dedupe_Merger::fillRelTableUrl('user/%ufid', 12, 34));
+    $this->assertSame('user/34', CRM_Dedupe_Merger::fillRelTableUrl('user/%25ufid', 12, 34));
+    $this->assertSame('user/', CRM_Dedupe_Merger::fillRelTableUrl('user/__UFID__', 12));
+    $this->assertSame('', CRM_Dedupe_Merger::fillRelTableUrl(NULL, 12));
+  }
+
+  /**
    * Test the special info handling is unchanged after cleanup.
    *
    * Note the handling is silly - we are testing to lock in over short term
