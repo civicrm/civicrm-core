@@ -163,24 +163,25 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
    * @param int $membershipId
    * @param bool $preserveContrib
    *
-   * @return object
-   *   $membershipPayment deleted membership payment object
+   * @return void
+   * @throws \CRM_Core_Exception
    * @internal
    */
-  public static function deleteMembershipPayment(int $membershipId, bool $preserveContrib = FALSE) {
+  public static function deleteMembershipPayment(int $membershipId, bool $preserveContrib = FALSE): void {
     $membershipPayment = new CRM_Member_DAO_MembershipPayment();
     $membershipPayment->membership_id = $membershipId;
     $membershipPayment->find();
+    $deleteContributions = [];
 
     while ($membershipPayment->fetch()) {
-      if (!$preserveContrib) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
+      self::deleteRecord(['id' => $membershipPayment->id]);
+      if (!$preserveContrib && $membershipPayment->contribution_id) {
+        $deleteContributions[] = ['id' => $membershipPayment->contribution_id];
       }
-      CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
-      $membershipPayment->delete();
-      CRM_Utils_Hook::post('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
     }
-    return $membershipPayment;
+    if ($deleteContributions) {
+      CRM_Contribute_BAO_Contribution::deleteRecords($deleteContributions);
+    }
   }
 
   /**
