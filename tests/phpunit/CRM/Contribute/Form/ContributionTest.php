@@ -1908,17 +1908,14 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * price fields.
    */
   public function testBuildFormWithPriceSetAssignsPriceFields(): void {
-      $this->createPriceSet('contribution', NULL, [], 'test_price_set');
-      $priceSetID = $this->ids['PriceSet']['test_price_set'];
-      $_GET['priceSetId'] = $_REQUEST['priceSetId'] = $priceSetID;
-      $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [], ['priceSetId' => $priceSetID]);
-      $form->buildForm();
-      $priceSet = $form->getTemplateVars('priceSet');
-      $this->assertEquals($priceSetID, $priceSet['id']);
-      $this->assertArrayHasKey($this->ids['PriceField'][0], $priceSet['fields']);
-      $this->assertCount(2, $priceSet['fields'][$this->ids['PriceField'][0]]['options']);
-      unset($_GET['priceSetId']);
-      unset($_REQUEST['priceSetId']);
+    $this->createPriceSet('contribution', NULL, [], 'test_price_set');
+    $priceSetID = $this->ids['PriceSet']['test_price_set'];
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [], ['priceSetId' => $priceSetID])
+      ->processForm(FormWrapper::BUILT);
+    $priceSet = $this->getTemplateVariable('priceSet');
+    $this->assertEquals($priceSetID, $priceSet['id']);
+    $this->assertArrayHasKey($this->ids['PriceField'][0], $priceSet['fields']);
+    $this->assertCount(2, $priceSet['fields'][$this->ids['PriceField'][0]]['options']);
   }
 
   /**
