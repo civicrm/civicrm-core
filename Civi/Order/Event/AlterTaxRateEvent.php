@@ -1,6 +1,6 @@
 <?php
 
-namespace Civi\Financial\Event;
+namespace Civi\Order\Event;
 
 use Civi\Core\Event\GenericHookEvent;
 

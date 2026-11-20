@@ -2296,7 +2296,7 @@ class CRM_Financial_BAO_Order {
     }
     $defaultRate = (float) (CRM_Core_PseudoConstant::getTaxRates()[$financialTypeID] ?? 0);
 
-    $event = new \Civi\Financial\Event\AlterTaxRateEvent($lineItem, $contactID, $defaultRate);
+    $event = new \Civi\Order\Event\AlterTaxRateEvent($lineItem, $contactID, $defaultRate);
     \Civi::dispatcher()->dispatch('civi.financial.alterTaxRate', $event);
 
     $result = ['tax_rate' => $event->getTaxRate()];
