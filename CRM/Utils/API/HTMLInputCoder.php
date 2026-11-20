@@ -271,19 +271,37 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
    * @throws \CRM_Core_Exception
    */
   public function transcode(string $field, $storedValue, string $outputFormat) {
+    if ($storedValue === NULL || $storedValue === []) {
+      return $storedValue;
+    }
+    $storageFormat = $this->isSkippedField($field) ? 'plain' : 'html-ish';
+    if ($storageFormat === $outputFormat) {
+      return $storedValue;
+    }
+    return $this->transcodeValue($storedValue, $storageFormat, $outputFormat);
+  }
+
+  /**
+   * Convert a value whose storage format differs from the requested one.
+   *
+   * @param string|string[]|null $storedValue
+   * @param string $storageFormat
+   *   'plain' or 'html-ish'
+   * @param string $outputFormat
+   * @return string|string[]|null
+   * @throws \CRM_Core_Exception
+   */
+  private function transcodeValue($storedValue, string $storageFormat, string $outputFormat) {
     if (is_array($storedValue)) {
-      return array_map(fn($t) => $this->transcode($field, $t, $outputFormat), $storedValue);
+      return array_map(fn($t) => $this->transcodeValue($t, $storageFormat, $outputFormat), $storedValue);
     }
     if ($storedValue === NULL) {
       return $storedValue;
     }
 
-    $storageFormat = $this->isSkippedField($field) ? 'plain' : 'html-ish';
     return match($storageFormat . ' => ' . $outputFormat) {
-      "plain => plain" => $storedValue,
       "plain => html-ish" => $this->encodeValue($storedValue),
       "plain => html" =>  htmlentities($storedValue),
-      "html-ish => html-ish" => $storedValue,
       "html-ish => plain" => $this->decodeValue($storedValue),
       "html-ish => html" => htmlentities($this->decodeValue($storedValue)),
       default => throw new \CRM_Core_Exception("Invalid transcode operation ($storageFormat => $outputFormat)")
