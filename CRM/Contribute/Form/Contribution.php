@@ -1006,7 +1006,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         );
       }
     }
-    $this->assign('priceSet', $this->getOrder()->getPriceSetMetadata());
+    $priceSet = $this->getOrder()->getPriceSetMetadata();
+    $priceSet['fields'] = $this->getPriceFieldMetaData();
+    $this->assign('priceSet', $priceSet);
   }
 
   /**
