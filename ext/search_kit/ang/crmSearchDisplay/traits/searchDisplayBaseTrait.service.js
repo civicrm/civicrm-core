@@ -1,8 +1,27 @@
 (function(angular, $) {
   "use strict";
 
+  // Displays waiting to fetch their total count, shared by every AngularJS app on the page
+  // (each contact summary tab is a separate app) so their counts go out in a single request
+  const pendingCounts = [];
+
+  // Wait until displays have stopped queuing for a brief timeout,
+  // to allow more important things to happen first
+  const fetchTotalCounts = CRM.utils.debounce(() => {
+    const countRequests = pendingCounts.splice(0).filter(countRequest => countRequest.isNeeded());
+    if (countRequests.length) {
+      // This runs outside of any one AngularJS app, so it uses CRM.api4 rather than crmApi4
+      CRM.api4(countRequests.map(countRequest => ['SearchDisplay', 'run', countRequest.getParams()]))
+        .then((results) => countRequests.forEach((countRequest, index) => {
+          if (typeof results[index].count === 'number') {
+            countRequest.setCount(results[index].count);
+          }
+        }));
+    }
+  }, 900);
+
   // Trait provides base methods and properties common to all search display types
-  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($timeout, $interval, $sce, crmApi4, crmStatus) {
+  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($interval, $sce, crmApi4, crmStatus) {
 
     // Return a base trait shared by all search display controllers
     // Gets mixed in using angular.extend()
@@ -196,16 +215,19 @@
         // - there is a counter (e.g. a contact summary tab)
         // - and the search is hidden or not set to auto-run
         // - or afform filters are present which would interfere with an accurate total
-        // (wait a brief timeout to allow more important things to happen first)
-        $timeout(() => {
-          if (hasCounter && (!(this.loading || this.results) || !angular.equals({}, this.getAfformFilters()))) {
-            const params = this.getApiParams('row_count');
-            // Exclude afform filters
-            params.filters = this.filters;
-            crmApi4('SearchDisplay', 'run', params)
-              .then((result) => setTotalCount(result.count));
-          }
-        }, 900);
+        if (hasCounter) {
+          pendingCounts.push({
+            isNeeded: () => !(this.loading || this.results) || !angular.equals({}, this.getAfformFilters()),
+            getParams: () => {
+              const params = this.getApiParams('row_count');
+              // Exclude afform filters
+              params.filters = this.filters;
+              return params;
+            },
+            setCount: (rowCount) => $scope.$evalAsync(() => setTotalCount(rowCount)),
+          });
+          fetchTotalCounts();
+        }
 
         // Clean up the form handler, visibility poller and pending debounced
         // searches, which are not released by the $scope itself
