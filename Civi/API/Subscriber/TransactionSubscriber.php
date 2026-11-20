@@ -132,11 +132,12 @@ class TransactionSubscriber implements EventSubscriberInterface {
    */
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
+    $id = $event->getRequestId();
     if ($this->isTransactional($event->getApiProvider(), $apiRequest)) {
-      $this->transactions[$apiRequest['id']] = new \CRM_Core_Transaction($this->isNested($event->getApiProvider(), $apiRequest));
+      $this->transactions[$id] = new \CRM_Core_Transaction($this->isNested($event->getApiProvider(), $apiRequest));
     }
     if ($this->isForceRollback($event->getApiProvider(), $apiRequest)) {
-      $this->transactions[$apiRequest['id']]->rollback();
+      $this->transactions[$id]->rollback();
     }
   }
 
@@ -147,12 +148,12 @@ class TransactionSubscriber implements EventSubscriberInterface {
    *   API response event.
    */
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
-    $apiRequest = $event->getApiRequest();
-    if (isset($this->transactions[$apiRequest['id']])) {
+    $id = $event->getRequestId();
+    if (isset($this->transactions[$id])) {
       if (civicrm_error($event->getResponse())) {
-        $this->transactions[$apiRequest['id']]->rollback();
+        $this->transactions[$id]->rollback();
       }
-      unset($this->transactions[$apiRequest['id']]);
+      unset($this->transactions[$id]);
     }
   }
 
@@ -163,10 +164,10 @@ class TransactionSubscriber implements EventSubscriberInterface {
    *   API exception event.
    */
   public function onApiException(\Civi\API\Event\ExceptionEvent $event) {
-    $apiRequest = $event->getApiRequest();
-    if (isset($this->transactions[$apiRequest['id']])) {
-      $this->transactions[$apiRequest['id']]->rollback();
-      unset($this->transactions[$apiRequest['id']]);
+    $id = $event->getRequestId();
+    if (isset($this->transactions[$id])) {
+      $this->transactions[$id]->rollback();
+      unset($this->transactions[$id]);
     }
   }
 

@@ -281,6 +281,63 @@ class GroupTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($child1['id'], $herarchical[4]['id']);
     $this->assertSame(1, $herarchical[4]['_depth']);
     $this->assertSame(0, $herarchical[4]['_descendents']);
+
+    // Test paginated hierarchical queries with deferred hydration of extra fields
+    $page1 = Group::get(FALSE)
+      ->addWhere('id', 'IN', [$parent1['id'], $parent2['id'], $child1['id'], $child2['id'], $subChild['id']])
+      ->addSelect('id', 'title', '_depth', '_descendents')
+      ->addOrderBy('title')
+      ->setLimit(2)
+      ->setOffset(0)
+      ->execute();
+
+    $this->assertCount(2, $page1);
+    $this->assertSame($parent2['id'], $page1[0]['id']);
+    $this->assertSame($parent2['title'], $page1[0]['title']);
+    $this->assertSame(0, $page1[0]['_depth']);
+    $this->assertSame(2, $page1[0]['_descendents']);
+    $this->assertSame($child2['id'], $page1[1]['id']);
+    $this->assertSame($child2['title'], $page1[1]['title']);
+    $this->assertSame(1, $page1[1]['_depth']);
+
+    $page2 = Group::get(FALSE)
+      ->addWhere('id', 'IN', [$parent1['id'], $parent2['id'], $child1['id'], $child2['id'], $subChild['id']])
+      ->addSelect('id', 'title', '_depth', '_descendents')
+      ->addOrderBy('title')
+      ->setLimit(2)
+      ->setOffset(2)
+      ->execute();
+
+    $this->assertCount(2, $page2);
+    $this->assertSame($subChild['id'], $page2[0]['id']);
+    $this->assertSame($subChild['title'], $page2[0]['title']);
+    $this->assertSame(2, $page2[0]['_depth']);
+    $this->assertSame($parent1['id'], $page2[1]['id']);
+    $this->assertSame($parent1['title'], $page2[1]['title']);
+    $this->assertSame(0, $page2[1]['_depth']);
+
+    // Test ordering by an expression alias in a paginated query with deferred hydration
+    $pageWithAlias = Group::get(FALSE)
+      ->addWhere('id', 'IN', [$parent1['id'], $parent2['id'], $child1['id'], $child2['id'], $subChild['id']])
+      ->addSelect('id', 'title', '_depth', '_descendents', 'UPPER(title) AS upper_title')
+      ->addOrderBy('upper_title', 'ASC')
+      ->setLimit(2)
+      ->setOffset(0)
+      ->execute();
+
+    $this->assertCount(2, $pageWithAlias);
+    $this->assertSame($parent2['id'], $pageWithAlias[0]['id']);
+    $this->assertSame(strtoupper($parent2['title']), $pageWithAlias[0]['upper_title']);
+
+    // Ensure language parameter does not leak locale when hydration occurs
+    $localeBefore = \CRM_Core_I18n::getLocale();
+    Group::get(FALSE)
+      ->setLanguage('fr_FR')
+      ->addWhere('id', 'IN', [$parent1['id'], $parent2['id']])
+      ->addSelect('id', 'title', '_depth')
+      ->setLimit(1)
+      ->execute();
+    $this->assertSame($localeBefore, \CRM_Core_I18n::getLocale());
   }
 
   public function testAddRemoveParents(): void {

@@ -174,6 +174,11 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           'runMsg' => E::ts('Refreshing %1 %2...'),
           'successMsg' => E::ts('%1 %2 Refreshed.'),
           'errorMsg' => E::ts('An error occurred while attempting to refresh %1 %2.'),
+          'params' => [
+            'where' => [
+              ['saved_search_id', 'IS NOT EMPTY'],
+            ],
+          ],
         ],
       ];
     }
