@@ -27,10 +27,16 @@
 
         this.getData = () => isEntityFieldset() ? this.afFormCtrl.getData(this.modelName) : localData;
         // Get name of afform entity or search display
-        this.getName = function() {
-          return this.modelName ||
-            // If there is no Afform entity, get the name of embedded search display
-            $element.find('[search-name][display-name]').attr('display-name');
+        this.getName = () => {
+          if (this.modelName) {
+            return this.modelName;
+          }
+          // If there is no Afform entity, get the name of embedded search display
+          const display = $element.find('[search-name]');
+          if (display.length) {
+            const displayName = display.attr('display-name');
+            return display.attr('search-name') + (displayName ? '.' + displayName : '');
+          }
         };
         this.getEntity = () => isEntityFieldset() ? this.afFormCtrl.getEntity(this.modelName) : null;
         this.getEntityType = () => this.getEntity()?.type ?? null;
