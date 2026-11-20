@@ -24,6 +24,7 @@ use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
 use Civi\Api4\CaseActivity;
 use Civi\Api4\CiviCase;
+use Civi\Api4\EntityTag;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipType;
 
@@ -537,6 +538,40 @@ class CaseTest extends Api4TestBase {
       ->addWhere('id', '=', $relationshipId)
       ->execute()->single();
     $this->assertFalse($deletedRelationship['is_active']);
+  }
+
+  public function testCaseDeleteDeletesEntityTags(): void {
+    $case = $this->createTestRecord('Case');
+    $tag = $this->createTestRecord('Tag', [
+      'used_for' => ['civicrm_case'],
+    ]);
+    $entityTag = $this->createTestRecord('EntityTag', [
+      'entity_table' => 'civicrm_case',
+      'entity_id' => $case['id'],
+      'tag_id' => $tag['id'],
+    ]);
+
+    // Move to trash
+    CiviCase::delete(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->setUseTrash(TRUE)
+      ->execute();
+
+    $remaining = EntityTag::get(FALSE)
+      ->addWhere('id', '=', $entityTag['id'])
+      ->execute();
+    $this->assertCount(1, $remaining);
+
+    // Hard delete
+    CiviCase::delete(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->setUseTrash(FALSE)
+      ->execute();
+
+    $remaining = EntityTag::get(FALSE)
+      ->addWhere('id', '=', $entityTag['id'])
+      ->execute();
+    $this->assertCount(0, $remaining);
   }
 
 }
