@@ -42,4 +42,48 @@ class CRM_Price_BAO_LineItemTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems());
   }
 
+  public function testMembershipLineItemWritesMembershipPaymentRecord(): void {
+    $membershipID = $this->createMembershipLineItem();
+
+    $this->assertSame(1, $this->getMembershipPaymentCount($membershipID));
+  }
+
+  public function testMembershipLineItemSkipsMembershipPaymentRecordWhenSettingDisabled(): void {
+    Civi::settings()->set('member_use_civicrm_membership_payment_table', FALSE);
+
+    $membershipID = $this->createMembershipLineItem();
+
+    $this->assertSame(0, $this->getMembershipPaymentCount($membershipID));
+  }
+
+  /**
+   * Adds a line item for a new membership to a new contribution.
+   *
+   * @return int
+   *   Membership ID.
+   */
+  private function createMembershipLineItem(): int {
+    // The added line item is not reflected in the financial items.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    $contactID = $this->individualCreate();
+    $membershipID = $this->contactMembershipCreate(['contact_id' => $contactID]);
+    $contributionID = $this->contributionCreate(['contact_id' => $contactID]);
+    $params = [
+      'entity_table' => 'civicrm_membership',
+      'entity_id' => $membershipID,
+      'contribution_id' => $contributionID,
+      'label' => 'General',
+      'qty' => 1,
+      'unit_price' => 100,
+      'line_total' => 100,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+    ];
+    CRM_Price_BAO_LineItem::create($params);
+    return $membershipID;
+  }
+
+  private function getMembershipPaymentCount(int $membershipID): int {
+    return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_membership_payment WHERE membership_id = %1', [1 => [$membershipID, 'Integer']]);
+  }
+
 }

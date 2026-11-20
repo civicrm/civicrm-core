@@ -258,6 +258,73 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
   }
 
+  public function testDeleteMembershipDeletesContributionLinkedByLineItem(): void {
+    [$membershipID, $contributionID] = $this->createMembershipPaidByLineItem();
+
+    CRM_Member_BAO_Membership::deleteMembership($membershipID);
+
+    $this->assertSame(0, Contribution::get(FALSE)->addWhere('id', '=', $contributionID)->execute()->count());
+  }
+
+  public function testDeleteMembershipPreservesContribution(): void {
+    // The membership's line items are deleted with it, leaving the kept contribution without any.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    [$membershipID, $contributionID] = $this->createMembershipPaidByLineItem();
+
+    CRM_Member_BAO_Membership::deleteMembership($membershipID, TRUE);
+
+    $this->assertSame(1, Contribution::get(FALSE)->addWhere('id', '=', $contributionID)->execute()->count());
+  }
+
+  public function testDeleteMembershipKeepsRecurringTemplate(): void {
+    [$membershipID, $templateID] = $this->createMembershipPaidByLineItem(['is_template' => TRUE]);
+
+    CRM_Member_BAO_Membership::deleteMembership($membershipID);
+
+    $this->assertSame(1, Contribution::get(FALSE)->addWhere('id', '=', $templateID)->addWhere('is_template', '=', TRUE)->execute()->count());
+  }
+
+  /**
+   * A legacy payment record with no matching line item still links the contribution.
+   */
+  public function testDeleteMembershipDeletesContributionLinkedByLegacyPayment(): void {
+    $membershipID = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
+    $contributionID = $this->contributionCreate(['contact_id' => $this->individualCreate()]);
+    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_membership_payment (membership_id, contribution_id) VALUES (%1, %2)', [
+      1 => [$membershipID, 'Integer'],
+      2 => [$contributionID, 'Integer'],
+    ]);
+    Civi::cache('long')->clear();
+
+    CRM_Member_BAO_Membership::deleteMembership($membershipID);
+
+    $this->assertSame(0, Contribution::get(FALSE)->addWhere('id', '=', $contributionID)->execute()->count());
+  }
+
+  /**
+   * Creates a membership linked to its contribution by line item alone.
+   *
+   * @param array $contributionParams
+   *
+   * @return int[]
+   *   Membership ID and contribution ID.
+   */
+  private function createMembershipPaidByLineItem(array $contributionParams = []): array {
+    $contactID = $this->individualCreate();
+    $membershipID = $this->contactMembershipCreate(['contact_id' => $contactID]);
+    $contributionID = $this->contributionCreate($contributionParams + [
+      'contact_id' => $contactID,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+      'version' => 4,
+    ]);
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = %1 WHERE contribution_id = %2",
+      [1 => [$membershipID, 'Integer'], 2 => [$contributionID, 'Integer']]
+    );
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_membership_payment WHERE membership_id = %1', [1 => [$membershipID, 'Integer']]));
+    return [$membershipID, $contributionID];
+  }
+
   /**
    * Test deleting membership payments with and without preserving contributions.
    */
