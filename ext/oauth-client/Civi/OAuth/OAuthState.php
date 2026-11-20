@@ -93,6 +93,31 @@ class OAuthState extends AutoService {
     return $state;
   }
 
+  /**
+   * Consume a callback state once, including concurrent requests.
+   */
+  public function consume(string $stateId): array {
+    $lock = \Civi::lockManager()->acquire('data.oauth.state.' . hash('sha256', $stateId));
+    if (!$lock->isAcquired()) {
+      throw new OAuthException('OAuth: Authorization state is already being processed.');
+    }
+    try {
+      $usedKey = $stateId . '_used';
+      if ($this->cache->get($usedKey)) {
+        throw new OAuthException('OAuth: Authorization state has already been consumed.');
+      }
+      $state = $this->load($stateId);
+      if (!$this->cache->set($usedKey, TRUE, $state['ttl'] ?? self::LEGACY_TTL)
+        || !$this->cache->delete($stateId)) {
+        throw new OAuthException('OAuth: Could not consume authorization state.');
+      }
+      return $state;
+    }
+    finally {
+      $lock->release();
+    }
+  }
+
   protected function getSessionId(): string {
     if (PHP_SAPI === 'cli') {
       // CLI doesn't have a session. If we generate OAuthState on CLI, then allow it to be used in any browser session.

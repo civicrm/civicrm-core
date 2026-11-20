@@ -301,11 +301,12 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
 
   public function testGetByScope() {
     $client = $this->createClient();
+    $contact = $this->createTestEntity('Contact', ['contact_type' => 'Individual'], 'scope_contact');
 
     $this->usePerms(['manage all OAuth contact tokens', 'edit all contacts']);
     $tokenCreationVals = [
       'client_id' => $client['id'],
-      'contact_id' => 1,
+      'contact_id' => $contact['id'],
       'access_token' => "loggedin-user-access-token",
       'refresh_token' => "loggedin-user-refresh-token",
       'scopes' => ['foo', 'bar'],

@@ -116,6 +116,11 @@ class AuthorizationCode extends AbstractGrantAction {
       'scopes' => $scopes,
       'tag' => $this->getTag(),
     ];
+    if ($provider instanceof \Civi\OAuth\CiviOpenIdProvider) {
+      $state['oidc_nonce'] = bin2hex(random_bytes(32));
+      $scopes = array_unique(array_merge((array) $scopes, ['openid']));
+      $state['scopes'] = $scopes;
+    }
     $stateId = \Civi::service('oauth2.state')->store($state);
     $authOptions = [
       'state' => $stateId,
@@ -123,6 +128,9 @@ class AuthorizationCode extends AbstractGrantAction {
     ];
     if ($this->prompt !== NULL) {
       $authOptions['prompt'] = $this->prompt;
+    }
+    if (isset($state['oidc_nonce'])) {
+      $authOptions['nonce'] = $state['oidc_nonce'];
     }
 
     $allowResponseModes = is_callable([$provider, 'getResponseModes']) ? $provider->getResponseModes() : ['query'];
@@ -137,6 +145,16 @@ class AuthorizationCode extends AbstractGrantAction {
     $output['redirect_uri'] = \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
 
     $externalUrl = $provider->getAuthorizationUrl($authOptions);
+    // In League's implementation, getAuthorizationUrl() generates the random code_verifier as part of `getAuthorizationUrl()`.
+    if ($provider->getPkceCode()) {
+      $state['code_verifier'] = $provider->getPkceCode();
+      // NOTE: In league's implementation, the $provider will not tell you what PKCE challenge method was chosen.
+      // For current RFC 7636, the auth-server is supposed to remember, and it doesn't influence the remaining client actions.
+      // Don't bend over backward to track or verify.
+    }
+
+    \Civi::service('oauth2.state')->store($state, $stateId);
+
     if ($this->isStartPageRequired()) {
       $state['externalStartPage'] = $externalUrl;
       \Civi::service('oauth2.state')->store($state, $stateId);
