@@ -24,16 +24,27 @@ use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
 use Civi\Api4\CaseActivity;
 use Civi\Api4\CiviCase;
+use Civi\Api4\Contact;
 use Civi\Api4\EntityTag;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipType;
+use Civi\Test\ACLPermissionTrait;
+use Civi\Test\HookInterface;
 
 /**
  * @group headless
  */
-class CaseTest extends Api4TestBase {
+class CaseTest extends Api4TestBase implements HookInterface {
+
+  use ACLPermissionTrait;
 
   protected ?array $enableComponents = ['CiviCase'];
+
+  public function tearDown(): void {
+    \CRM_Utils_Hook::singleton()->reset();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
+    parent::tearDown();
+  }
 
   public function testGetFields(): void {
     $fields = CiviCase::getFields(FALSE)
@@ -244,6 +255,123 @@ class CaseTest extends Api4TestBase {
       ->execute()
       ->single();
     $this->assertSame($otherManager['id'], $updatedResult['case_manager_id']);
+  }
+
+  public function testCaseManagerPermissionsAndAcl(): void {
+    $this->createLoggedInUser();
+    $client = $this->createTestRecord('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Case',
+      'last_name' => 'Client',
+    ]);
+    $manager = $this->createTestRecord('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Case',
+      'last_name' => 'Manager',
+    ]);
+
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => $manager['id'],
+      'contact_id' => $client['id'],
+    ]);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'access all cases and activities',
+      'view all contacts',
+    ];
+
+    $result = CiviCase::get()
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id', 'case_manager_id.display_name')
+      ->execute()
+      ->single();
+    $this->assertSame($manager['id'], $result['case_manager_id']);
+    $this->assertSame($manager['display_name'], $result['case_manager_id.display_name']);
+
+    // Trashed manager should be NULL unless user has 'access deleted contacts'.
+    Contact::delete(FALSE)
+      ->addWhere('id', '=', $manager['id'])
+      ->setUseTrash(TRUE)
+      ->execute();
+
+    $trashedResult = CiviCase::get()
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id', 'case_manager_id.display_name')
+      ->execute()
+      ->single();
+    $this->assertNull($trashedResult['case_manager_id']);
+    $this->assertNull($trashedResult['case_manager_id.display_name']);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access deleted contacts';
+    $withDeletedPermResult = CiviCase::get()
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id', 'case_manager_id.display_name')
+      ->execute()
+      ->single();
+    $this->assertSame($manager['id'], $withDeletedPermResult['case_manager_id']);
+    $this->assertSame($manager['display_name'], $withDeletedPermResult['case_manager_id.display_name']);
+
+    // Restore manager and test contact ACL hiding the manager contact.
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $manager['id'])
+      ->addValue('is_deleted', FALSE)
+      ->execute();
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'access all cases and activities',
+    ];
+    \CRM_ACL_BAO_Cache::resetCache();
+    $this->allowedContacts = [$client['id']];
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
+
+    $aclHiddenResult = CiviCase::get()
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id', 'case_manager_id.display_name')
+      ->execute()
+      ->single();
+    $this->assertNull($aclHiddenResult['case_manager_id']);
+    $this->assertNull($aclHiddenResult['case_manager_id.display_name']);
+
+    \CRM_ACL_BAO_Cache::resetCache();
+    unset(\Civi::$statics['CRM_Contact_BAO_Contact_Permission']);
+    $this->allowedContacts = [$client['id'], $manager['id']];
+    $aclAllowedResult = CiviCase::get()
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id', 'case_manager_id.display_name')
+      ->execute()
+      ->single();
+    $this->assertSame($manager['id'], $aclAllowedResult['case_manager_id']);
+    $this->assertSame($manager['display_name'], $aclAllowedResult['case_manager_id.display_name']);
+  }
+
+  public function testCaseManagerSubqueryIgnoresUnparseableCaseTypeXml(): void {
+    $uid = $this->createLoggedInUser();
+    $client = $this->createTestRecord('Contact');
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $client['id'],
+    ]);
+
+    $badCaseType = $this->createTestRecord('CaseType', [
+      'title' => 'Broken XML Case Type',
+      'name' => 'broken_xml_case_type',
+    ]);
+    // Write malformed XML directly so it bypasses CaseType BAO serialization.
+    \CRM_Core_DAO::executeQuery(
+      'UPDATE civicrm_case_type SET definition = %1 WHERE id = %2',
+      [1 => ['<CaseType><broken', 'String'], 2 => [$badCaseType['id'], 'Integer']]
+    );
+    \CRM_Case_XMLRepository::singleton()->flush();
+    \Civi::cache('metadata')->clear();
+
+    $result = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id', 'case_manager_id.display_name')
+      ->execute()
+      ->single();
+    $this->assertSame($uid, $result['case_manager_id']);
   }
 
   public function testCaseRoleFieldsForCaseManager(): void {
