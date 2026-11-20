@@ -24,12 +24,16 @@ class Refresh extends \Civi\Api4\Generic\BasicBatchAction {
       \CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache(array_column($items, 'id'));
     }
     foreach ($items as $item) {
-      $group = new \CRM_Contact_DAO_Group();
-      $group->id = $item['id'];
-      if (\CRM_Contact_BAO_GroupContactCache::load($group)) {
+      if (\CRM_Contact_BAO_GroupContactCache::load((int) $item['id'])) {
         $result[] = $item;
       }
     }
+  }
+
+  protected function getBatchAction() {
+    // Ensure this only acts on groups with a cache (smart groups and parent groups)
+    return parent::getBatchAction()
+      ->addClause('OR', ['saved_search_id', 'IS NOT EMPTY'], ['children', 'IS NOT EMPTY']);
   }
 
 }
