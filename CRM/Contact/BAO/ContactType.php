@@ -392,6 +392,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    */
   #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    Civi::cache('contactTypes')->clear();
     /** @var CRM_Contact_DAO_ContactType $contactType */
     $contactType = $event->object;
     if ($event->action === 'edit' && $contactType->find(TRUE)) {
@@ -448,7 +449,6 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
         ->addWhere('domain_id', '>', 0)
         ->execute();
     }
-    Civi::cache('contactTypes')->clear();
   }
 
   /**
