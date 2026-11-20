@@ -56,6 +56,19 @@ class CRM_RouterTest_Page_StaticExamples {
     );
   }
 
+  public static function psr7Cookies(ServerRequestInterface $request): ResponseInterface {
+    return new \GuzzleHttp\Psr7\Response(200,
+      [
+        'Content-Type' => 'text/plain',
+        'Set-Cookie' => [
+          'routerTestA=1; Path=/; Expires=Wed, 21 Oct 2037 07:28:00 GMT',
+          'routerTestB=2; Path=/',
+        ],
+      ],
+      'OK'
+    );
+  }
+
   public static function psr7OldInput(ServerRequestInterface $request): ResponseInterface {
     $parsed = json_decode(file_get_contents('php://input'), TRUE);
     return new \GuzzleHttp\Psr7\Response(200,
