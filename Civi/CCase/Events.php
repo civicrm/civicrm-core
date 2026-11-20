@@ -80,9 +80,13 @@ class Events {
       if (!isset(self::$isActive[$caseId])) {
         $tx = new \CRM_Core_Transaction();
         self::$isActive[$caseId] = 1;
-        $analyzer = new \Civi\CCase\Analyzer($caseId);
-        \CRM_Utils_Hook::caseChange($analyzer);
-        unset(self::$isActive[$caseId]);
+        try {
+          $analyzer = new \Civi\CCase\Analyzer($caseId);
+          \CRM_Utils_Hook::caseChange($analyzer);
+        }
+        finally {
+          unset(self::$isActive[$caseId]);
+        }
         unset($tx);
       }
     }
