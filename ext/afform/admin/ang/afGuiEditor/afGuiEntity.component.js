@@ -174,8 +174,8 @@
 
         function fieldDefaults(field) {
           let name = field.name;
-          // Use :name suffix if available (improves form portability)
-          if (field.options && Array.isArray(field.suffixes) && field.suffixes.includes('name')) {
+          // Use :name suffix if available (improves form portability), except for Boolean fields
+          if (field.data_type !== 'Boolean' && field.options && Array.isArray(field.suffixes) && field.suffixes.includes('name')) {
             name += ':name';
           }
           const tag = {
