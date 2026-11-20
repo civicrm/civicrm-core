@@ -44,11 +44,11 @@ return [
     'title' => ts('Use old-style MembershipPayment records'),
     'type' => 'Boolean',
     'html_type' => 'toggle',
-    'default' => TRUE,
+    'default' => FALSE,
     'add' => '6.13',
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('Disable this setting if you do not need to support old-style MembershipPayment records.'),
+    'help_text' => ts('Enable this setting if you need to support old-style MembershipPayment records, for example from an extension that reads them.'),
     'settings_pages' => ['member' => ['weight' => 0]],
   ],
 ];

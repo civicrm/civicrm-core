@@ -262,6 +262,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Test deleting membership payments with and without preserving contributions.
    */
   public function testDeleteMembershipPayment(): void {
+    Civi::settings()->set('member_use_civicrm_membership_payment_table', TRUE);
     $contactId = $this->individualCreate();
     $membership1 = $this->createTestEntity('Membership', [
       'contact_id' => $contactId,
