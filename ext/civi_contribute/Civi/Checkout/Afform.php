@@ -3,7 +3,8 @@
 namespace Civi\Checkout;
 
 use Civi\Core\Attribute\CiviEventListener;
-use Civi\Afform\Event\AfformSubmitEvent;
+use Civi\Afform\Event\AfformBaseEvent;
+use Civi\Afform\Event\AfformSubmittedEvent;
 use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
@@ -68,26 +69,28 @@ class Afform extends AutoService {
    * Check if Payment Processor is configured. If it is, start CheckoutSession
    * and add response to the afform response
    */
-  #[CiviEventListener(event: 'civi.afform.submit', priority: -100)]
-  public function startCheckout(AfformSubmitEvent $event) {
+  #[CiviEventListener(event: 'civi.afform.submitted')]
+  public function startCheckout(AfformSubmittedEvent $event) {
     if (!$this->isActive()) {
       return;
     }
 
-    if ($event->getEntityType() !== 'Contribution') {
+    $entityName = array_find_key($event->getFormDataModel()->getEntities(), fn($entity) => $entity['type'] === 'Contribution');
+    if (!$entityName) {
       return;
     }
 
-    // get contribution record
-    $contribution = $event->getRecords()[0]['fields'];
+    $contribution = $event->getRecords($entityName)[0]['fields'] ?? [];
 
     // check for payment processor value: if set this will trigger checkout, if not we will ignore
     $checkoutOption = $contribution['checkout_option'] ?? NULL;
     if (!$checkoutOption) {
       return;
     }
-    // get contribution ID (the record should already have been saved in CreateContribution)
-    $contributionId = $event->getEntityId(0);
+    $contributionId = $event->getEntityIds($entityName)[0]['id'] ?? NULL;
+    if (!$contributionId) {
+      throw new \CRM_Core_Exception('Afform checkout: the contribution was not saved');
+    }
 
     $checkoutSession = new CheckoutSession($contributionId, $checkoutOption);
 
@@ -126,7 +129,7 @@ class Afform extends AutoService {
    *   this - this could cause errors if SSL is not configured - we should warn about
    *   this at a higher level (system check?)
    */
-  private function setOnwardUrlsAndMessages(CheckoutSession $checkout, AfformSubmitEvent $event): void {
+  private function setOnwardUrlsAndMessages(CheckoutSession $checkout, AfformBaseEvent $event): void {
     $afform = $event->getAfform();
 
     $checkout->setTitle($afform['title']);

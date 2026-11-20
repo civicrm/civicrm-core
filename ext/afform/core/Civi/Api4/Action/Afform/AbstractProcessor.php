@@ -5,6 +5,7 @@ namespace Civi\Api4\Action\Afform;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Afform\Event\AfformSubmitEvent;
+use Civi\Afform\Event\AfformSubmittedEvent;
 use Civi\Afform\FormDataModel;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\AfformSubmission;
@@ -130,6 +131,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   protected array $_response = [];
+
+  /**
+   * Records of each form entity as the 'civi.afform.submit' listeners left them
+   *
+   * @var array[]
+   */
+  protected array $_submittedRecords = [];
 
   /**
    * Line items gathered from entities on the form - for payment processing
@@ -1102,11 +1110,27 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds, $this->_entityActions);
       try {
         \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+        $this->_submittedRecords[$entityName] = $event->records;
       }
       catch (\Throwable $e) {
         \Civi::log('afform')->error('Afform: ' . $event->getAfform()['name'] . ': civi.afform.submit crashed with error: ' . $e->getMessage());
         throw $e;
       }
+    }
+  }
+
+  /**
+   * Dispatch 'civi.afform.submitted' once the saved records are committed.
+   * Inside an enclosing transaction that is on its commit, too late to add response items.
+   */
+  protected function dispatchSubmitted(): void {
+    $event = new AfformSubmittedEvent($this->_afform, $this->_formDataModel, $this, $this->_entityIds, $this->_submittedRecords);
+    $dispatch = fn() => \Civi::dispatcher()->dispatch('civi.afform.submitted', $event);
+    if (\CRM_Core_Transaction::isActive()) {
+      \CRM_Core_Transaction::addCallback(\CRM_Core_Transaction::PHASE_POST_COMMIT, $dispatch);
+    }
+    else {
+      $dispatch();
     }
   }
 

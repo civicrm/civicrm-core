@@ -11,7 +11,6 @@ use Civi\Afform\FormDataModel;
 use Civi\Api4\AfformSubmission;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\Utils\CoreUtil;
-use Civi\Core\Exception\DBQueryException;
 
 /**
  * Class Submit
@@ -60,59 +59,65 @@ class Submit extends AbstractProcessor {
       throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
     }
 
-    // Save submission record
-    if (!empty($this->_afform['create_submission']) && empty($this->args['sid'])) {
-      $userId = \CRM_Core_Session::getLoggedInContactID();
+    \CRM_Core_Transaction::create()->run(function () {
+      // Save submission record
+      if (!empty($this->_afform['create_submission']) && empty($this->args['sid'])) {
+        $userId = \CRM_Core_Session::getLoggedInContactID();
 
-      $submissionRecord = [
-        'contact_id' => $userId,
-        'afform_name' => $this->name,
-        'data' => $this->getValues(),
-        'status_id:name' => 'Pending',
-      ];
-      // Update draft if it exists
-      if ($userId) {
-        $draft = AfformSubmission::get(FALSE)
-          ->addWhere('contact_id', '=', $userId)
-          ->addWhere('status_id:name', '=', 'Draft')
-          ->addWhere('afform_name', '=', $this->name)
-          ->addSelect('id')
+        $submissionRecord = [
+          'contact_id' => $userId,
+          'afform_name' => $this->name,
+          'data' => $this->getValues(),
+          'status_id:name' => 'Pending',
+        ];
+        // Update draft if it exists
+        if ($userId) {
+          $draft = AfformSubmission::get(FALSE)
+            ->addWhere('contact_id', '=', $userId)
+            ->addWhere('status_id:name', '=', 'Draft')
+            ->addWhere('afform_name', '=', $this->name)
+            ->addSelect('id')
+            ->execute()->first();
+          if ($draft) {
+            $submissionRecord['id'] = $draft['id'];
+          }
+        }
+
+        $submission = AfformSubmission::save(FALSE)
+          ->addRecord($submissionRecord)
           ->execute()->first();
-        if ($draft) {
-          $submissionRecord['id'] = $draft['id'];
+      }
+
+      // let's not save the data in other CiviCRM table if manual verification is needed.
+      if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
+        // check for verification email
+        $this->processVerificationEmail($submission['id']);
+      }
+      else {
+        // process and save various entities
+        $this->processFormData($this->_entityValues);
+
+        $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
+        // Update submission record with entity IDs.
+        if (!empty($this->_afform['create_submission'])) {
+          $submissionId = !empty($this->args['sid']) ? $this->args['sid'] : $submission['id'];
+
+          AfformSubmission::update(FALSE)
+            ->addWhere('id', '=', $submissionId)
+            ->addValue('data', $submissionData)
+            ->addValue('status_id:name', 'Processed')
+            ->execute();
+        }
+
+        // Return ids plus token for uploading files
+        foreach ($this->_entityIds as $key => $value) {
+          $this->setResponseItem($key, $value);
         }
       }
+    });
 
-      $submission = AfformSubmission::save(FALSE)
-        ->addRecord($submissionRecord)
-        ->execute()->first();
-    }
-
-    // let's not save the data in other CiviCRM table if manual verification is needed.
-    if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
-      // check for verification email
-      $this->processVerificationEmail($submission['id']);
-    }
-    else {
-      // process and save various entities
-      $this->processFormData($this->_entityValues);
-
-      $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
-      // Update submission record with entity IDs.
-      if (!empty($this->_afform['create_submission'])) {
-        $submissionId = !empty($this->args['sid']) ? $this->args['sid'] : $submission['id'];
-
-        AfformSubmission::update(FALSE)
-          ->addWhere('id', '=', $submissionId)
-          ->addValue('data', $submissionData)
-          ->addValue('status_id:name', 'Processed')
-          ->execute();
-      }
-
-      // Return ids plus token for uploading files
-      foreach ($this->_entityIds as $key => $value) {
-        $this->setResponseItem($key, $value);
-      }
+    if (empty($this->_afform['manual_processing']) || !empty($this->args['sid'])) {
+      $this->dispatchSubmitted();
     }
 
     // todo - add only if needed?
@@ -440,6 +445,79 @@ class Submit extends AbstractProcessor {
   }
 
   /**
+   * Drop new records the user left blank and which lack required values, e.g. an optional
+   * activity block. Records complete from form defaults alone are still created.
+   *
+   * @param \Civi\Afform\Event\AfformSubmitEvent $event
+   * @see afform_civicrm_config
+   */
+  public static function preprocessBlankRecords(AfformSubmitEvent $event): void {
+    $entityType = $event->getEntityType();
+    if (!$entityType || CoreUtil::isContact($entityType) || $entityType === 'Contribution') {
+      return;
+    }
+    $entity = $event->getEntity();
+    $idField = CoreUtil::getIdFieldName($entityType);
+    foreach ($event->records as $index => $record) {
+      $fields = $record['fields'] ?? [];
+      if (!$fields || !empty($fields[$idField]) || $event->getEntityId($index)) {
+        continue;
+      }
+      if (self::hasEnteredValue($fields, $entity['fields'] ?? [])) {
+        continue;
+      }
+      foreach ($record['joins'] ?? [] as $joinEntity => $joinRecords) {
+        foreach ($joinRecords as $joinValues) {
+          if (self::hasEnteredValue($joinValues ?? [], $entity['joins'][$joinEntity]['fields'] ?? [])) {
+            continue 3;
+          }
+        }
+      }
+      $values = [];
+      foreach ($fields as $key => $value) {
+        $values[explode(':', $key)[0]] = $value;
+      }
+      $createAction = \Civi\API\Request::create($entityType, 'create', ['version' => 4, 'checkPermissions' => FALSE]);
+      if ($createAction->checkRequiredFields($values)) {
+        $event->records[$index]['fields'] = NULL;
+      }
+    }
+  }
+
+  /**
+   * Whether the user entered a value in a field shown on the form.
+   *
+   * @param array $values
+   * @param array $formFields
+   *   Field definitions from the form markup, keyed by field name.
+   * @return bool
+   */
+  private static function hasEnteredValue(array $values, array $formFields): bool {
+    foreach ($formFields as $fieldName => $formField) {
+      $inputType = $formField['defn']['input_type'] ?? NULL;
+      if (in_array($inputType, ['Hidden', 'DisplayOnly'], TRUE)) {
+        continue;
+      }
+      $value = $values[$fieldName] ?? NULL;
+      if ($value === NULL || $value === '' || $value === []) {
+        continue;
+      }
+      if (array_key_exists('afform_default', $formField['defn'] ?? []) && self::matchesDefault($value, $formField['defn']['afform_default'])) {
+        continue;
+      }
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  private static function matchesDefault($value, $default): bool {
+    if (is_bool($default) || is_bool($value)) {
+      return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) === filter_var($default, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+    return $value == $default;
+  }
+
+  /**
    * Preprocess submitted values to unset fields that are disabled.
    *
    * @param \Civi\Afform\Event\AfformSubmitEvent $event
@@ -505,23 +583,13 @@ class Submit extends AbstractProcessor {
         // We add a specific check here to ensure that it is not processed by the generic entity save.
         continue;
       }
-      try {
-        $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
-        $event->setSaved($index, $saved);
-        self::saveJoins($event, $index, $event->getEntityId($index), $record['joins'] ?? []);
+      // An existing record found by e.g. a dedupe rule stays as it is on a create-only form
+      if (!empty($record['fields'][CoreUtil::getIdFieldName($event->getEntityType())]) && empty($event->getEntity()['actions']['update'])) {
+        continue;
       }
-      catch (DBQueryException $e) {
-        // The database rejected the statement, so data the user entered was not stored. That
-        // is never the "optional entity left blank" case handled below, and reporting success
-        // for it leaves the submitter believing their data is safe.
-        \Civi::log('afform')->error('Afform: ' . $event->getAfform()['name'] . ': Database error on submit in processGenericEntity call for "' . $event->getEntityName() . '". Message: ' . $e->getMessage());
-        throw $e;
-      }
-      catch (\CRM_Core_Exception $e) {
-        // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
-        // intentionally left blank. Other times it's a real error the user should know about.
-        \Civi::log('afform')->debug('Afform: ' . $event->getAfform()['name'] . ': Silently ignoring exception on submit in processGenericEntity call for "' . $event->getEntityName() . '". Message: ' . $e->getMessage());
-      }
+      $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
+      $event->setSaved($index, $saved);
+      self::saveJoins($event, $index, $event->getEntityId($index), $record['joins'] ?? []);
     }
   }
 

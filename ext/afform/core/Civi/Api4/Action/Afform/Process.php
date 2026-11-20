@@ -44,18 +44,21 @@ class Process extends AbstractProcessor {
     // preprocess submitted values
     $entityValues = $this->preprocessSubmittedValues($afformSubmissionData['data']);
 
-    // process and save various enities
-    $this->processFormData($entityValues);
+    \CRM_Core_Transaction::create()->run(function () use ($entityValues, $afformSubmissionData) {
+      // process and save various enities
+      $this->processFormData($entityValues);
 
-    // combine ids with existing data
-    $submissionData = $this->combineValuesAndIds($afformSubmissionData['data'], $this->_entityIds);
+      // combine ids with existing data
+      $submissionData = $this->combineValuesAndIds($afformSubmissionData['data'], $this->_entityIds);
 
-    // Update submission record with entity IDs.
-    AfformSubmission::update(FALSE)
-      ->addWhere('id', '=', $this->submissionId)
-      ->addValue('data', $submissionData)
-      ->addValue('status_id:name', 'Processed')
-      ->execute();
+      // Update submission record with entity IDs.
+      AfformSubmission::update(FALSE)
+        ->addWhere('id', '=', $this->submissionId)
+        ->addValue('data', $submissionData)
+        ->addValue('status_id:name', 'Processed')
+        ->execute();
+    });
+    $this->dispatchSubmitted();
 
     return $this->_entityIds;
   }

@@ -125,6 +125,9 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
     // the session should be pending so that should be our nextUrl
     $nextUrl = $session->getNextUrl();
     $this->assertTrue(\str_starts_with($nextUrl, 'https://now.go.to'));
+
+    // A payment must not start before the records it pays for are committed
+    $this->assertFalse(TestCheckoutOption::$startedInTransaction);
   }
 
   /**
