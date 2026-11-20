@@ -75,15 +75,39 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue implements CRM_Queue_Q
       $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
 
       $result = [];
-      while ($dao->fetch()) {
-        if ($this->attemptClaim($dao, $lease_time)) {
-          $result[] = (object) [
-            'id' => $dao->id,
-            'data' => unserialize($dao->data),
-            'queue_name' => $dao->queue_name,
-            'run_count' => 1 + (int) $dao->run_count,
-          ];
+      try {
+        while ($dao->fetch()) {
+          $data = unserialize($dao->data);
+          if ($this->attemptClaim($dao, $lease_time)) {
+            $result[] = (object) [
+              'id' => $dao->id,
+              'data' => $data,
+              'queue_name' => $dao->queue_name,
+              'run_count' => 1 + (int) $dao->run_count,
+            ];
+          }
         }
+      }
+      catch (Throwable $e) {
+        // Give back the items claimed so far, so they don't stay leased
+        // with a raised run_count although they never ran. Only undo our
+        // own claim: if run_count moved on, another process holds the item.
+        try {
+          foreach ($result as $item) {
+            CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item SET release_time = NULL, run_count = run_count - 1 WHERE id = %1 AND run_count = %2', [
+              1 => [$item->id, 'Integer'],
+              2 => [$item->run_count, 'Integer'],
+            ]);
+          }
+        }
+        catch (Throwable $undoError) {
+          // Report the original error, not this one.
+          \Civi::log('queue')->error('Could not give back claimed items of queue "{queue}": {message}', [
+            'queue' => $this->getName(),
+            'message' => $undoError->getMessage(),
+          ]);
+        }
+        throw $e;
       }
 
       if (!$dao->N || $result) {
