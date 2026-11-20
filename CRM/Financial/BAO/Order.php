@@ -1208,7 +1208,8 @@ class CRM_Financial_BAO_Order {
         $isFinancialTypeOverridden = (int) $lineItem['financial_type_id'] !== (int) $this->getOverrideFinancialTypeID();
         $lineItem['financial_type_id'] = $this->getOverrideFinancialTypeID();
       }
-      $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
+      CRM_Financial_BAO_Order::applyTaxToLineItem($lineItem);
+      $taxRate = $lineItem['tax_rate'];
       if ($this->getOverrideTotalAmount() !== FALSE) {
         $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
       }
@@ -1221,7 +1222,8 @@ class CRM_Financial_BAO_Order {
         $lineItem['membership_num_terms'] = $lineItem['membership_num_terms'] ?: 1;
       }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
-      $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
+      CRM_Financial_BAO_Order::applyTaxToLineItem($lineItem);
+      $taxRate = $lineItem['tax_rate'];
       if ($this->getOverrideTotalAmount() !== FALSE) {
         $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
       }
@@ -1490,7 +1492,7 @@ class CRM_Financial_BAO_Order {
         $lineItem['price_field_value_id'] = (int) $lineItem['price_field_value_id'];
         $lineItem = array_merge($this->getPriceFieldValueDefaults($lineItem['price_field_value_id']), $lineItem);
       }
-      $lineItem['tax_rate'] = $this->getTaxRate($lineItem['financial_type_id']);
+      CRM_Financial_BAO_Order::applyTaxToLineItem($lineItem);
       if (isset($lineItem['line_total_inclusive'])) {
         $lineItem['line_total'] = $lineItem['line_total_inclusive'] / (1 + ($lineItem['tax_rate'] / 100));
         $lineItem['tax_amount'] = $lineItem['line_total_inclusive'] - $lineItem['line_total'];
@@ -2243,6 +2245,72 @@ class CRM_Financial_BAO_Order {
     }
 
     return $lineItem ?? [];
+  }
+
+
+  /**
+   * Set the tax rate, and the tax details when provided, on a line item.
+   *
+   * Wraps getTaxForLineItem() so callers need a single call. The tax_details
+   * key is only set when an extension provided a breakdown, and is removed
+   * otherwise, so a stale value can never be left on the line item.
+   *
+   * @param array $lineItem
+   *   Line item to update. Must contain financial_type_id.
+   * @param int|null $contactID
+   *   The paying contact, if known.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function applyTaxToLineItem(array &$lineItem, ?int $contactID = NULL): void {
+    $tax = self::getTaxForLineItem($lineItem, $contactID);
+    $lineItem['tax_rate'] = $tax['tax_rate'];
+    if (isset($tax['tax_details'])) {
+      $lineItem['tax_details'] = $tax['tax_details'];
+    }
+    else {
+      unset($lineItem['tax_details']);
+    }
+  }
+
+  /**
+   * Get the tax rate, and optionally the tax details, for a line item.
+   *
+   * @param array $lineItem
+   *   Must contain financial_type_id. line_total is used to compute detail amounts.
+   * @param int|null $contactID
+   *   The paying contact, if known.
+   *
+   * @return array
+   *   [
+   *     'tax_rate' => float,
+   *     'tax_details' => [['name' => string, 'rate' => float, 'amount' => float], ...] (optional)
+   *   ]
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function getTaxForLineItem(array $lineItem, ?int $contactID = NULL): array {
+    $financialTypeID = (int) ($lineItem['financial_type_id'] ?? 0);
+    if (!$financialTypeID) {
+      throw new CRM_Core_Exception('Line item has no financial_type_id.');
+    }
+    $defaultRate = (float) (CRM_Core_PseudoConstant::getTaxRates()[$financialTypeID] ?? 0);
+
+    $event = new \Civi\Financial\Event\AlterTaxRateEvent($lineItem, $contactID, $defaultRate);
+    \Civi::dispatcher()->dispatch('civi.financial.alterTaxRate', $event);
+
+    $result = ['tax_rate' => $event->getTaxRate()];
+
+    $taxDetails = $event->getTaxDetails();
+    if ($taxDetails) {
+      $lineTotal = (float) ($lineItem['line_total'] ?? 0);
+      foreach ($taxDetails as &$tax) {
+        $tax['amount'] = round($lineTotal * $tax['rate'] / 100, 2);
+      }
+      unset($tax);
+      $result['tax_details'] = $taxDetails;
+    }
+    return $result;
   }
 
   /**
