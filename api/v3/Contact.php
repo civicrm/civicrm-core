@@ -1089,9 +1089,7 @@ WHERE     $whereClause
 function _civicrm_api3_contact_getlist_params(&$request) {
   // get the autocomplete options from settings
   $acpref = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-    CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_autocomplete_options'
-    )
+    Civi::settings()->get('contact_autocomplete_options')
   );
 
   // get the option values for contact autocomplete

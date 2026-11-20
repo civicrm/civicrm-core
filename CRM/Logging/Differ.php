@@ -496,13 +496,10 @@ ORDER BY log_date
    */
   public static function checkLogCanBeUsedWithNoLogDate($change_date) {
 
-    if (civicrm_api3('Setting', 'getvalue', ['name' => 'logging_all_tables_uniquid', 'group' => 'CiviCRM Preferences'])) {
+    if (Civi::settings()->get('logging_all_tables_uniquid')) {
       return TRUE;
     }
-    $uniqueDate = civicrm_api3('Setting', 'getvalue', [
-      'name' => 'logging_uniqueid_date',
-      'group' => 'CiviCRM Preferences',
-    ]);
+    $uniqueDate = Civi::settings()->get('logging_uniqueid_date');
     if (strtotime($uniqueDate) <= strtotime($change_date)) {
       return TRUE;
     }

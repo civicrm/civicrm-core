@@ -1730,10 +1730,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'activity_type_id' => 'Contact Merged',
       'status_id' => 'Completed',
     ]);
-    if (civicrm_api3('Setting', 'getvalue', [
-      'name' => 'contact_undelete',
-      'group' => 'CiviCRM Preferences',
-    ])) {
+    if (Civi::settings()->get('contact_undelete')) {
       civicrm_api3('activity', 'create', [
         'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
         $otherId,
