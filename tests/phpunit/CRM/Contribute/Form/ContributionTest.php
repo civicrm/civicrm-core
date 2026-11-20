@@ -1900,6 +1900,28 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the price fields are assigned when a price set is selected.
+   *
+   * When a price set is selected in the contribution form the price set
+   * snippet is loaded with the priceSetId url parameter. The template
+   * (CRM/Price/Form/PriceSet.tpl) relies on priceSet.fields to render the
+   * price fields.
+   */
+  public function testBuildFormWithPriceSetAssignsPriceFields(): void {
+      $this->createPriceSet('contribution', NULL, [], 'test_price_set');
+      $priceSetID = $this->ids['PriceSet']['test_price_set'];
+      $_GET['priceSetId'] = $_REQUEST['priceSetId'] = $priceSetID;
+      $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [], ['priceSetId' => $priceSetID]);
+      $form->buildForm();
+      $priceSet = $form->getTemplateVars('priceSet');
+      $this->assertEquals($priceSetID, $priceSet['id']);
+      $this->assertArrayHasKey($this->ids['PriceField'][0], $priceSet['fields']);
+      $this->assertCount(2, $priceSet['fields'][$this->ids['PriceField'][0]]['options']);
+      unset($_GET['priceSetId']);
+      unset($_REQUEST['priceSetId']);
+  }
+
+  /**
    * Get the contribution form object.
    *
    * @param array $formValues
