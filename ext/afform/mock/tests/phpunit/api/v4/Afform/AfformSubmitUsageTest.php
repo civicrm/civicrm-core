@@ -390,6 +390,109 @@ EOHTML;
   }
 
   /**
+   * A value preset on the af-entity `data` attribute overrides submitted values
+   * server-side, so even when the field shows on the form it is not user input:
+   * an otherwise blank record stays dropped.
+   */
+  public function testBlankRecordWithPresetData(): void {
+    $statusId = \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'activity_status')
+      ->addWhere('name', '=', 'Scheduled')
+      ->execute()->single()['value'];
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="status_id" />', "{target_contact_id: ['Individual1'], status_id: $statusId}"),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('PresetData');
+    $this->submitContactWithActivity($lastName, ['subject' => '']);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+  }
+
+  /**
+   * replaceRelativeDates() turns a relative date filter default (e.g. "this.day")
+   * into an absolute date before the blank record check runs; the resolved value
+   * must still be recognized as the form default, so the blank record is dropped
+   * instead of reaching save and failing the whole submission.
+   */
+  public function testBlankRecordWithRelativeDateDefault(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="activity_date_time" defn="{afform_default: \'this.day\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('RelativeDateBlank');
+    $this->submitContactWithActivity($lastName, ['subject' => '', 'activity_date_time' => 'this.day']);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+  }
+
+  /**
+   * The browser turns a "now" date default into its own local date before submitting,
+   * which the server cannot reproduce: the field does not count as user input.
+   */
+  public function testBlankRecordWithClientResolvedDateDefault(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="activity_date_time" defn="{afform_default: \'now -1 day\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('NowDefaultBlank');
+    $this->submitContactWithActivity($lastName, ['subject' => '', 'activity_date_time' => date('Y-m-d', strtotime('-1 day'))]);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+  }
+
+  /**
+   * The browser turns a "user_contact_id" default into the logged-in contact's id.
+   */
+  public function testBlankRecordWithCurrentUserDefault(): void {
+    $userID = $this->createLoggedInUser();
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="source_contact_id" defn="{afform_default: \'user_contact_id\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('UserDefaultBlank');
+    $this->submitContactWithActivity($lastName, ['subject' => '', 'source_contact_id' => $userID]);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+  }
+
+  public function testTextDefaultIsNotResolvedAsDate(): void {
+    [$resolved] = \CRM_Utils_Date::getFromTo('this.day');
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" defn="{afform_default: \'this.day\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('TextDate');
+    try {
+      $this->submitContactWithActivity($lastName, ['subject' => $resolved]);
+      $this->fail('Entered text must not be treated as a date default');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('mandatory_missing', $e->getErrorCode());
+    }
+    $this->assertCount(0, Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+  }
+
+  public function testDefaultComparisonForMultiValueFields(): void {
+    $call = [\Civi\Api4\Action\Afform\Submit::class, 'matchesDefault'];
+    $this->assertTrue(\Civi\Test\Invasive::call($call, [['a', 'b'], ['b', 'a'], FALSE, TRUE]));
+    $this->assertFalse(\Civi\Test\Invasive::call($call, [['a', 'c'], ['b', 'a'], FALSE, TRUE]));
+    $this->assertFalse(\Civi\Test\Invasive::call($call, [['a', 'b'], ['b', 'a'], FALSE, FALSE]));
+    $entered = [\Civi\Api4\Action\Afform\Submit::class, 'hasEnteredValue'];
+    $fields = ['subject' => ['defn' => ['input_type' => 'CheckBox', 'afform_default' => ['a', 'b']]]];
+    $this->assertFalse(\Civi\Test\Invasive::call($entered, [['subject' => ['b', 'a']], $fields, [], 'Activity', TRUE]));
+    $this->assertTrue(\Civi\Test\Invasive::call($entered, [['subject' => ['a', 'c']], $fields, [], 'Activity', TRUE]));
+  }
+
+  public function testJoinedPresetAndEnteredValues(): void {
+    $call = [\Civi\Api4\Action\Afform\Submit::class, 'hasEnteredValue'];
+    $fields = ['email' => ['defn' => []]];
+    $this->assertFalse(\Civi\Test\Invasive::call($call, [['email' => 'preset@example.org'], $fields, ['email' => 'preset@example.org'], 'Email', FALSE]));
+    $this->assertTrue(\Civi\Test\Invasive::call($call, [['email' => 'entered@example.org'], $fields, [], 'Email', FALSE]));
+  }
+
+  /**
    * 'civi.afform.submitted' fires once, after the transaction is committed, with the saved ids.
    */
   public function testSubmittedEventFiresAfterCommit(): void {
@@ -448,11 +551,11 @@ EOHTML;
     }
   }
 
-  private function getContactWithActivityLayout(string $activityFields): string {
+  private function getContactWithActivityLayout(string $activityFields, string $activityData = "{target_contact_id: ['Individual1']}"): string {
     return <<<EOHTML
 <af-form ctrl="afform">
   <af-entity type="Individual" name="Individual1" actions="{create: true, update: true}" security="FBAC" />
-  <af-entity type="Activity" name="Activity1" actions="{create: true, update: true}" security="FBAC" data="{target_contact_id: ['Individual1']}" />
+  <af-entity type="Activity" name="Activity1" actions="{create: true, update: true}" security="FBAC" data="$activityData" />
   <fieldset af-fieldset="Individual1"><af-field name="last_name" /></fieldset>
   <fieldset af-fieldset="Activity1">$activityFields</fieldset>
 </af-form>

@@ -463,12 +463,12 @@ class Submit extends AbstractProcessor {
       if (!$fields || !empty($fields[$idField]) || $event->getEntityId($index)) {
         continue;
       }
-      if (self::hasEnteredValue($fields, $entity['fields'] ?? [])) {
+      if (self::hasEnteredValue($fields, $entity['fields'] ?? [], $entity['data'] ?? [], $entityType, TRUE)) {
         continue;
       }
       foreach ($record['joins'] ?? [] as $joinEntity => $joinRecords) {
         foreach ($joinRecords as $joinValues) {
-          if (self::hasEnteredValue($joinValues ?? [], $entity['joins'][$joinEntity]['fields'] ?? [])) {
+          if (self::hasEnteredValue($joinValues ?? [], $entity['joins'][$joinEntity]['fields'] ?? [], $entity['joins'][$joinEntity]['data'] ?? [], $joinEntity, FALSE)) {
             continue 3;
           }
         }
@@ -490,31 +490,84 @@ class Submit extends AbstractProcessor {
    * @param array $values
    * @param array $formFields
    *   Field definitions from the form markup, keyed by field name.
+   * @param array $predetermined
+   *   Values from the entity or join `data` attribute, keyed by field name.
+   *   These override submitted values in preprocessSubmittedValues(), so the
+   *   user cannot have entered them.
+   * @param string $entityType
+   * @param bool $resolveDates
+   *   Whether replaceRelativeDates() processed these values (it skips joins).
    * @return bool
    */
-  private static function hasEnteredValue(array $values, array $formFields): bool {
+  private static function hasEnteredValue(array $values, array $formFields, array $predetermined, string $entityType, bool $resolveDates): bool {
     foreach ($formFields as $fieldName => $formField) {
       $inputType = $formField['defn']['input_type'] ?? NULL;
       if (in_array($inputType, ['Hidden', 'DisplayOnly'], TRUE)) {
+        continue;
+      }
+      if (array_key_exists($fieldName, $predetermined)) {
         continue;
       }
       $value = $values[$fieldName] ?? NULL;
       if ($value === NULL || $value === '' || $value === []) {
         continue;
       }
-      if (array_key_exists('afform_default', $formField['defn'] ?? []) && self::matchesDefault($value, $formField['defn']['afform_default'])) {
-        continue;
+      if (array_key_exists('afform_default', $formField['defn'] ?? [])) {
+        $field = self::getEntityField($entityType, explode(':', $fieldName)[0]) ?? [];
+        $inputType = $formField['defn']['input_type'] ?? $field['input_type'] ?? NULL;
+        $isMulti = in_array($inputType, ['CheckBox', 'Toggle', 'Multi-Select'], TRUE)
+          || !empty($formField['defn']['input_attrs']['multiple']) || !empty($field['input_attrs']['multiple']);
+        $default = $formField['defn']['afform_default'];
+        if (self::matchesDefault($value, $default, $resolveDates && in_array($field['data_type'] ?? NULL, ['Date', 'Timestamp'], TRUE), $isMulti)
+          || self::matchesClientResolvedDefault($value, $default, $inputType, $field['fk_entity'] ?? NULL, $isMulti)) {
+          continue;
+        }
       }
       return TRUE;
     }
     return FALSE;
   }
 
-  private static function matchesDefault($value, $default): bool {
+  private static function matchesDefault($value, $default, bool $resolveDates, bool $isMulti): bool {
     if (is_bool($default) || is_bool($value)) {
       return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) === filter_var($default, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
+    // replaceRelativeDates() has already replaced a relative date filter default
+    // (e.g. "this.day") with the absolute date it represents; compare against the
+    // resolved value too, not just the raw string from the markup.
+    if ($resolveDates && is_string($default) && array_key_exists($default, (array) \CRM_Core_OptionGroup::values('relative_date_filters'))) {
+      [$from, $to] = \CRM_Utils_Date::getFromTo($default);
+      $resolved = $from ?: $to;
+      if ($resolved && $value == $resolved) {
+        return TRUE;
+      }
+    }
+    if ($isMulti && is_array($value) && is_array($default) && array_is_list($value) && array_is_list($default)) {
+      // The order of selected options is not significant, unlike other arrays.
+      sort($value);
+      sort($default);
+    }
     return $value == $default;
+  }
+
+  /**
+   * Compare against a default that afField resolves in the browser before submitting:
+   * "user_contact_id" becomes the current contact, "now [+-N day|week|year]" a date.
+   */
+  private static function matchesClientResolvedDefault($value, $default, ?string $inputType, ?string $fkEntity, bool $isMulti): bool {
+    if ($inputType === 'EntityRef' && in_array($fkEntity, ['Contact', 'Individual'], TRUE)) {
+      $userId = \CRM_Core_Session::getLoggedInContactID();
+      $replace = fn($id) => $id === 'user_contact_id' ? $userId : $id;
+      $resolved = is_array($default) ? array_map($replace, $default) : $replace($default);
+      return $resolved !== $default && self::matchesDefault($value, $resolved, FALSE, $isMulti);
+    }
+    if ($inputType === 'Date' && is_string($default) && is_string($value) && preg_match('/^now(?: ([-+]?\d+) (day|week|year))?$/', $default, $match)) {
+      // Mirrors getRelativeDate() in afField; the browser's time zone may put its date one day off.
+      $days = (int) ($match[1] ?? 0) * ['day' => 1, 'week' => 7, 'year' => 365][$match[2] ?? 'day'];
+      $entered = strtotime(substr($value, 0, 10));
+      return $entered !== FALSE && abs($entered - strtotime(date('Y-m-d', strtotime("$days days")))) <= 86400;
+    }
+    return FALSE;
   }
 
   /**
