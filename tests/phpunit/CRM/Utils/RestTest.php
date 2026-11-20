@@ -141,10 +141,12 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
   public function testAjaxJsonPhpError(): void {
     $this->hookClass->setHook('civicrm_alterAPIPermissions', fn() => throw new TypeError('Ruh-roh'));
     $originalGet = $_GET;
+    $originalRequest = $_REQUEST;
     $originalServer = $_SERVER;
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $_GET = ['entity' => 'Contact', 'action' => 'get', 'json' => json_encode(['sequential' => 1])];
+    $_REQUEST = $_GET;
     ob_start();
     try {
       CRM_Utils_REST::ajaxJson();
@@ -156,6 +158,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
     finally {
       ob_end_clean();
       $_GET = $originalGet;
+      $_REQUEST = $originalRequest;
       $_SERVER = $originalServer;
     }
     $this->assertEquals(1, $output['is_error']);
