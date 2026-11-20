@@ -2,6 +2,8 @@
 
 class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   protected $priceFieldValues;
   protected $visibilityOptionsKeys;
   protected $visibilityOptions;
@@ -27,6 +29,11 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
       'name' => 'public_price',
       'visibility_id' => $this->visibilityOptionsKeys['admin'],
     ]);
+  }
+
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   public function testPublicFieldWithOnlyAdminOptionsIsNotAllowed(): void {
@@ -76,12 +83,13 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $thousands = Civi::settings()->get('monetaryThousandSeparator');
     $decimal = Civi::settings()->get('monetaryDecimalPoint');
-    $paramsSet['title'] = 'Price Set' . bin2hex(random_bytes(4));
-    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
-    $paramsSet['is_active'] = TRUE;
-    $paramsSet['financial_type_id'] = 'Event Fee';
-    $paramsSet['extends'] = 'CiviEvent';
-    $priceSet = $this->callAPISuccess('price_set', 'create', $paramsSet);
+    $priceSet = $this->createTestEntity('PriceSet', [
+      'title' => 'Price Set',
+      'name' => 'price_set',
+      'is_active' => TRUE,
+      'financial_type_id:name' => 'Event Fee',
+      'extends:name' => ['CiviEvent'],
+    ]);
     $form = new CRM_Price_Form_Field();
     $form->_action = CRM_Core_Action::ADD;
     $form->setPriceSetId($priceSet['id']);
@@ -89,8 +97,9 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $this->publicFieldParams['option_amount'][1] = '123' . $thousands . '456' . $thousands . '789' . $decimal . '987654321';
     $this->publicFieldParams['option_visibility_id'][1] = $this->visibilityOptionsKeys['public'];
     $priceField = $form->submit($this->publicFieldParams);
-    $priceOptions = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
-    $this->assertSame('123456789.987654321', $priceOptions['values'][$priceOptions['id']]['amount']);
+    // Read the stored decimal directly: apiv4 returns the amount as a float, which drops these digits.
+    $amount = CRM_Core_DAO::singleValueQuery('SELECT amount FROM civicrm_price_field_value WHERE price_field_id = %1', [1 => [$priceField->id, 'Integer']]);
+    $this->assertSame('123456789.987654321', $amount);
   }
 
   private function initializeFieldParameters($params) {
@@ -130,7 +139,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $membershipTypeID = $this->membershipTypeCreate();
     $membershipTypeID2 = $this->membershipTypeCreate(['member_of_contact_id' => $this->setupIDs['contact']]);
 
-    $priceSetID = $this->callAPISuccess('PriceSet', 'create', ['title' => 'blah', 'extends' => 'CiviMember'])['id'];
+    $priceSetID = $this->createTestEntity('PriceSet', ['title' => 'blah', 'name' => 'blah', 'extends:name' => ['CiviMember']])['id'];
     /** @var \CRM_Price_Form_Field $form */
     $form = $this->getFormObject('CRM_Price_Form_Field');
     $_REQUEST['sid'] = $priceSetID;

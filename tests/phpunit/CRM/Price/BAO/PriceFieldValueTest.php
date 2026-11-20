@@ -15,6 +15,13 @@
  */
 class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
   /**
    * Verifies visibility field exists and is configured as a pseudoconstant
    * referencing the 'visibility' option group.
@@ -27,32 +34,26 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
   }
 
   public function testEmptyStringLabel(): void {
-    // Put stuff here that should happen before all tests in this unit.
-    $priceSetParams = [
+    $priceSetID = $this->createTestEntity('PriceSet', [
       'name' => 'default_goat_priceset',
       'title' => 'Goat accommodation',
-      'is_active' => 1,
+      'is_active' => TRUE,
       'help_pre' => "Where does your goat sleep",
       'help_post' => "thank you for your time",
-      'extends' => 'CiviContribute',
-      'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'is_quick_config' => 1,
-      'is_reserved' => 1,
-    ];
+      'extends:name' => ['CiviContribute'],
+      'financial_type_id:name' => 'Donation',
+      'is_quick_config' => TRUE,
+      'is_reserved' => TRUE,
+    ])['id'];
 
-    $price_set = $this->callAPISuccess('price_set', 'create', $priceSetParams);
-    $priceSetID = $price_set['id'];
-
-    $priceFieldParams = [
+    $priceFieldID = $this->createTestEntity('PriceField', [
       'price_set_id' => $priceSetID,
       'name' => 'grassvariety',
       'label' => 'Grass Variety',
       'html_type' => 'Text',
-      'is_enter_qty' => 1,
-      'is_active' => 1,
-    ];
-    $priceField = $this->callAPISuccess('price_field', 'create', $priceFieldParams);
-    $priceFieldID = $priceField['id'];
+      'is_enter_qty' => TRUE,
+      'is_active' => TRUE,
+    ])['id'];
     $params = [
       'price_field_id' => $priceFieldID,
       'name' => 'rye_grass',
