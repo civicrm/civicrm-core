@@ -1,8 +1,13 @@
 <?php
 
 use Civi\Api4\Contact;
+use Civi\Api4\CustomField;
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\File;
 use Civi\Api4\Individual;
+use Civi\Api4\Membership;
+use Civi\Api4\Order;
+use Civi\Api4\Relationship;
 
 /**
  * Class CRM_Dedupe_DedupeMergerTest
@@ -13,14 +18,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
-  protected $_groupId;
-
-  protected $_contactIds = [];
+  protected $_apiversion = 4;
 
   /**
    * Contacts created for the test.
-   *
-   * Overlaps contactIds....
    *
    * @var array
    */
@@ -59,16 +60,12 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function createDupeContacts(): void {
     // create a group to hold contacts, so that dupe checks don't consider any other contacts in the DB
-    $params = [
+    $this->createTestEntity('Group', [
       'name' => 'Test Dupe Merger Group',
       'title' => 'Test Dupe Merger Group',
-      'domain_id' => 1,
-      'is_active' => 1,
+      'is_active' => TRUE,
       'visibility' => 'Public Pages',
-    ];
-
-    $result = $this->callAPISuccess('group', 'create', $params);
-    $this->_groupId = $result['id'];
+    ], 'dupes');
 
     // contact data set
 
@@ -88,82 +85,66 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       [
         'first_name' => 'robin',
         'last_name' => 'hood',
-        'email' => 'robin@example.com',
+        'email_primary.email' => 'robin@example.com',
         'contact_type' => 'Individual',
       ],
       [
         'first_name' => 'robin',
         'last_name' => 'hood',
-        'email' => 'robin@example.com',
+        'email_primary.email' => 'robin@example.com',
         'contact_type' => 'Individual',
       ],
       [
         'first_name' => 'robin',
         'last_name' => 'hood',
-        'email' => 'hood@example.com',
+        'email_primary.email' => 'hood@example.com',
         'contact_type' => 'Individual',
       ],
       [
         'first_name' => 'robin',
         'last_name' => 'dale',
-        'email' => 'robin@example.com',
+        'email_primary.email' => 'robin@example.com',
         'contact_type' => 'Individual',
       ],
       [
         'first_name' => 'little',
         'last_name' => 'dale',
-        'email' => 'dale@example.com',
+        'email_primary.email' => 'dale@example.com',
         'contact_type' => 'Individual',
       ],
       [
         'first_name' => 'little',
         'last_name' => 'dale',
-        'email' => 'dale@example.com',
+        'email_primary.email' => 'dale@example.com',
         'contact_type' => 'Individual',
       ],
       [
         'first_name' => 'will',
         'last_name' => 'dale',
-        'email' => 'dale@example.com',
+        'email_primary.email' => 'dale@example.com',
         'contact_type' => 'Individual',
       ],
       [
         'first_name' => 'will',
         'last_name' => 'dale',
-        'email' => 'will@example.com',
+        'email_primary.email' => 'will@example.com',
         'contact_type' => 'Individual',
       ],
       [
         'first_name' => 'will',
         'last_name' => 'dale',
-        'email' => 'will@example.com',
+        'email_primary.email' => 'will@example.com',
         'contact_type' => 'Individual',
       ],
     ];
 
-    $count = 1;
-    foreach ($params as $param) {
-      $param['version'] = 3;
-      $contact = civicrm_api('contact', 'create', $param);
-      $this->_contactIds[$count++] = $contact['id'];
-
-      $grpParams = [
-        'contact_id' => $contact['id'],
-        'group_id' => $this->_groupId,
-        'version' => 3,
-      ];
-      $this->callAPISuccess('group_contact', 'create', $grpParams);
+    foreach ($params as $index => $param) {
+      $contactID = $this->createTestEntity('Contact', $param, 'dupe_' . $index)['id'];
+      $this->createTestEntity('GroupContact', [
+        'contact_id' => $contactID,
+        'group_id' => $this->ids['Group']['dupes'],
+      ], 'dupe_' . $index);
     }
-  }
-
-  /**
-   * Delete all created contacts.
-   */
-  public function deleteDupeContacts(): void {
-    foreach ($this->_contactIds as $contactId) {
-      $this->contactDelete($contactId);
-    }
-    $this->groupDelete($this->_groupId);
   }
 
   /**
@@ -174,16 +155,13 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testBatchMergeSelectedDuplicates(): void {
     $this->createDupeContacts();
 
-    // verify that all contacts have been created separately
-    $this->assertCount(9, $this->_contactIds, 'Check for number of contacts.');
-
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
     $dao->name = 'IndividualSupervised';
     $dao->is_reserved = 1;
     $dao->find(TRUE);
 
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $this->_groupId);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $this->ids['Group']['dupes']);
 
     // -------------------------------------------------------------------------
     // Name and Email (reserved) Matches ( 3 pairs )
@@ -201,7 +179,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     //avoid invalid key error
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $object = new CRM_Contact_Page_DedupeFind();
-    $object->set('gid', $this->_groupId);
+    $object->set('gid', $this->ids['Group']['dupes']);
     $object->set('rgid', $dao->id);
     $object->set('action', CRM_Core_Action::UPDATE);
     $object->setEmbedded(TRUE);
@@ -209,7 +187,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     // Retrieve pairs from prev next cache table
     $select = ['pn.is_selected' => 'is_selected'];
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->_groupId, [], TRUE, 0);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->ids['Group']['dupes'], [], TRUE, 0);
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
     $this->assertCount(count($foundDupes), $pnDupePairs, 'Check number of dupe pairs in prev next cache.');
 
@@ -221,11 +199,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->assertSame('1', $pnDupePairs[0]['is_selected'], 'Check if second record in dupe pairs is marked as selected.');
 
     // batch merge selected dupes
-    $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 1);
+    $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->ids['Group']['dupes'], 'safe', 5, 1);
     $this->assertSame(2, count($result['merged']), 'Check number of merged pairs.');
 
-    $stats = $this->callAPISuccess('Dedupe', 'getstatistics', [
-      'group_id' => $this->_groupId,
+    $stats = $this->callApiV3Success('Dedupe', 'getstatistics', [
+      'group_id' => $this->ids['Group']['dupes'],
       'rule_group_id' => $dao->id,
       'check_permissions' => TRUE,
     ])['values'];
@@ -234,8 +212,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // retrieve pairs from prev next cache table
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
     $this->assertSame(1, count($pnDupePairs), 'Check number of remaining dupe pairs in prev next cache.');
-
-    $this->deleteDupeContacts();
   }
 
   /**
@@ -244,16 +220,13 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testBatchMergeAllDuplicates(): void {
     $this->createDupeContacts();
 
-    // verify that all contacts have been created separately
-    $this->assertSame(9, count($this->_contactIds), 'Check for number of contacts.');
-
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
     $dao->name = 'IndividualSupervised';
     $dao->is_reserved = 1;
     $dao->find(TRUE);
 
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $this->_groupId);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $this->ids['Group']['dupes']);
 
     // -------------------------------------------------------------------------
     // Name and Email (reserved) Matches ( 3 pairs )
@@ -271,7 +244,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     //avoid invalid key error
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $object = new CRM_Contact_Page_DedupeFind();
-    $object->set('gid', $this->_groupId);
+    $object->set('gid', $this->ids['Group']['dupes']);
     $object->set('rgid', $dao->id);
     $object->set('action', CRM_Core_Action::UPDATE);
     $object->setEmbedded(TRUE);
@@ -279,24 +252,22 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     // Retrieve pairs from prev next cache table
     $select = ['pn.is_selected' => 'is_selected'];
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->_groupId, [], TRUE, 0);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->ids['Group']['dupes'], [], TRUE, 0);
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
 
     $this->assertEquals(count($foundDupes), count($pnDupePairs), 'Check number of dupe pairs in prev next cache.');
 
     // batch merge all dupes
-    $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 2);
+    $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->ids['Group']['dupes'], 'safe', 5, 2);
     $this->assertSame(3, count($result['merged']), 'Check number of merged pairs.');
 
-    $stats = $this->callAPISuccess('Dedupe', 'getstatistics', [
+    $stats = $this->callApiV3Success('Dedupe', 'getstatistics', [
       'rule_group_id' => $dao->id,
-      'group_id' => $this->_groupId,
+      'group_id' => $this->ids['Group']['dupes'],
     ]);
     // retrieve pairs from prev next cache table
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
     $this->assertSame(0, count($pnDupePairs), 'Check number of remaining dupe pairs in prev next cache.');
-
-    $this->deleteDupeContacts();
   }
 
   /**
@@ -328,7 +299,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testGetMatches(): void {
     $this->setupMatchData();
 
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
     ])['values'];
     $this->assertEquals([
@@ -363,14 +334,14 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatchesExcludeDeleted(bool $isReverse): void {
     $this->setupMatchData();
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'check_permissions' => TRUE,
       'criteria' => ['Contact' => ['id' => 'IS NOT NULL']],
     ])['values'];
     $this->assertCount(2, $pairs);
-    $this->callAPISuccess('Contact', 'delete', ['id' => ($isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])]);
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    Contact::delete(FALSE)->addWhere('id', '=', $isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])->execute();
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'check_permissions' => TRUE,
       'criteria' => ['Contact' => ['id' => ['>' => 1]]],
@@ -391,14 +362,14 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testGetMatchesModifiedDate(bool $isReverse): void {
     $this->setupMatchData();
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET modified_date = "2020-04-09" WHERE id = ' . $this->ids['Contact']['mickey_1']);
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'check_permissions' => TRUE,
       'criteria' => ['where' => [['modified_date', 'BETWEEN', ['2020-01-01', '2020-09-01']]]],
     ])['values'];
     $this->assertCount(1, $pairs);
-    $this->callAPISuccess('Contact', 'delete', ['id' => ($isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])]);
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    Contact::delete(FALSE)->addWhere('id', '=', $isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])->execute();
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'check_permissions' => TRUE,
       'criteria' => ['Contact' => ['id' => ['>' => 1]]],
@@ -414,24 +385,24 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testGetMatchesIgnoreLocationType(): void {
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
-    $this->callAPISuccess('address', 'create', [
+    $this->createTestEntity('Address', [
       'contact_id' => $contact1,
       'state_province_id' => 1049,
-      'location_type_id' => $this->getLocationTypeID('Home'),
-    ]);
-    $this->callAPISuccess('address', 'create', [
+      'location_type_id:name' => 'Home',
+    ], 'home');
+    $this->createTestEntity('Address', [
       'contact_id' => $contact2,
       'state_province_id' => 1049,
-      'location_type_id' => $this->getLocationTypeID('Work'),
-    ]);
+      'location_type_id:name' => 'Work',
+    ], 'work');
     $ruleGroup = $this->createRuleGroup();
-    $this->callAPISuccess('Rule', 'create', [
+    $this->createTestEntity('DedupeRule', [
       'dedupe_rule_group_id' => $ruleGroup['id'],
       'rule_table' => 'civicrm_address',
       'rule_field' => 'state_province_id',
       'rule_weight' => 8,
     ]);
-    $dupeCount = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $dupeCount = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $ruleGroup['id'],
     ])['count'];
     $this->assertSame(1, $dupeCount);
@@ -442,7 +413,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatchesCriteriaMatched(): void {
     $this->setupMatchData();
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'criteria' => ['contact' => ['id' => ['>' => 1]]],
     ])['values'];
@@ -471,18 +442,15 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'last_name' => 'Mouse',
       'email' => 'mickey@mouse.com',
     ], 'mickey_4');
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'criteria' => ['contact' => ['first_name' => 'Mickey']],
     ])['values'];
     // Each of the 4 Mickeys matches all the others 3+2+1 = 6 matches
     $this->assertCount(6, $pairs);
     // Merge 2 Mickeys
-    $this->callAPISuccess('Contact', 'merge', [
-      'to_keep_id' => $this->ids['Contact']['mickey_3'],
-      'to_remove_id' => $this->ids['Contact']['mickey_4'],
-    ]);
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $this->mergeDuplicates($this->ids['Contact']['mickey_3'], $this->ids['Contact']['mickey_4']);
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'criteria' => ['contact' => ['first_name' => 'Mickey']],
     ])['values'];
@@ -492,21 +460,18 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // Now re-do our get limiting it by nick name - Mickey 2
     // is the only mouse who matches the criteria - but Mickey 2
     // matches both remaining mice.
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'criteria' => ['contact' => ['nick_name' => 'MouseMeister']],
     ])['values'];
     $this->assertCount(2, $pairs);
 
     // Merge Mickey 2 into Mickey 3
-    $this->callAPISuccess('Contact', 'merge', [
-      'to_keep_id' => $this->ids['Contact']['mickey_3'],
-      'to_remove_id' => $this->ids['Contact']['mickey_2'],
-    ]);
+    $this->mergeDuplicates($this->ids['Contact']['mickey_3'], $this->ids['Contact']['mickey_2']);
     // Now get our merge-able pairs again. Even though mickey_2 is gone
     // the user is still expecting to see that merged mickey available
     // to merge with Mickey 1.
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'criteria' => ['contact' => ['nick_name' => 'MouseMeister']],
     ])['values'];
@@ -520,7 +485,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatchesCriteriaMatchedWithLimit(): void {
     $this->setupMatchData();
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'criteria' => ['contact' => ['id' => ['>' => 1]]],
       'options' => ['limit' => 1],
@@ -536,7 +501,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatchesCriteriaMatchedWithSearchLimit(): void {
     $this->setupMatchData();
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'criteria' => ['contact' => ['id' => ['>' => 1]]],
       'search_limit' => 1,
@@ -551,7 +516,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatchesNoCriteria(): void {
     $this->setupMatchData();
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
     ])['values'];
     $this->assertCount(2, $pairs);
@@ -564,7 +529,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatchesNoCriteriaButLimit(): void {
     $this->setupMatchData();
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'options' => ['limit' => 1],
     ])['values'];
@@ -576,7 +541,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatchesCriteriaNotMatched(): void {
     $this->setupMatchData();
-    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+    $pairs = $this->callApiV3Success('Dedupe', 'getduplicates', [
       'rule_group_id' => $this->getDedupeRuleGroupID('IndividualSupervised'),
       'criteria' => ['contact' => ['id' => ['>' => 100000]]],
     ])['values'];
@@ -593,10 +558,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetOrganizationMatches(): void {
     $this->setupMatchData();
-    $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', [
-      'contact_type' => 'Organization',
-      'used' => 'Supervised',
-    ]);
+    $ruleGroups = DedupeRuleGroup::get(FALSE)
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('used', '=', 'Supervised')
+      ->execute()->single();
 
     $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
       $ruleGroups['id'],
@@ -669,17 +634,17 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetOrganizationMatchesInGroup(): void {
     $this->setupMatchData();
-    $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', [
-      'contact_type' => 'Organization',
-      'used' => 'Supervised',
-    ]);
+    $ruleGroups = DedupeRuleGroup::get(FALSE)
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('used', '=', 'Supervised')
+      ->execute()->single();
 
     $groupID = $this->groupCreate(['title' => 'she-mice']);
 
-    $this->callAPISuccess('GroupContact', 'create', [
+    $this->createTestEntity('GroupContact', [
       'group_id' => $groupID,
       'contact_id' => $this->contacts[4]['id'],
-    ]);
+    ], 'contact_4');
 
     $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
       $ruleGroups['id'],
@@ -708,10 +673,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       ],
     ], $pairs);
 
-    $this->callAPISuccess('GroupContact', 'create', [
+    $this->createTestEntity('GroupContact', [
       'group_id' => $groupID,
       'contact_id' => $this->contacts[5]['id'],
-    ]);
+    ], 'contact_5');
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_prevnext_cache");
     $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
       $ruleGroups['id'],
@@ -760,10 +725,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     $groupID = $this->groupCreate(['title' => 'she-mice']);
 
-    $this->callAPISuccess('GroupContact', 'create', [
+    $this->createTestEntity('GroupContact', [
       'group_id' => $groupID,
       'contact_id' => $this->contacts[3]['id'],
-    ]);
+    ], 'contact_3');
 
     $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
       $this->getDedupeRuleGroupID('IndividualSupervised'),
@@ -872,11 +837,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     ]);
 
     //Check if membership is correctly transferred to original contact.
-    $originalContactMembership = $this->callAPISuccess('Membership', 'get', [
-      'membership_type_id' => $memTypeId,
-      'contact_id' => $originalContactID,
-    ]);
-    $this->assertSame(1, $originalContactMembership['count']);
+    $originalContactMemberships = Membership::get(FALSE)
+      ->addWhere('membership_type_id', '=', $memTypeId)
+      ->addWhere('contact_id', '=', $originalContactID)
+      ->execute();
+    $this->assertCount(1, $originalContactMemberships);
   }
 
   /**
@@ -889,7 +854,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // Create Custom Field
     $createGroup = $this->setupCustomGroupForIndividual();
     $createField = $this->setupCustomField('Graduation', $createGroup);
-    $customFieldName = 'custom_' . $createField['id'];
 
     // Contacts setup
     $this->setupMatchData();
@@ -901,41 +865,28 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $duplicateContactID2 = $this->contacts[2]['id'];
 
     // update the text custom field for original contact with value 'abc'
-    $this->callAPISuccess('Contact', 'create', [
-      'id' => $originalContactID,
-      $customFieldName => 'abc',
-    ]);
-    $this->assertCustomFieldValue($originalContactID, 'abc', $customFieldName);
+    $this->setCustomFieldValues($originalContactID, [$createField['id'] => 'abc']);
+    $this->assertCustomFieldValue($originalContactID, 'abc', $createField['id']);
 
     // update the text custom field for duplicate contact 1 with value 'def'
-    $this->callAPISuccess('Contact', 'create', [
-      'id' => $duplicateContactID1,
-      $customFieldName => 'def',
-    ]);
-    $this->assertCustomFieldValue($duplicateContactID1, 'def', $customFieldName);
+    $this->setCustomFieldValues($duplicateContactID1, [$createField['id'] => 'def']);
+    $this->assertCustomFieldValue($duplicateContactID1, 'def', $createField['id']);
 
     // update the text custom field for duplicate contact 2 with value 'ghi'
-    $this->callAPISuccess('Contact', 'create', [
-      'id' => $duplicateContactID2,
-      (string) ($customFieldName) => 'ghi',
-    ]);
-    $this->assertCustomFieldValue($duplicateContactID2, 'ghi', $customFieldName);
+    $this->setCustomFieldValues($duplicateContactID2, [$createField['id'] => 'ghi']);
+    $this->assertCustomFieldValue($duplicateContactID2, 'ghi', $createField['id']);
 
     /*** USE-CASE 1: DO NOT OVERWRITE CUSTOM FIELD VALUE **/
     $this->mergeContacts($originalContactID, $duplicateContactID1, [
-      "move_{$customFieldName}" => NULL,
+      "move_custom_{$createField['id']}" => NULL,
     ]);
-    $this->assertCustomFieldValue($originalContactID, 'abc', $customFieldName);
+    $this->assertCustomFieldValue($originalContactID, 'abc', $createField['id']);
 
     /*** USE-CASE 2: OVERWRITE CUSTOM FIELD VALUE **/
     $this->mergeContacts($originalContactID, $duplicateContactID2, [
-      "move_{$customFieldName}" => 'ghi',
+      "move_custom_{$createField['id']}" => 'ghi',
     ]);
-    $this->assertCustomFieldValue($originalContactID, 'ghi', $customFieldName);
-
-    // cleanup created custom set
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $createField['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $createGroup['id']]);
+    $this->assertCustomFieldValue($originalContactID, 'ghi', $createField['id']);
   }
 
   /**
@@ -964,13 +915,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testCreatedDatePostMerge($keepContactKey, $duplicateContactKey) {
     $this->setupMatchData();
-    $lowerContactCreatedDate = $this->callAPISuccess('Contact', 'getsingle', [
-      'id' => $this->contacts[0]['id'],
-      'return' => ['created_date'],
-    ])['created_date'];
+    $lowerContactCreatedDate = $this->getContactCreatedDate($this->contacts[0]['id']);
     // Assume contacts have been flipped in the UL so merging into the higher id
     $this->mergeContacts($this->contacts[$keepContactKey]['id'], $this->contacts[$duplicateContactKey]['id'], []);
-    $this->assertEquals($lowerContactCreatedDate, $this->callAPISuccess('Contact', 'getsingle', ['id' => $this->contacts[$keepContactKey]['id'], 'return' => ['created_date']])['created_date']);
+    $this->assertSame($lowerContactCreatedDate, $this->getContactCreatedDate($this->contacts[$keepContactKey]['id']));
   }
 
   /**
@@ -998,27 +946,20 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $duplicateContactID = $this->contacts[1]['id'];
 
     // Update the text custom fields for duplicate contact
-    $this->callAPISuccess('Contact', 'create', [
-      'id' => $duplicateContactID,
-      "custom_{$customField1['id']}" => 'abc',
-      "custom_{$multiField['id']}" => 'def',
+    $this->setCustomFieldValues($duplicateContactID, [
+      $customField1['id'] => 'abc',
+      $multiField['id'] => 'def',
     ]);
-    $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField1['id']}");
-    $this->assertCustomFieldValue($duplicateContactID, 'def', "custom_{$multiField['id']}");
+    $this->assertCustomFieldValue($duplicateContactID, 'abc', $customField1['id']);
+    $this->assertCustomFieldValue($duplicateContactID, 'def', $multiField['id']);
 
     // Merge, and ensure that no value was migrated
     $this->mergeContacts($originalContactID, $duplicateContactID, [
       "move_custom_{$customField1['id']}" => NULL,
       "move_rel_table_custom_{$multiGroup['id']}" => NULL,
     ]);
-    $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField1['id']}");
-    $this->assertCustomFieldValue($originalContactID, '', "custom_{$multiField['id']}");
-
-    // cleanup created custom set
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $customField1['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $createGroup['id']]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $multiField['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $multiGroup['id']]);
+    $this->assertCustomFieldValue($originalContactID, NULL, $customField1['id']);
+    $this->assertCustomFieldValue($originalContactID, NULL, $multiField['id']);
   }
 
   /**
@@ -1049,15 +990,14 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $duplicateContactID = $this->contacts[1]['id'];
 
     // Update the text custom fields for duplicate contact
-    $this->callAPISuccess('Contact', 'create', [
-      'id' => $duplicateContactID,
-      "custom_{$customField1['id']}" => 'abc',
-      "custom_{$customField2['id']}" => 'def',
-      "custom_{$multiField['id']}" => 'ghi',
+    $this->setCustomFieldValues($duplicateContactID, [
+      $customField1['id'] => 'abc',
+      $customField2['id'] => 'def',
+      $multiField['id'] => 'ghi',
     ]);
-    $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField1['id']}");
-    $this->assertCustomFieldValue($duplicateContactID, 'def', "custom_{$customField2['id']}");
-    $this->assertCustomFieldValue($duplicateContactID, 'ghi', "custom_{$multiField['id']}");
+    $this->assertCustomFieldValue($duplicateContactID, 'abc', $customField1['id']);
+    $this->assertCustomFieldValue($duplicateContactID, 'def', $customField2['id']);
+    $this->assertCustomFieldValue($duplicateContactID, 'ghi', $multiField['id']);
 
     // Perform merge
     $this->mergeContacts($originalContactID, $duplicateContactID, [
@@ -1065,16 +1005,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       "move_custom_{$customField2['id']}" => 'def',
       "move_rel_table_custom_{$multiGroup['id']}" => '1',
     ]);
-    $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField1['id']}");
-    $this->assertCustomFieldValue($originalContactID, 'def', "custom_{$customField2['id']}");
-    $this->assertCustomFieldValue($originalContactID, 'ghi', "custom_{$multiField['id']}");
-
-    // cleanup created custom set
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $customField1['id']]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $customField2['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $createGroup['id']]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $multiField['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $multiGroup['id']]);
+    $this->assertCustomFieldValue($originalContactID, NULL, $customField1['id']);
+    $this->assertCustomFieldValue($originalContactID, 'def', $customField2['id']);
+    $this->assertCustomFieldValue($originalContactID, 'ghi', $multiField['id']);
   }
 
   /**
@@ -1142,24 +1075,16 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     ]);
 
     // verify that the fields were set
-    $this->assertCustomFieldValue($unrelatedContact, $duplicateContactID, "custom_{$refFieldContact['id']}");
-    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $duplicateContactID, "custom_{$refFieldActivity['id']}_id");
+    $this->assertCustomFieldValue($unrelatedContact, $duplicateContactID, $refFieldContact['id']);
+    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $duplicateContactID, $refFieldActivity['id']);
 
     // Perform merge
     $this->mergeContacts($originalContactID, $duplicateContactID, []);
 
     // verify that the ContactReference fields were updated to point to the surviving contact post-merge
-    $this->assertCustomFieldValue($unrelatedContact, $originalContactID, "custom_{$refFieldContact['id']}");
-    $this->assertCustomFieldValue($unrelatedContact, $originalContactID, "custom_{$entityrefFieldContact['id']}");
-    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $originalContactID, "custom_{$refFieldActivity['id']}_id");
-
-    // cleanup created custom set
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $refFieldContact['id']]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $entityrefFieldContact['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $contactGroup['id']]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $refFieldActivity['id']]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $entityrefFieldActivity['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $activityGroup['id']]);
+    $this->assertCustomFieldValue($unrelatedContact, $originalContactID, $refFieldContact['id']);
+    $this->assertCustomFieldValue($unrelatedContact, $originalContactID, $entityrefFieldContact['id']);
+    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $originalContactID, $refFieldActivity['id']);
   }
 
   /**
@@ -1211,21 +1136,15 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     ]);
 
     // verify that the fields were set
-    $this->assertCustomFieldValue($unrelatedContact, $duplicateContactID, "custom_{$refFieldContact['id']}");
-    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $duplicateContactID, "custom_{$refFieldActivity['id']}");
+    $this->assertCustomFieldValue($unrelatedContact, $duplicateContactID, $refFieldContact['id']);
+    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $duplicateContactID, $refFieldActivity['id']);
 
     // Perform merge
     $this->mergeContacts($originalContactID, $duplicateContactID, []);
 
     // verify that the ContactReference fields were updated to point to the surviving contact post-merge
-    $this->assertCustomFieldValue($unrelatedContact, $originalContactID, "custom_{$refFieldContact['id']}");
-    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $originalContactID, "custom_{$refFieldActivity['id']}");
-
-    // cleanup created custom set
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $refFieldContact['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $contactGroup['id']]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $refFieldActivity['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $activityGroup['id']]);
+    $this->assertCustomFieldValue($unrelatedContact, $originalContactID, $refFieldContact['id']);
+    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $originalContactID, $refFieldActivity['id']);
   }
 
   public static function contactEntityNameProvider(): iterable {
@@ -1250,24 +1169,17 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $duplicateContactID = $this->contacts[1]['id'];
 
     // Update the text custom fields for duplicate contact
-    $this->callAPISuccess('Contact', 'create', [
-      'id' => $duplicateContactID,
-      "custom_{$customField['id']}" => 'abc',
-    ]);
-    $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField['id']}");
+    $this->setCustomFieldValues($duplicateContactID, [$customField['id'] => 'abc']);
+    $this->assertCustomFieldValue($duplicateContactID, 'abc', $customField['id']);
 
     // Change custom field to view only.
-    $this->callAPISuccess('CustomField', 'update', ['id' => $customField['id'], 'is_view' => TRUE]);
+    CustomField::update(FALSE)->addWhere('id', '=', $customField['id'])->addValue('is_view', TRUE)->execute();
 
     // Merge, and ensure that the value was migrated
     $this->mergeContacts($originalContactID, $duplicateContactID, [
       "move_custom_{$customField['id']}" => 'abc',
     ]);
-    $this->assertCustomFieldValue($originalContactID, 'abc', "custom_{$customField['id']}");
-
-    // cleanup created custom set
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $customField['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $createGroup['id']]);
+    $this->assertCustomFieldValue($originalContactID, 'abc', $customField['id']);
   }
 
   /**
@@ -1296,37 +1208,132 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Checks if the expected value for the given field corresponds to what is
-   * stored in the database for the given contact ID.
+   * Merge two contacts.
    *
-   * @param $contactID
-   * @param $expectedValue
-   * @param $customFieldName
+   * @param int $keepID
+   * @param int $removeID
+   * @param string $mode
+   *   safe or aggressive.
    *
    * @throws \CRM_Core_Exception
    */
-  private function assertCustomFieldValue($contactID, $expectedValue, $customFieldName): void {
-    $this->assertEntityCustomFieldValue('Contact', $contactID, $expectedValue, $customFieldName);
+  private function mergeDuplicates(int $keepID, int $removeID, string $mode = 'safe'): void {
+    Contact::mergeDuplicates(FALSE)
+      ->setContactId($keepID)
+      ->setDuplicateId($removeID)
+      ->setMode($mode)
+      ->execute();
+  }
+
+  /**
+   * @param int $contactID
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private function getContactCreatedDate(int $contactID): string {
+    return Contact::get(FALSE)
+      ->addSelect('created_date')
+      ->addWhere('id', '=', $contactID)
+      ->execute()->single()['created_date'];
+  }
+
+  /**
+   * Get the APIv4 details of a custom field.
+   *
+   * @param int $customFieldID
+   *
+   * @return array
+   *   - name: the field name, prefixed by the group name for a single-record group
+   *   - group_name
+   *   - is_multiple: whether the field belongs to a multi-record group
+   * @throws \CRM_Core_Exception
+   */
+  private function getCustomFieldDetails(int $customFieldID): array {
+    $field = CustomField::get(FALSE)
+      ->addSelect('name', 'custom_group_id.name', 'custom_group_id.is_multiple')
+      ->addWhere('id', '=', $customFieldID)
+      ->execute()->single();
+    return [
+      'name' => $field['custom_group_id.is_multiple'] ? $field['name'] : $field['custom_group_id.name'] . '.' . $field['name'],
+      'group_name' => $field['custom_group_id.name'],
+      'is_multiple' => $field['custom_group_id.is_multiple'],
+    ];
+  }
+
+  /**
+   * Set custom field values on a contact.
+   *
+   * @param int $contactID
+   * @param array $values
+   *   Values keyed by custom field ID.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function setCustomFieldValues(int $contactID, array $values): void {
+    $contactValues = [];
+    foreach ($values as $customFieldID => $value) {
+      $field = $this->getCustomFieldDetails($customFieldID);
+      if ($field['is_multiple']) {
+        civicrm_api4('Custom_' . $field['group_name'], 'create', [
+          'checkPermissions' => FALSE,
+          'values' => ['entity_id' => $contactID, $field['name'] => $value],
+        ]);
+      }
+      else {
+        $contactValues[$field['name']] = $value;
+      }
+    }
+    if ($contactValues) {
+      Contact::update(FALSE)
+        ->addWhere('id', '=', $contactID)
+        ->setValues($contactValues)
+        ->execute();
+    }
+  }
+
+  /**
+   * Checks if the expected value for the given field corresponds to what is
+   * stored in the database for the given contact ID.
+   *
+   * @param int $contactID
+   * @param mixed $expectedValue
+   * @param int $customFieldID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function assertCustomFieldValue(int $contactID, $expectedValue, int $customFieldID): void {
+    $this->assertEntityCustomFieldValue('Contact', $contactID, $expectedValue, $customFieldID);
   }
 
   /**
    * Check if the custom field of the given field and entity id matches the
    * expected value
    *
-   * @param $entity
-   * @param $id
-   * @param $expectedValue
-   * @param $customFieldName
+   * @param string $entity
+   * @param int $id
+   * @param mixed $expectedValue
+   * @param int $customFieldID
    *
    * @throws \CRM_Core_Exception
    */
-  private function assertEntityCustomFieldValue($entity, $id, $expectedValue, $customFieldName) {
-    $data = $this->callAPISuccess($entity, 'getsingle', [
-      'id'     => $id,
-      'return' => [$customFieldName],
-    ]);
-
-    $this->assertEquals($expectedValue, $data[$customFieldName], "Custom field value was supposed to be '{$expectedValue}', '{$data[$customFieldName]}' found.");
+  private function assertEntityCustomFieldValue(string $entity, int $id, $expectedValue, int $customFieldID): void {
+    $field = $this->getCustomFieldDetails($customFieldID);
+    if ($field['is_multiple']) {
+      $value = civicrm_api4('Custom_' . $field['group_name'], 'get', [
+        'checkPermissions' => FALSE,
+        'select' => [$field['name']],
+        'where' => [['entity_id', '=', $id]],
+      ])->first()[$field['name']] ?? NULL;
+    }
+    else {
+      $value = civicrm_api4($entity, 'get', [
+        'checkPermissions' => FALSE,
+        'select' => [$field['name']],
+        'where' => [['id', '=', $id]],
+      ])->single()[$field['name']];
+    }
+    $this->assertSame($expectedValue, $value);
   }
 
   /**
@@ -1336,25 +1343,15 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *   Data for the created custom group record
    * @throws \CRM_Core_Exception
    */
-  private function setupCustomGroupForIndividual() {
-    $customGroup = $this->callAPISuccess('custom_group', 'get', [
-      'name' => 'test_group',
-    ]);
-
-    if ($customGroup['count'] > 0) {
-      $this->callAPISuccess('CustomGroup', 'delete', ['id' => $customGroup['id']]);
-    }
-
-    $customGroup = $this->callAPISuccess('custom_group', 'create', [
+  private function setupCustomGroupForIndividual(): array {
+    return $this->createTestEntity('CustomGroup', [
       'title' => 'Test_Group',
       'name' => 'test_group',
-      'extends' => ['Individual'],
+      'extends' => 'Individual',
       'style' => 'Inline',
       'is_multiple' => FALSE,
-      'is_active' => 1,
-    ]);
-
-    return $customGroup;
+      'is_active' => TRUE,
+    ], 'test_group');
   }
 
   /**
@@ -1368,13 +1365,13 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *   Data for the created custom field record
    * @throws \CRM_Core_Exception
    */
-  private function setupCustomField($fieldLabel, $createGroup) {
-    return $this->callAPISuccess('custom_field', 'create', [
+  private function setupCustomField(string $fieldLabel, array $createGroup): array {
+    return $this->createTestEntity('CustomField', [
       'label' => $fieldLabel,
-      'data_type' => 'Alphanumeric',
+      'data_type' => 'String',
       'html_type' => 'Text',
       'custom_group_id' => $createGroup['id'],
-    ]);
+    ], $fieldLabel);
   }
 
   /**
@@ -1692,10 +1689,7 @@ WHERE
     CRM_Core_DAO_AllCoreTables::flush();
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate(['api.Im.create' => ['name' => 'chat_handle']]);
-    $this->callAPISuccess('Contact', 'merge', [
-      'to_keep_id' => $contact1,
-      'to_remove_id' => $contact2,
-    ]);
+    $this->mergeDuplicates($contact1, $contact2);
   }
 
   /**
@@ -1732,7 +1726,7 @@ WHERE
     ]);
     $employerName = Contact::get()->addSelect('organization_name')->addWhere('id', '=', $individualID)->execute()->first()['organization_name'];
     $this->assertSame('remove', $employerName);
-    $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $organizationToKeepID, 'to_remove_id' => $organizationToRemoveID, 'mode' => 'aggressive']);
+    $this->mergeDuplicates($organizationToKeepID, $organizationToRemoveID, 'aggressive');
     $employerName = Contact::get()->addSelect('organization_name')->addWhere('id', '=', $individualID)->execute()->first()['organization_name'];
     $this->assertSame('keep', $employerName);
   }
@@ -1769,22 +1763,18 @@ WHERE
     $contact1 = $this->individualCreate();
     $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Relationship']);
     $contact2 = $this->createContactWithEmployerRelationship([
-      $this->getCustomFieldName('text') => 'blah',
-      $this->getCustomFieldName('boolean') => TRUE,
+      $this->getCustomFieldName('text', 4) => 'blah',
+      $this->getCustomFieldName('boolean', 4) => TRUE,
     ]);
-    $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2]);
-    $this->callAPISuccessGetSingle('Relationship', [
-      'contact_id_a' => $contact1,
-    ]);
+    $this->mergeDuplicates($contact1, $contact2);
+    Relationship::get(FALSE)->addWhere('contact_id_a', '=', $contact1)->execute()->single();
 
     $contact2 = $this->createContactWithEmployerRelationship([
-      $this->getCustomFieldName('boolean') => TRUE,
-      $this->getCustomFieldName('text') => '',
+      $this->getCustomFieldName('boolean', 4) => TRUE,
+      $this->getCustomFieldName('text', 4) => '',
     ]);
-    $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact2, 'to_remove_id' => $contact1]);
-    $this->callAPISuccessGetSingle('Relationship', [
-      'contact_id_a' => $contact2,
-    ]);
+    $this->mergeDuplicates($contact2, $contact1);
+    Relationship::get(FALSE)->addWhere('contact_id_a', '=', $contact2)->execute()->single();
   }
 
   /**
@@ -1924,12 +1914,12 @@ WHERE
   protected function createContactWithEmployerRelationship(array $params): int {
     $contact2 = $this->individualCreate();
     // Test the merge can also happen if the other contact has an empty text field.
-    $this->callAPISuccess('Relationship', 'create', array_merge([
+    $this->createTestEntity('Relationship', array_merge([
       'contact_id_a' => $contact2,
       'contact_id_b' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-      'relationship_type_id' => 'Employee of',
+      'relationship_type_id:name' => 'Employee of',
       'is_current_employer' => TRUE,
-    ], $params));
+    ], $params), 'employee_' . $contact2);
     return $contact2;
   }
 
@@ -1964,7 +1954,7 @@ WHERE
     [$mainId, $otherId] = $this->createMergePair();
     $employerId = $this->organizationCreate(['organization_name' => 'Acme Employer']);
     $participantId = $this->participantCreate(['contact_id' => $otherId]);
-    $contributionId = $this->createParticipantContribution($employerId, $participantId);
+    $contributionId = $this->createOrderForEntity($employerId, 'civicrm_participant', $participantId, 'Event Fee');
 
     $this->runPaymentSql('civicrm_participant', $mainId, $otherId);
 
@@ -1978,7 +1968,7 @@ WHERE
     [$mainId, $otherId] = $this->createMergePair();
     $thirdPartyId = $this->individualCreate([], 'parent');
     $membershipId = $this->contactMembershipCreate(['contact_id' => $otherId]);
-    $contributionId = $this->createMembershipContribution($thirdPartyId, $membershipId);
+    $contributionId = $this->createOrderForEntity($thirdPartyId, 'civicrm_membership', $membershipId, 'Member Dues');
 
     $this->runPaymentSql('civicrm_membership', $mainId, $otherId);
 
@@ -2016,11 +2006,7 @@ WHERE
       'membership_type_id' => $membershipTypeID,
       'end_date' => '2035-01-01',
     ]);
-    $contributionID = $this->createMembershipContribution($otherID, $otherMembershipID);
-    CRM_Core_DAO::executeQuery(
-      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = %1 WHERE contribution_id = %2",
-      [1 => [$otherMembershipID, 'Integer'], 2 => [$contributionID, 'Integer']]
-    );
+    $contributionID = $this->createOrderForEntity($otherID, 'civicrm_membership', $otherMembershipID, 'Member Dues');
 
     $this->assertEquals($otherMembershipID, $this->getMembershipPaymentMembershipID($contributionID));
     $this->assertEquals($otherMembershipID, $this->getMembershipLineItemEntityID($contributionID));
@@ -2108,7 +2094,7 @@ WHERE
       'membership_type_id' => $membershipTypeID,
       'end_date' => '2035-01-01',
     ]);
-    $contributionID = $this->createMembershipContribution($mainID, $mainMembershipID);
+    $contributionID = $this->createOrderForEntity($mainID, 'civicrm_membership', $mainMembershipID, 'Member Dues');
     $this->callApiV3Success('MembershipPayment', 'create', [
       'contribution_id' => $contributionID,
       'membership_id' => $otherMembershipID,
@@ -2132,7 +2118,7 @@ WHERE
     ];
     $mainMembershipID = $this->contactMembershipCreate(['contact_id' => $mainID, 'membership_type_id' => $membershipTypeID] + $dates);
     $otherMembershipID = $this->contactMembershipCreate(['contact_id' => $otherID, 'membership_type_id' => $membershipTypeID] + $dates);
-    $contributionID = $this->createMembershipContribution($otherID, $otherMembershipID);
+    $contributionID = $this->createOrderForEntity($otherID, 'civicrm_membership', $otherMembershipID, 'Member Dues');
 
     $this->mergeContactsMergingMemberships($mainID, $otherID);
 
@@ -2180,11 +2166,7 @@ WHERE
       'contact_id' => $otherID,
       'membership_type_id' => $membershipTypeID,
     ]);
-    $contributionID = $this->createMembershipContribution($mainID, $mainMembershipID);
-    CRM_Core_DAO::executeQuery(
-      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = %1 WHERE contribution_id = %2",
-      [1 => [$mainMembershipID, 'Integer'], 2 => [$contributionID, 'Integer']]
-    );
+    $contributionID = $this->createOrderForEntity($mainID, 'civicrm_membership', $mainMembershipID, 'Member Dues');
     // A site that no longer writes the legacy records is linked by line item alone.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_membership_payment WHERE contribution_id = %1', [1 => [$contributionID, 'Integer']]);
 
@@ -2230,35 +2212,36 @@ WHERE
   }
 
   /**
-   * Creates a contribution belonging to $payerId and links it to the given
-   * participant via civicrm_participant_payment.
+   * Create an order paid by $payerID for an existing participant or membership.
+   *
+   * The line item links the contribution to the entity, which also records the
+   * legacy participant_payment or membership_payment row.
+   *
+   * @param int $payerID
+   * @param string $entityTable
+   *   civicrm_participant or civicrm_membership.
+   * @param int $entityID
+   * @param string $financialType
+   *
+   * @return int
+   *   Contribution ID.
+   * @throws \CRM_Core_Exception
    */
-  private function createParticipantContribution(int $payerId, int $participantId): int {
-    $contributionId = $this->contributionCreate([
-      'contact_id'        => $payerId,
-      'financial_type_id' => 'Event Fee',
-    ]);
-    $this->callAPISuccess('ParticipantPayment', 'create', [
-      'contribution_id' => $contributionId,
-      'participant_id'  => $participantId,
-    ]);
-    return $contributionId;
-  }
-
-  /**
-   * Creates a contribution belonging to $payerId and links it to the given
-   * membership via civicrm_membership_payment.
-   */
-  private function createMembershipContribution(int $payerId, int $membershipId): int {
-    $contributionId = $this->contributionCreate([
-      'contact_id'        => $payerId,
-      'financial_type_id' => 'Member Dues',
-    ]);
-    $this->callApiV3Success('MembershipPayment', 'create', [
-      'contribution_id' => $contributionId,
-      'membership_id'   => $membershipId,
-    ]);
-    return $contributionId;
+  private function createOrderForEntity(int $payerID, string $entityTable, int $entityID, string $financialType): int {
+    return Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $payerID,
+        'financial_type_id:name' => $financialType,
+      ])
+      ->addLineItem([
+        'entity_table' => $entityTable,
+        'entity_id' => $entityID,
+        'line_total' => 100,
+        'unit_price' => 100,
+        'qty' => 1,
+        'financial_type_id:name' => $financialType,
+      ])
+      ->execute()->single()['id'];
   }
 
   /**
@@ -2292,7 +2275,7 @@ WHERE
       }
     });
     try {
-      $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $keepID, 'to_remove_id' => $removeID, 'mode' => 'aggressive']);
+      $this->mergeDuplicates($keepID, $removeID, 'aggressive');
       $this->fail('The error should reach the caller');
     }
     catch (TypeError $e) {
