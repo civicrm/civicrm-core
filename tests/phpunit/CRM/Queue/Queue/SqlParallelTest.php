@@ -93,6 +93,50 @@ class CRM_Queue_Queue_SqlParallelTest extends CiviUnitTestCase {
   }
 
   /**
+   * If claiming one candidate fails, claimItems() must give back the
+   * candidates it already claimed, so they don't stay leased without running,
+   * but leave a claim that another process made since then.
+   */
+  public function testClaimItemsRelinquishesClaimsWhenBatchFails() {
+    $queue = new class(['type' => 'SqlParallel', 'name' => 'test-queue']) extends CRM_Queue_Queue_SqlParallel {
+      public $raceItemId;
+
+      protected function attemptClaim($dao, int $lease_time): bool {
+        $claimed = parent::attemptClaim($dao, $lease_time);
+        if ((int) $dao->id === $this->raceItemId) {
+          // Another process claims it again, as after an expired lease.
+          CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + 60), run_count = run_count + 1 WHERE id = %1', [
+            1 => [$this->raceItemId, 'Integer'],
+          ]);
+        }
+        return $claimed;
+      }
+
+    };
+    $queue->createItem(['test-key' => 'a']);
+    $queue->createItem(['test-key' => 'b']);
+    $queue->createItem(['test-key' => 'c']);
+    $ids = array_column(CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_queue_item ORDER BY id')->fetchAll(), 'id');
+    $queue->raceItemId = (int) $ids[1];
+    // 'c' cannot be unserialized, so the batch fails after claiming 'a' and 'b'.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item SET data = %1 WHERE id = %2', [
+      1 => ['O:7:"Closure":0:{}', 'String'],
+      2 => [$ids[2], 'Integer'],
+    ]);
+
+    try {
+      $queue->claimItems(3);
+      $this->fail('claimItems() should pass on the error');
+    }
+    catch (Exception $e) {
+      $this->assertStringContainsString('Closure', $e->getMessage());
+    }
+
+    $this->assertQueueStats(3, 2, 1, $queue);
+    $this->assertDBQuery('0,2,0', 'SELECT GROUP_CONCAT(run_count ORDER BY id) FROM civicrm_queue_item');
+  }
+
+  /**
    * @param int $racesRemaining
    * @return CRM_Queue_Queue_SqlParallel
    *   A queue whose candidate loses its race the first $racesRemaining
