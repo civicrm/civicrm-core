@@ -79,6 +79,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PR_COMMANDS_PAT || secrets.GITHUB_TOKEN }}
           COMMENT_BODY: ${{ github.event.comment.body }}
+          STATE: ${{ steps.pr_info.outputs.state }}
+          MERGE_COMMIT: ${{ steps.pr_info.outputs.merge_commit }}
+          HEAD_REF: ${{ steps.pr_info.outputs.head_ref }}
+          HEAD_OWNER: ${{ steps.pr_info.outputs.head_owner }}
+          HEAD_REPO: ${{ steps.pr_info.outputs.head_repo }}
+          BASE_REF: ${{ steps.pr_info.outputs.base_ref }}
         run: |
           # Configure Git
           if [ -n "${{ secrets.PR_COMMANDS_PAT }}" ]; then
@@ -89,17 +95,14 @@ jobs:
             git config user.email "github-actions[bot]@users.noreply.github.com"
           fi
 
-          STATE="${{ steps.pr_info.outputs.state }}"
-          MERGE_COMMIT="${{ steps.pr_info.outputs.merge_commit }}"
-
           if [ "$STATE" = "MERGED" ]; then
             git fetch origin pull/${{ github.event.issue.number }}/head
             git checkout -b pr-branch FETCH_HEAD
           else
             # Connect remote head_repo
-            git remote add head_repo "https://x-access-token:${{ secrets.PR_COMMANDS_PAT || secrets.GITHUB_TOKEN }}@github.com/${{ steps.pr_info.outputs.head_owner }}/${{ steps.pr_info.outputs.head_repo }}.git"
-            git fetch head_repo ${{ steps.pr_info.outputs.head_ref }}
-            git checkout -b pr-branch head_repo/${{ steps.pr_info.outputs.head_ref }}
+            git remote add head_repo "https://x-access-token:${{ secrets.PR_COMMANDS_PAT || secrets.GITHUB_TOKEN }}@github.com/$HEAD_OWNER/$HEAD_REPO.git"
+            git fetch head_repo "$HEAD_REF"
+            git checkout -b pr-branch "head_repo/$HEAD_REF"
           fi
 
           CMD=$(echo "$COMMENT_BODY" | head -n 1 | xargs | tr '[:upper:]' '[:lower:]')
@@ -111,8 +114,8 @@ jobs:
 
           if [[ "$CMD" =~ ^/squash ]]; then
             echo "Running squash..."
-            base_branch="${{ steps.pr_info.outputs.base_ref }}"
-            head_branch="${{ steps.pr_info.outputs.head_ref }}"
+            base_branch="$BASE_REF"
+            head_branch="$HEAD_REF"
 
             git fetch origin $base_branch
             merge_base=$(git merge-base origin/$base_branch HEAD)
@@ -136,8 +139,8 @@ jobs:
           elif [[ "$CMD" =~ ^/(rebase|port)([[:space:]]+([^[:space:]]+))? ]]; then
             ACTION="${BASH_REMATCH[1]}"
             NEW_BASE="${BASH_REMATCH[3]}"
-            base_branch="${{ steps.pr_info.outputs.base_ref }}"
-            head_branch="${{ steps.pr_info.outputs.head_ref }}"
+            base_branch="$BASE_REF"
+            head_branch="$HEAD_REF"
 
             if [ "$ACTION" = "port" ] && [ -z "$NEW_BASE" ]; then
               echo "Error: /port requires a target branch argument (e.g. /port 5.74)."
@@ -174,9 +177,10 @@ jobs:
               if ! git rebase --onto origin/$NEW_BASE $UPSTREAM HEAD; then
                 echo "REBASE_FAILED=true" >> $GITHUB_ENV
                 CONFLICTS=$(git diff --name-only --diff-filter=U)
-                echo "CONFLICTS<<EOF" >> $GITHUB_ENV
+                DELIM="EOF_$(openssl rand -hex 16)"
+                echo "CONFLICTS<<$DELIM" >> $GITHUB_ENV
                 echo "$CONFLICTS" >> $GITHUB_ENV
-                echo "EOF" >> $GITHUB_ENV
+                echo "$DELIM" >> $GITHUB_ENV
                 git rebase --abort
                 exit 1
               fi
@@ -213,8 +217,8 @@ jobs:
 
           elif [[ "$CMD" =~ ^/(lintroll|lint) ]]; then
             echo "Running lintroll..."
-            base_branch="${{ steps.pr_info.outputs.base_ref }}"
-            head_branch="${{ steps.pr_info.outputs.head_ref }}"
+            base_branch="$BASE_REF"
+            head_branch="$HEAD_REF"
 
             git fetch origin $base_branch
 
@@ -267,6 +271,7 @@ jobs:
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.PR_COMMANDS_PAT || secrets.GITHUB_TOKEN }}
+          BASE_REF: ${{ steps.pr_info.outputs.base_ref }}
         run: |
           # 1. Add reaction
           gh api \
@@ -278,10 +283,10 @@ jobs:
 
           # 2. Compile failure message
           if [ "$REBASE_FAILED" = "true" ]; then
-            if [ "$TARGET_BASE" = "${{ steps.pr_info.outputs.base_ref }}" ]; then
+            if [ "$TARGET_BASE" = "$BASE_REF" ]; then
               printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "$TARGET_BASE" "$CONFLICTS" "$TARGET_BASE"
             else
-              printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase --onto origin/%s origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "$TARGET_BASE" "$CONFLICTS" "$TARGET_BASE" "${{ steps.pr_info.outputs.base_ref }}"
+              printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase --onto origin/%s origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "$TARGET_BASE" "$CONFLICTS" "$TARGET_BASE" "$BASE_REF"
             fi
           elif [ "$LINTROLL_FAILED" = "true" ]; then
             MSG="### ❌ Lintroll Failed due to Conflicts"$'\n\n'"The automated formatting rebase failed due to merge conflicts. Please run \`civilint --fix\` and resolve any conflicts locally, then force-push your changes."
