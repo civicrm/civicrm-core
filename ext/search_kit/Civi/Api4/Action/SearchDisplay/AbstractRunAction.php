@@ -87,6 +87,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private $_afform;
 
   /**
+   * @var bool
+   */
+  private $_linksPreprocessed = FALSE;
+
+  /**
    * @var array
    */
   private $tasks;
@@ -1026,6 +1031,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $this->preprocessLink($button);
       }
     }
+    $this->_linksPreprocessed = TRUE;
   }
 
   /**
@@ -1131,6 +1137,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array
    */
   private function getLinkTokens(array $link): array {
+    // Link paths are only resolved by preprocessLinks(); without it there are no tokens to add
+    if (!$this->_linksPreprocessed) {
+      return [];
+    }
     $tokens = [];
     if (!$link['path'] && !empty($link['task'])) {
       $tokens[] = $link['prefix'] . $this->getIdKeyName($link['entity']);
