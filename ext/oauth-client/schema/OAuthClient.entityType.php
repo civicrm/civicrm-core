@@ -74,6 +74,17 @@ return [
         'manage OAuth client',
       ],
     ],
+    'pkce_method' => [
+      'title' => E::ts('PKCE Method'),
+      'sql_type' => 'varchar(16)',
+      'input_type' => 'Select',
+      'description' => E::ts('PKCE Method'),
+      'add' => '5.83',
+      'default' => 'auto',
+      'pseudoconstant' => [
+        'callback' => 'CRM_OAuth_BAO_OAuthClient::getPkceMethods',
+      ],
+    ],
     'options' => [
       'title' => E::ts('Options'),
       'sql_type' => 'text',
