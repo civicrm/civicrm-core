@@ -177,6 +177,8 @@ interface CRM_Core_Resources_CollectionAdderInterface {
    * And from javascript access it at CRM.myNamespace.myString
    *
    * @param string|array $text
+   *   A string, a list of strings, or strings with their plural form or NULL
+   *   as from CRM_Utils_JS::parseStrings().
    * @param string|null $domain
    * @return static
    */

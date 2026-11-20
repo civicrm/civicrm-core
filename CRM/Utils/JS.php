@@ -22,8 +22,8 @@ class CRM_Utils_JS {
    *
    * @param string $content
    *   Raw Javascript code.
-   * @return array
-   *   Array of translatable strings
+   * @return array<string, string|null>
+   *   Translatable strings, each with its plural form or NULL.
    */
   public static function parseStrings(string $content): array {
     $cleanString = function(string $text): string {
@@ -56,14 +56,48 @@ class CRM_Utils_JS {
 
     foreach ($matches[1] as $index => $text) {
       $text = $cleanString($text);
-      $strings[$text] = $text;
-      // If we have a plural form (second argument matched)
-      if (!empty($matches[2][$index])) {
-        $plural = $cleanString($matches[2][$index]);
-        $strings[$plural] = $plural;
+      $plural = empty($matches[2][$index]) ? NULL : $cleanString($matches[2][$index]);
+      $strings[$text] = $plural ?? $strings[$text] ?? NULL;
+    }
+    return $strings;
+  }
+
+  /**
+   * Translate strings for the client-side ts(), which looks a plural up by its plural form.
+   *
+   * @param array $strings
+   *   A list of strings, or strings with their plural form or NULL as from parseStrings().
+   * @param string|array|null $domain
+   *   Translation domain(s), as for ts().
+   * @return array<string, string>
+   *   The translations that differ from the original, keyed by original.
+   */
+  public static function translateStrings(array $strings, $domain): array {
+    $translated = [];
+    foreach (self::normalizeStrings($strings) as $text => $plural) {
+      $text = (string) $text;
+      $forms = $plural === NULL ? [$text => []] : [
+        $text => ['plural' => $plural, 'count' => 1],
+        $plural => ['plural' => $plural, 'count' => 2],
+      ];
+      foreach ($forms as $original => $params) {
+        $translation = _ts($text, $params + ['domain' => $domain, 'raw' => TRUE]);
+        if ($translation !== $original) {
+          $translated[$original] = $translation;
+        }
       }
     }
-    return array_values($strings);
+    return $translated;
+  }
+
+  /**
+   * @param array $strings
+   *   A list of strings, or strings with their plural form or NULL as from parseStrings().
+   * @return array<string, string|null>
+   *   Strings with their plural form or NULL.
+   */
+  public static function normalizeStrings(array $strings): array {
+    return array_is_list($strings) ? array_fill_keys($strings, NULL) : $strings;
   }
 
   /**

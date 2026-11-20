@@ -117,7 +117,7 @@ class CRM_Utils_HTMLTest extends CiviUnitTestCase {
     // Plurals
     $cases[] = [
       '{{ ts("Singular \'%1\'", {plural: "%count Plurals \'%1\'", 1: "1"}) }}',
-      ["Singular '%1'", "%count Plurals '%1'"],
+      ["Singular '%1'" => "%count Plurals '%1'"],
     ];
 
     return $cases;
@@ -127,15 +127,18 @@ class CRM_Utils_HTMLTest extends CiviUnitTestCase {
    * @param string $html
    *   Example HTML input.
    * @param array $expectedStrings
-   *   List of expected strings.
+   *   Expected strings: a list, or strings keyed with their plural form.
    * @dataProvider translateExamples
    */
   public function testParseStrings($html, $expectedStrings) {
     // Magic! The JS parser works with HTML!
     $actualStrings = CRM_Utils_JS::parseStrings($html);
-    sort($expectedStrings);
-    sort($actualStrings);
-    $this->assertEquals($expectedStrings, $actualStrings);
+    if (array_is_list($expectedStrings)) {
+      $expectedStrings = array_fill_keys($expectedStrings, NULL);
+    }
+    ksort($expectedStrings);
+    ksort($actualStrings);
+    $this->assertSame($expectedStrings, $actualStrings);
   }
 
 }

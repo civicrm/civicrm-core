@@ -49,8 +49,8 @@ class CRM_Core_Resources_Strings {
    * @param string $format
    *   Type of file (e.g. 'text/javascript', 'text/html').
    *
-   * @return array
-   *   List of translatable strings.
+   * @return array<string, string|null>
+   *   Translatable strings, each with its plural form or NULL.
    *
    * @throws \CRM_Core_Exception
    */
@@ -79,8 +79,8 @@ class CRM_Core_Resources_Strings {
    *   File path.
    * @param string $format
    *   Type of file (e.g. 'text/javascript', 'text/html').
-   * @return array
-   *   List of translatable strings.
+   * @return array<string, string|null>
+   *   Translatable strings, each with its plural form or NULL.
    *
    * @throws CRM_Core_Exception
    */
