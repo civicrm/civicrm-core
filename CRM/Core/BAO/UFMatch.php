@@ -537,30 +537,25 @@ AND    domain_id    = %4
   }
 
   /**
-   * This checks and adds a unique index on (uf_id,domain_id)
+   * Ensure the index on (uf_id,domain_id) is unique, unless duplicates prevent it.
    *
    * @return bool
    * @throws \Civi\Core\Exception\DBQueryException
    */
   public static function tryToAddUniqueIndexOnUfId(): bool {
-    if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_uf_match', 'UI_uf_match_uf_id_domain_id')) {
-      // Run a query to check if we have duplicates
-      $query = 'SELECT COUNT(*) FROM civicrm_uf_match
-GROUP BY uf_id,domain_id
-HAVING COUNT(*) > 1';
-      $dao = CRM_Core_DAO::executeQuery($query);
-      if ($dao->fetch()) {
-        // Tell the user they need to fix it manually
-        \Civi::log()->error('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.');
-        return FALSE;
-      }
-      else {
-        // Add the unique index
-        CRM_Core_DAO::executeQuery("
-        ALTER TABLE civicrm_uf_match ADD UNIQUE INDEX UI_uf_match_uf_id_domain_id (uf_id,domain_id);
-      ");
-      }
+    $indexes = CRM_Core_BAO_SchemaHandler::getIndexes(['civicrm_uf_match'])['civicrm_uf_match'];
+    if (!empty($indexes['UI_uf_match_uf_id_domain_id']['unique'])) {
+      return TRUE;
     }
+    $duplicates = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_uf_match
+GROUP BY uf_id,domain_id
+HAVING COUNT(*) > 1');
+    if ($duplicates) {
+      \Civi::log()->error('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.');
+      return FALSE;
+    }
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_uf_match', 'UI_uf_match_uf_id_domain_id');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_uf_match ADD UNIQUE INDEX UI_uf_match_uf_id_domain_id (uf_id,domain_id)');
     return TRUE;
   }
 
