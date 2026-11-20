@@ -1365,7 +1365,8 @@ function _civicrm_api3_basic_create_fallback($bao_name, $params) {
 /**
  * Function to do a 'standard' api del.
  *
- * When the api is only doing a $bao::del then use this if api::del doesn't exist it will try DAO delete method.
+ * Deletes via the APIv4 delete action where the entity has one, so v3 and v4
+ * share a single delete path.
  *
  * @param string|CRM_Core_DAO $bao_name
  * @param array $params
@@ -1380,6 +1381,22 @@ function _civicrm_api3_basic_create_fallback($bao_name, $params) {
 function _civicrm_api3_basic_delete($bao_name, &$params) {
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
   _civicrm_api3_check_edit_permissions($bao_name, $params);
+  $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($bao_name);
+  $apiClass = $entityName ? \Civi\Api4\Utils\CoreUtil::getApiClass($entityName) : NULL;
+  if ($apiClass && method_exists($apiClass, 'delete')) {
+    // The caller's check_permissions must reach APIv4: record access checks and
+    // hook_civicrm_pre listeners (eg. contact-owned entities, financialacls) only
+    // enforce access when it is set.
+    $deleted = civicrm_api4($entityName, 'delete', [
+      'checkPermissions' => !empty($params['check_permissions']),
+      'where' => [[\Civi\Api4\Utils\CoreUtil::getIdFieldName($entityName), '=', $params['id']]],
+    ]);
+    if (!$deleted->count()) {
+      throw new CRM_Core_Exception('Could not delete entity id ' . $params['id']);
+    }
+    return civicrm_api3_create_success();
+  }
+  CRM_Core_Error::deprecatedWarning("APIv3 delete for $bao_name is not backed by an APIv4 entity. Register the entity so it has an APIv4 delete action.");
   if (method_exists($bao_name, 'del') && !\Civi\Api4\Utils\ReflectionUtils::isMethodDeprecated($bao_name, 'del')) {
     $args = [&$params['id']];
     $dao = new $bao_name();

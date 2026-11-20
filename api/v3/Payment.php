@@ -74,7 +74,9 @@ function civicrm_api3_payment_get($params) {
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_payment_delete($params) {
-  return civicrm_api3('FinancialTrxn', 'delete', $params);
+  // Payment's own delete permission has already been checked, so the
+  // underlying FinancialTrxn delete is not permission-checked again.
+  return civicrm_api3('FinancialTrxn', 'delete', ['id' => $params['id'], 'check_permissions' => FALSE]);
 }
 
 /**
