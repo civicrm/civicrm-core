@@ -15,19 +15,9 @@
  */
 
 /**
- * This class extends the PEAR pager object by substituting standard default pager arguments
- * We also extract the pageId from either the GET variables or the POST variable (since we
- * use a POST to jump to a specific page). At some point we should evaluate if we want
- * to use Pager_Jumping instead. We've changed the format to allow navigation by jumping
- * to a page and also First, Prev CURRENT Next Last
- */
-
-require_once 'Pager/Sliding.php';
-
-/**
  * Class CRM_Utils_Pager
  */
-class CRM_Utils_Pager extends Pager_Sliding {
+class CRM_Utils_Pager {
 
   /**
    * Constants for static parameters of the pager
@@ -41,6 +31,30 @@ class CRM_Utils_Pager extends Pager_Sliding {
   const ROWCOUNT = 50;
 
   /**
+   * Total number of items across all pages.
+   * @var int
+   */
+  public $_totalItems = 0;
+
+  /**
+   * Number of items per page.
+   * @var int
+   */
+  public $_perPage = 25;
+
+  /**
+   * Current page ID (1-indexed).
+   * @var int
+   */
+  public $_currentPage = 1;
+
+  /**
+   * Total number of pages.
+   * @var int
+   */
+  public $_totalPages = 1;
+
+  /**
    * The output of the pager. This is a name/value array with various keys
    * that an application could use to display the pager
    *
@@ -48,37 +62,88 @@ class CRM_Utils_Pager extends Pager_Sliding {
    */
   public $_response;
 
+  private $_urlVar = self::PAGE_ID;
+  private $_altFirst = 'first page';
+  private $_altPrev = 'previous page';
+  private $_altNext = 'next page';
+  private $_altLast = 'last page';
+  private $_prevImg = ' &lt; Previous';
+  private $_nextImg = 'Next &gt; ';
+  private $_firstPagePre = '';
+  private $_firstPageText = ' &lt;&lt; First';
+  private $_firstPagePost = '';
+  private $_lastPagePre = '';
+  private $_lastPageText = 'Last &gt;&gt; ';
+  private $_lastPagePost = '';
+  private $_spacesBefore = '&nbsp;';
+  private $_spacesAfter = '&nbsp;';
+  private $_excludeVars = [];
+  private $_extraVars = [];
+  private $_linkData = NULL;
+
   /**
-   * The pager constructor. Takes a few values, and then assigns a lot of defaults
-   * to the PEAR pager class
-   * We have embedded some html in this class. Need to figure out how to export this
-   * to the top level at some point in time
+   * The pager constructor.
    *
    * @param array $params
+   *   Array of parameters for the pager, including:
+   *   - 'total': int, total number of records across all pages.
+   *   - 'status': string|null, template status message string containing '%%StatusMessage%%'.
+   *   - 'rowCount': int|null, number of records per page.
+   *   - 'pageID': int|null, current page number.
+   *   - 'buttonTop': string|null, name of the form element for the top submit button.
+   *   - 'buttonBottom': string|null, name of the form element for the bottom submit button.
+   *   - 'csvString': string|null, optional CSV download link or string.
    *
    * @return \CRM_Utils_Pager the newly created and initialized pager object
    */
   public function __construct($params) {
-    if ($params['status'] === NULL) {
-      $params['status'] = ts('Contacts %%StatusMessage%%');
-    }
+    $params['status'] ??= ts('Contacts %%StatusMessage%%');
 
     $this->initialize($params);
 
-    parent::__construct($params);
+    $this->_totalItems = (int) ($params['totalItems'] ?? $params['total'] ?? 0);
+    $this->_perPage = (int) ($params['perPage'] ?? 25);
+    $this->_urlVar = $params['urlVar'] ?? self::PAGE_ID;
+    $this->_altFirst = $params['altFirst'] ?? 'first page';
+    $this->_altPrev = $params['altPrev'] ?? 'previous page';
+    $this->_altNext = $params['altNext'] ?? 'next page';
+    $this->_altLast = $params['altLast'] ?? 'last page';
+    $this->_prevImg = $params['prevImg'] ?? ' ' . ts('&lt; Previous');
+    $this->_nextImg = $params['nextImg'] ?? ts('Next &gt;') . ' ';
+    $this->_firstPagePre = $params['firstPagePre'] ?? '';
+    $this->_firstPageText = $params['firstPageText'] ?? ' ' . ts('&lt;&lt; First');
+    $this->_firstPagePost = $params['firstPagePost'] ?? '';
+    $this->_lastPagePre = $params['lastPagePre'] ?? '';
+    $this->_lastPageText = $params['lastPageText'] ?? ts('Last &gt;&gt;') . ' ';
+    $this->_lastPagePost = $params['lastPagePost'] ?? '';
+    $this->_spacesBefore = str_repeat('&nbsp;', $params['spacesBeforeSeparator'] ?? 1);
+    $this->_spacesAfter = str_repeat('&nbsp;', $params['spacesAfterSeparator'] ?? 1);
+    $this->_excludeVars = $params['excludeVars'] ?? [];
+    $this->_extraVars = $params['extraVars'] ?? [];
+
+    $this->_totalPages = $this->_perPage > 0 ? (int) ceil($this->_totalItems / $this->_perPage) : 0;
+
+    $currentPage = (int) ($params['currentPage'] ?? 1);
+    if ($currentPage < 1) {
+      $currentPage = 1;
+    }
+    if ($this->_totalPages > 0 && $currentPage > $this->_totalPages) {
+      $currentPage = $this->_totalPages;
+    }
+    $this->_currentPage = $currentPage;
 
     [$offset, $limit] = $this->getOffsetAndRowCount();
     $start = $offset + 1;
     $end = $offset + $limit;
-    if ($end > $params['total']) {
-      $end = $params['total'];
+    if ($end > $this->_totalItems) {
+      $end = $this->_totalItems;
     }
 
-    if ($params['total'] == 0) {
+    if ($this->_totalItems == 0) {
       $statusMessage = '';
     }
     else {
-      $statusMessage = ts('%1 - %2 of %3', [1 => $start, 2 => $end, 3 => $params['total']]);
+      $statusMessage = ts('%1 - %2 of %3', [1 => $start, 2 => $end, 3 => $this->_totalItems]);
     }
     $params['status'] = str_replace('%%StatusMessage%%', $statusMessage, $params['status']);
 
@@ -116,24 +181,14 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * values.
    *
    * @param array $params
-   *   The set of options needed to initialize the parent constructor.
    *
    * @return array
    */
   public function initialize(&$params) {
-    // set the mode for the pager to Sliding
-
     $params['mode'] = 'Sliding';
-
-    // also set the urlVar to be a crm specific get variable.
-
     $params['urlVar'] = self::PAGE_ID;
-
-    // set this to a small value, since we dont use this functionality
-
     $params['delta'] = 1;
-
-    $params['totalItems'] = $params['total'];
+    $params['totalItems'] = $params['total'] ?? 0;
     $params['append'] = TRUE;
     $params['separator'] = '';
     $params['spacesBeforeSeparator'] = 1;
@@ -154,49 +209,40 @@ class CRM_Utils_Pager extends Pager_Sliding {
     $params['lastPageText'] = ts('Last &gt;&gt;') . ' ';
     $params['lastPagePost'] = '';
 
-    if (isset($params['pageID'])) {
-      $params['currentPage'] = $this->getPageID($params['pageID'], $params);
-    }
+    $defaultPageId = $params['pageID'] ?? 1;
+    $params['currentPage'] = $this->getPageID($defaultPageId, $params);
 
-    $params['perPage'] = $this->getPageRowCount($params['rowCount']);
+    $params['perPage'] = $this->getPageRowCount($params['rowCount'] ?? NULL);
 
     return $params;
   }
 
   /**
-   * Figure out the current page number based on value of
-   * GET / POST variables. Hierarchy rules are followed,
-   * POST over-rides a GET, a POST at the top overrides
-   * a POST at the bottom (of the page)
+   * Figure out the current page number based on value of GET / POST variables.
    *
    * @param int $defaultPageId
-   *   DefaultPageId current pageId.
-   *
    * @param array $params
    *
    * @return int
-   *   new pageId to display to the user
    */
   public function getPageID($defaultPageId, &$params) {
-    // POST has higher priority than GET vars
-    // else if a value is set that has higher priority and finally the GET var
     $currentPage = $defaultPageId;
     if (!empty($_POST)) {
-      if (isset($_POST[$params['buttonTop']], $_POST[self::PAGE_ID])) {
-        $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
+      if (isset($params['buttonTop'], $_POST[$params['buttonTop']], $_POST[self::PAGE_ID])) {
+        $currentPage = max((int) @$_POST[self::PAGE_ID], 1);
       }
-      elseif (isset($_POST[$params['buttonBottom']], $_POST[self::PAGE_ID_BOTTOM])) {
-        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM], 1);
+      elseif (isset($params['buttonBottom'], $_POST[$params['buttonBottom']], $_POST[self::PAGE_ID_BOTTOM])) {
+        $currentPage = max((int) @$_POST[self::PAGE_ID_BOTTOM], 1);
       }
       elseif (isset($_POST[self::PAGE_ID])) {
-        $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
+        $currentPage = max((int) @$_POST[self::PAGE_ID], 1);
       }
       elseif (isset($_POST[self::PAGE_ID_BOTTOM])) {
-        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM], 1);
+        $currentPage = max((int) @$_POST[self::PAGE_ID_BOTTOM], 1);
       }
     }
     elseif (isset($_GET[self::PAGE_ID])) {
-      $currentPage = max((int ) @$_GET[self::PAGE_ID], 1);
+      $currentPage = max((int) @$_GET[self::PAGE_ID], 1);
     }
     return $currentPage;
   }
@@ -205,18 +251,15 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * Get the number of rows to display from either a GET / POST variable
    *
    * @param int|null $defaultPageRowCount
-   *   The default value if not set.
    *
    * @return int
-   *   the rowCount value to use
    */
   public function getPageRowCount($defaultPageRowCount = NULL) {
-    // POST has higher priority than GET vars
     if (isset($_POST[self::PAGE_ROWCOUNT])) {
-      $rowCount = max((int ) @$_POST[self::PAGE_ROWCOUNT], 1);
+      $rowCount = max((int) @$_POST[self::PAGE_ROWCOUNT], 1);
     }
     elseif (isset($_GET[self::PAGE_ROWCOUNT])) {
-      $rowCount = max((int ) @$_GET[self::PAGE_ROWCOUNT], 1);
+      $rowCount = max((int) @$_GET[self::PAGE_ROWCOUNT], 1);
     }
     else {
       if (empty($defaultPageRowCount)) {
@@ -230,10 +273,9 @@ class CRM_Utils_Pager extends Pager_Sliding {
   }
 
   /**
-   * Use the pager class to get the pageId and Offset.
+   * Return page ID and offset.
    *
    * @return array
-   *   an array of the pageID and offset
    */
   public function getOffsetAndRowCount() {
     $pageId = $this->getCurrentPageID();
@@ -244,6 +286,55 @@ class CRM_Utils_Pager extends Pager_Sliding {
     $offset = ($pageId - 1) * $this->_perPage;
 
     return [$offset, $this->_perPage];
+  }
+
+  /**
+   * @return int
+   */
+  public function getCurrentPageID(): int {
+    return $this->_currentPage;
+  }
+
+  /**
+   * @return int
+   */
+  public function numPages(): int {
+    return $this->_totalPages;
+  }
+
+  /**
+   * @return int
+   */
+  public function numItems(): int {
+    return $this->_totalItems;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isFirstPage(): bool {
+    return $this->_currentPage < 2;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isLastPage(): bool {
+    return $this->_currentPage == $this->_totalPages || $this->_totalPages == 0;
+  }
+
+  /**
+   * @return int|false
+   */
+  public function getNextPageID() {
+    return ($this->getCurrentPageID() == $this->numPages() || $this->numPages() == 0) ? FALSE : $this->getCurrentPageID() + 1;
+  }
+
+  /**
+   * @return int|false
+   */
+  public function getPreviousPageID() {
+    return $this->isFirstPage() ? FALSE : $this->getCurrentPageID() - 1;
   }
 
   /**
@@ -263,7 +354,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
     }
     $href = $this->makeURL(self::PAGE_ID, 1);
     return $this->formatLink($href, str_replace('%d', 1, $this->_altFirst), $this->_firstPagePre . $this->_firstPageText . $this->_firstPagePost) .
-    $this->_spacesBefore . $this->_spacesAfter;
+      $this->_spacesBefore . $this->_spacesAfter;
   }
 
   /**
@@ -295,8 +386,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
     if ($this->_currentPage < $this->_totalPages) {
       $href = $this->makeURL(self::PAGE_ID, $this->getNextPageID());
       return $this->_spacesAfter .
-      $this->formatLink($href, $this->_altNext, $this->_nextImg) .
-      $this->_spacesBefore . $this->_spacesAfter;
+        $this->formatLink($href, $this->_altNext, $this->_nextImg) .
+        $this->_spacesBefore . $this->_spacesAfter;
     }
     return '';
   }
@@ -327,6 +418,49 @@ class CRM_Utils_Pager extends Pager_Sliding {
    */
   private function formatLink($href, $title, $image) {
     return sprintf('<a class="crm-pager-link action-item crm-hover-button" href="%s" title="%s">%s</a>', $href, $title, $image);
+  }
+
+  /**
+   * Return any extra GET/POST args that should be appended to links.
+   *
+   * @return array
+   * @access private
+   */
+  private function _getLinksData() {
+    // This all feels quirky, but it's loyal to the prior implementation.
+    // It's just rewritten/flattened/simplified.
+
+    $qs = (!isset($_GET[$this->_urlVar]) && isset($_POST[$this->_urlVar])) ? $_POST : $_GET;
+
+    foreach (array_intersect($this->_excludeVars, array_keys($qs)) as $key) {
+      unset($qs[$key]);
+    }
+
+    $decode = fn($val) => strtr($val, array_flip(get_html_translation_table(HTML_ENTITIES)));
+    $map = fn($func, $data) => is_array($data) ? array_map($func, $data) : $func($data);
+    foreach ($this->_extraVars ?? [] as $var => $value) {
+      $qs[$var] = $map($decode, $this->_extraVars[$var]);
+    }
+
+    return $qs;
+  }
+
+  public function __get(string $name) {
+    if ($name === '_linkData') {
+      // We don't usually need this, but some extensions (eg `countrymanager`) may use it.
+      $this->_linkData ??= $this->_getLinksData();
+      return $this->_linkData;
+    }
+
+    // Note: If you get here, it may be that you relied on an obscure from the old PEAR Pager class.
+    // We no longer extend this.
+    $trace = debug_backtrace();
+    trigger_error('Undefined property via CRM_Utils_Pager::__get(): ' . $name . ' in ' . $trace[0]['file'] . ' on line ' . $trace[0]['line'], E_USER_WARNING);
+    return NULL;
+  }
+
+  public function __isset(string $name) {
+    return in_array($name, ['_linkData'], TRUE);
   }
 
 }
