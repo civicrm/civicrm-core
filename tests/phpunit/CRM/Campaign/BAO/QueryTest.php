@@ -18,6 +18,8 @@
  */
 class CRM_Campaign_BAO_QueryTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   public function testCampaignVoterClause(): void {
     $loggedInContact = $this->createLoggedInUser();
     $contact = $this->individualCreate();
