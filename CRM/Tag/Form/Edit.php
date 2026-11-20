@@ -164,15 +164,19 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $deleted = 0;
+      $deleted = $failed = 0;
       $tag = Tag::get(FALSE)
         ->addSelect('label', 'is_tagset')
         ->addWhere('id', '=', $this->_id[0])
         ->execute()
         ->single();
       foreach ($this->_id as $id) {
-        if (CRM_Core_BAO_Tag::deleteRecord(['id' => $id])) {
+        try {
+          CRM_Core_BAO_Tag::deleteRecord(['id' => $id]);
           $deleted++;
+        }
+        catch (CRM_Core_Exception $e) {
+          $failed++;
         }
       }
       if (count($this->_id) == 1 && $deleted == 1) {
@@ -185,6 +189,10 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       }
       else {
         CRM_Core_Session::setStatus(ts("Deleted %1 tags.", [1 => $deleted]), ts('Deleted'), 'success');
+      }
+
+      if ($failed) {
+        CRM_Core_Session::setStatus(ts('1 could not be deleted.', ['plural' => '%count could not be deleted.', 'count' => $failed]), ts('Error'), 'error');
       }
     }
     else {

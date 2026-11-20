@@ -491,17 +491,20 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $fieldValues = ['option_group_id' => $this->_gid];
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
 
-      if (CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id])) {
-        if ($this->_gName == 'phone_type') {
-          CRM_Core_BAO_Phone::setOptionToNull($this->_defaultValues['value'] ?? NULL);
-        }
-
-        CRM_Core_Session::setStatus(ts('Selected %1 type has been deleted.', [1 => $this->_gLabel]), ts('Record Deleted'), 'success');
+      try {
+        CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id]);
       }
-      else {
+      catch (CRM_Core_Exception $e) {
         CRM_Core_Session::setStatus(ts('Selected %1 type has not been deleted.', [1 => $this->_gLabel]), ts('Sorry'), 'error');
         CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_OptionValue', $fieldValues);
+        return;
       }
+
+      if ($this->_gName == 'phone_type') {
+        CRM_Core_BAO_Phone::setOptionToNull($this->_defaultValues['value'] ?? NULL);
+      }
+
+      CRM_Core_Session::setStatus(ts('Selected %1 type has been deleted.', [1 => $this->_gLabel]), ts('Record Deleted'), 'success');
     }
     else {
       $params = $this->getSubmittedValues();

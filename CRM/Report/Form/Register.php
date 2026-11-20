@@ -158,14 +158,9 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
 
-      if (CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id])) {
-        CRM_Core_Session::setStatus(ts('Selected %1 Report has been deleted.', [1 => $this->_GName]), ts('Record Deleted'), 'success');
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/report/options/report_template', "reset=1"));
-      }
-      else {
-        CRM_Core_Session::setStatus(ts('Selected %1 type has not been deleted.', [1 => $this->_GName]), '', 'info');
-        CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_OptionValue', $fieldValues);
-      }
+      $optionValue = CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id]);
+      CRM_Core_Session::setStatus(ts('Selected %1 Report has been deleted.', [1 => $optionValue->label]), ts('Record Deleted'), 'success');
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/report/options/report_template', "reset=1"));
     }
     else {
       // get the submitted form values.

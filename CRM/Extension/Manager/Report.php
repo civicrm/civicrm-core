@@ -77,9 +77,9 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
     $customReports = $this->getCustomReportsByName();
     $cr = $this->getCustomReportsById();
     $id = $cr[$customReports[$info->key]];
-    $optionValue = CRM_Core_BAO_OptionValue::deleteRecord(['id' => $id]);
+    CRM_Core_BAO_OptionValue::deleteRecord(['id' => $id]);
 
-    return $optionValue ? TRUE : FALSE;
+    return TRUE;
   }
 
   /**

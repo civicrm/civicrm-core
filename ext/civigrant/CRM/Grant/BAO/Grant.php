@@ -118,7 +118,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   public static function del($id) {
     CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $id]);
-    return FALSE;
+    return TRUE;
   }
 
   /**
