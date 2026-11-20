@@ -274,7 +274,8 @@ SELECT acl.*
     if (empty(Civi::$statics[__CLASS__]['permissioned_groups'])) {
       Civi::$statics[__CLASS__]['permissioned_groups'] = [];
     }
-    if (!empty(Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey])) {
+    // An empty list (no permitted ids) is a cached result too.
+    if (isset(Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey])) {
       return Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey];
     }
 

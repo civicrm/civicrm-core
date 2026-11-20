@@ -190,7 +190,7 @@ WHERE  modified_date IS NULL
    * Flush the contents of the acl contact cache.
    */
   protected static function flushACLContactCache(): void {
-    unset(Civi::$statics['CRM_ACL_API']);
+    unset(Civi::$statics['CRM_ACL_API'], Civi::$statics['CRM_ACL_BAO_ACL']['permissioned_groups']);
     // Use DELETE rather than TRUNCATE: TRUNCATE is DDL, so it force-commits the
     // current transaction and bumps the table's metadata version. Concurrent
     // connections with an open SELECT on civicrm_acl_contact_cache (e.g. a
