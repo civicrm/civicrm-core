@@ -1918,7 +1918,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * Returns the directive filters of the display instance this request belongs to.
    *
    * With several instances on the form, the request must repeat the literal
-   * filter values of one of them.
+   * filter values of one of them; of those that match, the one with the most
+   * literal filters wins.
    *
    * @param array $searchDisplay
    * @return array
@@ -1933,15 +1934,24 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (count($instances) < 2) {
       return $instances[0] ?? [];
     }
+    $match = NULL;
+    $matchCount = -1;
     foreach ($instances as $filters) {
-      foreach ($filters as $filterKey => $filterVal) {
-        if ($filterVal !== NULL && ($this->filters[$filterKey] ?? NULL) != $filterVal) {
+      $literals = array_filter($filters, fn($filterVal) => $filterVal !== NULL);
+      foreach ($literals as $filterKey => $filterVal) {
+        if (($this->filters[$filterKey] ?? NULL) != $filterVal) {
           continue 2;
         }
       }
-      return $filters;
+      if (count($literals) > $matchCount) {
+        $match = $filters;
+        $matchCount = count($literals);
+      }
     }
-    throw new UnauthorizedException('Filters do not match any instance of this search display');
+    if ($match === NULL) {
+      throw new UnauthorizedException('Filters do not match any instance of this search display');
+    }
+    return $match;
   }
 
   /**

@@ -421,6 +421,71 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     }
   }
 
+  public static function instanceOrderProvider(): array {
+    return ['broad instance first' => [TRUE], 'narrow instance first' => [FALSE]];
+  }
+
+  /**
+   * With the same display placed twice, where one instance's literal filters
+   * are a subset of the other's, each instance keeps its own filters.
+   *
+   * @dataProvider instanceOrderProvider
+   */
+  public function testLiteralFiltersWithSubsetInstance(bool $broadFirst): void {
+    $contactIds = [];
+    foreach (['wanted', 'other'] as $source) {
+      $contactIds[$source] = $this->createTestRecord('Individual', ['last_name' => __FUNCTION__, 'first_name' => 'Fx', 'source' => $source])['id'];
+    }
+    SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => 'TestSubsetInstance',
+        'label' => 'TestSubsetInstance',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+          'where' => [['last_name', '=', __FUNCTION__]],
+        ],
+      ])
+      ->addChain('display', SearchDisplay::create(FALSE)->setValues([
+        'saved_search_id' => '$id',
+        'name' => 'TestSubsetInstanceDisplay',
+        'label' => 'TestSubsetInstanceDisplay',
+        'type' => 'table',
+        'acl_bypass' => TRUE,
+        'settings' => [
+          'limit' => 20,
+          'pager' => TRUE,
+          'columns' => [['key' => 'id', 'label' => 'Id', 'type' => 'field']],
+        ],
+      ]))
+      ->execute();
+    $broad = '<crm-search-display-table search-name="TestSubsetInstance" display-name="TestSubsetInstanceDisplay" filters="{first_name: \'Fx\'}"></crm-search-display-table>';
+    $narrow = '<crm-search-display-table search-name="TestSubsetInstance" display-name="TestSubsetInstanceDisplay" filters="{first_name: \'Fx\', source: \'wanted\'}"></crm-search-display-table>';
+    Afform::create(FALSE)
+      ->setLayoutFormat('html')
+      ->setValues([
+        'name' => 'testSubsetInstanceForm',
+        'title' => 'Subset instance',
+        'type' => 'search',
+        'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+        'layout' => '<div>' . ($broadFirst ? $broad . $narrow : $narrow . $broad) . '</div>',
+      ])
+      ->execute();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $params = [
+      'return' => 'page:1',
+      'savedSearch' => 'TestSubsetInstance',
+      'display' => 'TestSubsetInstanceDisplay',
+      'afform' => 'testSubsetInstanceForm',
+    ];
+    $narrowRows = civicrm_api4('SearchDisplay', 'run', $params + ['filters' => ['first_name' => 'Fx', 'source' => 'wanted']]);
+    $this->assertSame([$contactIds['wanted']], array_column((array) $narrowRows, 'key'));
+    $broadRows = civicrm_api4('SearchDisplay', 'run', $params + ['filters' => ['first_name' => 'Fx']]);
+    $this->assertCount(2, $broadRows);
+  }
+
   public function testSearchReferencesToAfform(): void {
     $search = SavedSearch::save(FALSE)
       ->addRecord([
