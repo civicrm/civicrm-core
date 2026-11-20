@@ -703,26 +703,22 @@ class CRM_Core_BAO_CustomValueTable {
       return NULL;
     }
     if (!isset($params['entityID']) ||
-      CRM_Utils_Type::escape($params['entityID'],
-        'Integer', FALSE
-      ) === NULL
+      CRM_Utils_Type::escape($params['entityID'], 'Positive', FALSE) === NULL
     ) {
-      return CRM_Core_Error::createAPIError(ts('entityID needs to be set and of type Integer'));
+      return CRM_Core_Error::createAPIError('entityID needs to be set and of type Integer');
     }
 
     // first collect all the ids. The format is:
     // custom_ID
     $fieldIDs = [];
     foreach ($params as $n => $v) {
-      $key = $idx = NULL;
-      if (substr($n, 0, 7) == 'custom_') {
-        $idx = substr($n, 7);
-        if (CRM_Utils_Type::escape($idx, 'Integer', FALSE) === NULL) {
-          return CRM_Core_Error::createAPIError(ts('field ID needs to be of type Integer for index %1',
-            [1 => $idx]
-          ));
-        }
-        $fieldIDs[] = (int) $idx;
+      $key = CRM_Core_BAO_CustomField::getKeyID($n);
+      if ($key) {
+        $fieldIDs[] = $key;
+      }
+      // Legacy validation - may be superfluous
+      elseif (str_starts_with($n, 'custom_')) {
+        return CRM_Core_Error::createAPIError(sprintf('Custom field ID must be Integer. Got "%s"', $n));
       }
     }
 
@@ -741,7 +737,7 @@ class CRM_Core_BAO_CustomValueTable {
           }
         }
         else {
-          return CRM_Core_Error::createAPIError(ts('Invalid entity type: "%1"', [1 => $type]));
+          return CRM_Core_Error::createAPIError(sprintf('Invalid entity type: "%s"', $type));
         }
       }
     }

@@ -444,12 +444,10 @@ trait Api3TestTrait {
         }
       }
       // Convert custom field names
-      if (str_starts_with($name, 'custom_') && is_numeric($name[7])) {
-        $customGroups = \CRM_Core_BAO_CustomGroup::getAll(['extends' => [$field['extends']]]);
-        $customGroupDetail = $customGroups[$field['custom_group_id']];
-        $customFieldDetail = $customGroupDetail['fields'][$field['custom_field_id']];
-        $custom[$customGroupDetail['name']][$customFieldDetail['name']] = $name;
-        $v4FieldName = $customGroupDetail['name'] . '.' . $customFieldDetail['name'];
+      $v4FieldName = \CRM_Core_BAO_CustomField::getLongNameFromShortName($name);
+      if ($v4FieldName) {
+        [$groupName, $fieldName] = explode('.', $v4FieldName);
+        $custom[$groupName][$fieldName] = $name;
         if (isset($v3Params[$name])) {
           $v3Params[$v4FieldName] = $v3Params[$name];
           unset($v3Params[$name]);

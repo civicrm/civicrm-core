@@ -526,27 +526,27 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Get the field id from an import key.
+   * Get field id from shortName.
    *
    * @param string $key
    *   The key to parse.
    *
    * @param bool $all
+   *   Pass TRUE to retrieve id and suffix e.g. from `custom_123_45`
    *
    * @return array|int|null
    */
-  public static function getKeyID($key, $all = FALSE) {
-    $match = [];
-    if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match)) {
-      if (!$all) {
-        return (int) $match[1];
-      }
-      else {
-        return [
-          $match[1],
-          $match[2] ?? NULL,
-        ];
-      }
+  public static function getKeyID(string $key, bool $all = FALSE): array|int|null {
+    if (!str_starts_with($key, 'custom_')) {
+      return $all ? [NULL, NULL] : NULL;
+    }
+    [, $id, $suffix] = array_pad(explode('_', $key, 3), 3, NULL);
+    // $id must be a positive integer
+    if (strval(intval($id)) === $id && intval($id) > 0
+      // $suffix, if set, must be a positive or negative integer
+      && ($suffix === NULL || strval(intval($suffix)) === $suffix)
+    ) {
+      return $all ? [$id, $suffix] : (int) $id;
     }
     return $all ? [NULL, NULL] : NULL;
   }
@@ -635,8 +635,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   Full name of group.field per Api4 naming convention.
    */
   public static function getLongNameFromShortName(string $shortName): ?string {
-    [$prefix, $id] = explode('_', $shortName);
-    if ($prefix !== 'custom' || strval(intval($id)) !== $id) {
+    $id = self::getKeyID($shortName);
+    if (!$id) {
       return NULL;
     }
     foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
