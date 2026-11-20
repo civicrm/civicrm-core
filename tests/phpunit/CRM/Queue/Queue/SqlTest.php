@@ -209,6 +209,49 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
   }
 
   /**
+   * A poll on a leased head returns NULL at once, without claim attempts.
+   */
+  public function testClaimItemDoesNotRetryOnLeasedHead() {
+    $queue = $this->makeQueueThatLosesRaceNTimes(0);
+    $queue->createItem(['test-key' => 'a']);
+    $queue->createItem(['test-key' => 'b']);
+    $this->assertEquals('a', $queue->claimItem()->data['test-key']);
+
+    $this->assertNull($queue->claimItem());
+    $this->assertEquals(1, $queue->attemptCount, 'A leased head should not be claimed again.');
+  }
+
+  /**
+   * Background workers poll claimItem() continuously, so it must not need a
+   * temporary table, which MariaDB writes to disk because of the data column.
+   */
+  public function testClaimItemNeedsNoTemporaryTable() {
+    $queue = new CRM_Queue_Queue_Sql(['type' => 'Sql', 'name' => 'test-queue']);
+    $queue->createItem(['test-key' => 'a']);
+    $queue->createItem(['test-key' => 'b']);
+
+    // SHOW STATUS may count a temporary table of its own, so measure that first.
+    $start = $this->countTemporaryTables();
+    $overhead = $this->countTemporaryTables() - $start;
+    $before = $this->countTemporaryTables();
+    $item = $queue->claimItem();
+    $after = $this->countTemporaryTables();
+
+    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertEquals($overhead, $after - $before, 'claimItem() should not create a temporary table');
+  }
+
+  /**
+   * @return int
+   *   Number of temporary tables created so far on this database connection.
+   */
+  private function countTemporaryTables(): int {
+    $dao = CRM_Core_DAO::executeQuery("SHOW SESSION STATUS LIKE 'Created_tmp_tables'");
+    $dao->fetch();
+    return (int) $dao->Value;
+  }
+
+  /**
    * @param int $racesRemaining
    * @return CRM_Queue_Queue_Sql
    *   A queue whose candidate loses its race the first $racesRemaining
