@@ -794,17 +794,12 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function validateAllCounts(int $membershipId, int $count): void {
-    $memPayParams = [
-      'membership_id' => $membershipId,
-      'version' => 3,
-    ];
     $lineItemParams = [
       'entity_id' => $membershipId,
       'entity_table' => 'civicrm_membership',
       'contribution_id' => ['>' => 0],
     ];
     $this->callAPISuccessGetCount('LineItem', $lineItemParams, $count);
-    $this->callAPISuccessGetCount('MembershipPayment', $memPayParams, $count);
   }
 
   /**

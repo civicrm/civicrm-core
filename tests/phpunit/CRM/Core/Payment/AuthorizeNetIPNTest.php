@@ -278,7 +278,6 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertSame('1', $contribution['values'][0]['payment_instrument_id']);
     $this->assertSame('1', $contribution['values'][1]['payment_instrument_id']);
     $this->assertSame('second_one', $contribution['values'][1]['trxn_id']);
-    $this->callAPISuccessGetSingle('membership_payment', ['contribution_id' => $contribution['values'][1]['id']]);
     $this->callAPISuccessGetSingle('line_item', [
       'contribution_id' => $contribution['values'][1]['id'],
       'entity_table' => 'civicrm_membership',

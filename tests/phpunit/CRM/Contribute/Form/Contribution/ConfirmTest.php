@@ -835,7 +835,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     ])['values'];
     $this->assertCount(2, $contributions);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['return' => ['contribution_id', 'membership_id'], 'version' => 3]);
+    $membershipPayment = $this->getMembershipContribution();
     $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions);
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertEquals($membership['contact_id'], $contributions[$membershipPayment['contribution_id']]['contact_id']);
@@ -876,7 +876,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->getContributionPageID());
 
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id'], 'version' => 3]);
+    $membershipPayment = $this->getMembershipContribution(NULL, $contribution['id']);
     $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id'], 'entity_id' => $membershipPayment['membership_id']]);
     $this->assertMailSentContainingStrings([
       'Dear Dave,',
@@ -1183,10 +1183,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', [
       'contact_id' => $contactID,
     ]);
-    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', [
-      'contribution_id' => $contribution['id'],
-      'version' => 3,
-    ]);
+    $membershipPayment = $this->getMembershipContribution(NULL, $contribution['id']);
     $this->assertEquals($membershipPayment['membership_id'], $membership['id']);
   }
 
@@ -1207,7 +1204,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->getContributionPageID());
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID()]);
-    $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'contribution_id' => $contribution['id']]);
+    $this->getMembershipContribution(NULL, $contribution['id']);
     //Assert only one mail is being sent.
     $this->assertMailSentCount(1);
     $this->assertMailSentContainingStrings([
@@ -1416,7 +1413,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($processor['payment_instrument_id'], $contribution['payment_instrument_id']);
 
     $this->assertSame('create_first_success', $contribution['trxn_id']);
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['version' => 3]);
+    $membershipPayment = $this->getMembershipContribution();
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
@@ -2049,16 +2046,11 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertSame(2, $contribution['payment_instrument_id']);
 
     $this->assertSame('create_first_success', $contribution['trxn_id']);
-    $membershipPayments = $this->callAPISuccess('membership_payment', 'get', [
-      'sequential' => 1,
-      'contribution_id' => $contribution['id'],
-      'version' => 3,
-    ]);
-    $this->assertSame(2, $membershipPayments['count']);
+    $this->assertCount(2, $this->getMembershipContributions(NULL, $contribution['id']));
     $lines = $this->validateTripleLines($contribution['id'], $preExistingMembershipID);
     $this->assertEquals($preExistingMembershipID + 2, $lines[2]['entity_id']);
 
-    $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $contribution['id'], 'membership_id' => $preExistingMembershipID + 1, 'version' => 3]);
+    $this->getMembershipContribution($preExistingMembershipID + 1, $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $preExistingMembershipID + 1]);
 
     \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy'])->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_second_success']);
@@ -2230,7 +2222,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ] + $this->getBillingSubmitValues();
     $this->submitOnlineContributionForm($submittedValues, $this->getContributionPageID());
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id'], 'return' => 'membership_id', 'version' => 3]);
+    $membershipPayment = $this->getMembershipContribution(NULL, $contribution['id']);
     $this->callAPISuccessGetCount('LineItem', [
       'entity_table' => 'civicrm_membership',
       'entity_id' => $membershipPayment['membership_id'],
@@ -2312,7 +2304,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     ]);
 
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['version' => 3]);
+    $membershipPayment = $this->getMembershipContribution();
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
@@ -2442,8 +2434,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($id, $lines[1]['entity_id']);
     $this->assertSame('civicrm_membership', $lines[0]['entity_table']);
     $this->assertEquals($preExistingMembershipID + 1, $lines[0]['entity_id']);
-    $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $id, 'membership_id' => $preExistingMembershipID + 1, 'version' => 3]);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $id, 'version' => 3]);
+    $membershipPayment = $this->getMembershipContribution($preExistingMembershipID + 1, $id);
     $this->assertEquals($membershipPayment['contribution_id'], $id);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertEquals($membership['contact_id'], Contribution::get()
@@ -2473,7 +2464,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ], $this->getContributionPageID());
     $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->getContributionPageID()])['values'];
     $this->assertCount(2, $contributions);
-    $this->callAPISuccess('membership_payment', 'getsingle', ['version' => 3, 'contribution_id' => ['IN' => array_keys($contributions)]]);
+    $this->assertArrayHasKey($this->getMembershipContribution()['contribution_id'], $contributions);
     $this->assertMailSentContainingStrings([
       'Membership Fee',
       '$2.00',

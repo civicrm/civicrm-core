@@ -235,7 +235,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
     $this->checkPaymentResult($order, $expectedResult);
-    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', $params + ['version' => 3]);
+    $membershipPayment = $this->getMembershipContribution(NULL, $order['id']);
 
     $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id']]);
     $this->callAPISuccess('Contribution', 'Delete', ['id' => $order['id']]);
@@ -266,7 +266,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     ];
     $order = $this->callAPISuccess('Order', 'get', $paymentMembership);
     $this->checkPaymentResult($order, $expectedResult);
-    $this->callAPISuccessGetCount('MembershipPayment', $paymentMembership + ['version' => 3], 2);
+    $this->assertCount(2, $this->getMembershipContributions(NULL, $order['id']));
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $order['id'],
       'payment_instrument_id' => 'Check',
@@ -382,7 +382,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     }
 
     // Check membership details
-    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $order['id'], 'version' => 3]);
+    $membershipPayment = $this->getMembershipContribution(NULL, $order['id']);
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id']]);
 
     if (isset($expectations['status_id'])) {

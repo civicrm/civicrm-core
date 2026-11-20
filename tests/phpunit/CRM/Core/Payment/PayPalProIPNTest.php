@@ -112,7 +112,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   public function testIPNPaymentMembershipRecurSuccess(): void {
     $durationUnit = 'year';
     $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
-    $this->callAPISuccessGetSingle('membership_payment', []);
+    $this->getMembershipContribution();
     $paypalRecurParams = [
       'amount' => '200.00',
       'payment_gross' => '200.00',
@@ -149,8 +149,6 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['values'][1]['id'],
       'entity_table' => 'civicrm_membership',
     ]);
-    $this->callAPISuccessGetSingle('membership_payment', ['contribution_id' => $contribution['values'][1]['id']]);
-
   }
 
   /**

@@ -2517,7 +2517,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
     $this->assertSame('civicrm_membership', $lineItem['entity_table']);
-    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3]);
+    $this->getMembershipContribution($membership['id'], $contribution['id']);
   }
 
   /**
@@ -2605,7 +2605,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
     $this->assertSame('civicrm_membership', $lineItem['entity_table']);
-    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3]);
+    $this->getMembershipContribution($membership['id'], $contribution['id']);
   }
 
   /**
@@ -3737,7 +3737,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ], $contributionParams));
 
     $this->ids['Contribution'][$key] = $contribution['id'];
-    $this->_ids['membership'] = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'membership_id', 'contribution_id' => $contribution['id'], 'version' => 3]);
+    $this->_ids['membership'] = $this->getMembershipContribution(NULL, $contribution['id'])['membership_id'];
   }
 
   /**
@@ -4407,7 +4407,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertSame('civicrm_membership', $lineItem['entity_table']);
     $membership = $this->callAPISuccess('Membership', 'getsingle', ['id' => $lineItem['entity_id']]);
     $this->callAPISuccess('LineItem', 'getsingle', []);
-    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3], 1);
+    $this->assertCount(1, $this->getMembershipContributions($membership['id']));
 
     return [$originalContribution, $membership];
   }
@@ -4528,10 +4528,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
 
     // Let's see if the membership payments got created while we're at it.
-    $membershipPayments = $this->callApiV3Success('MembershipPayment', 'get', [
-      'membership_id' => $membership['id'],
-    ]);
-    $this->assertSame(2, $membershipPayments['count']);
+    $this->assertCount(2, $this->getMembershipContributions($membership['id']));
 
     $this->assertSame('Expired', CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membershipStatusId));
     $this->callAPISuccess('Contribution', 'completetransaction', ['id' => $repeatedContribution['id']]);

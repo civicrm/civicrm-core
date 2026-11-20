@@ -1202,6 +1202,53 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Get the memberships and the contributions that paid for them, from the line items.
+   *
+   * Each pair is returned once, however many line items link it. Recurring
+   * templates are left out.
+   *
+   * @param int|null $membershipID
+   * @param int|null $contributionID
+   *
+   * @return array[]
+   *   Each with membership_id and contribution_id.
+   */
+  protected function getMembershipContributions(?int $membershipID = NULL, ?int $contributionID = NULL): array {
+    $query = LineItem::get(FALSE)
+      ->addSelect('entity_id', 'contribution_id')
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('contribution_id.is_template', '=', FALSE)
+      ->addGroupBy('entity_id')
+      ->addGroupBy('contribution_id');
+    if ($membershipID) {
+      $query->addWhere('entity_id', '=', $membershipID);
+    }
+    if ($contributionID) {
+      $query->addWhere('contribution_id', '=', $contributionID);
+    }
+    $pairs = [];
+    foreach ($query->execute() as $lineItem) {
+      $pairs[] = ['membership_id' => $lineItem['entity_id'], 'contribution_id' => $lineItem['contribution_id']];
+    }
+    return $pairs;
+  }
+
+  /**
+   * Get the one membership and contribution linked by line item.
+   *
+   * @param int|null $membershipID
+   * @param int|null $contributionID
+   *
+   * @return array
+   *   With membership_id and contribution_id.
+   */
+  protected function getMembershipContribution(?int $membershipID = NULL, ?int $contributionID = NULL): array {
+    $pairs = $this->getMembershipContributions($membershipID, $contributionID);
+    $this->assertCount(1, $pairs);
+    return $pairs[0];
+  }
+
+  /**
    * Delete contribution.
    *
    * @param int $contributionID
