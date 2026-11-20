@@ -6408,7 +6408,7 @@ AND   displayRelType.is_active = 1
 
           // always add contact_a.id to the ORDER clause
           // so the order is deterministic
-          if (!str_contains('contact_a.id', $orderBy)) {
+          if (!str_contains($orderBy, 'contact_a.id')) {
             $orderBy .= ", contact_a.id";
           }
         }

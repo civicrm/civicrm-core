@@ -1374,6 +1374,25 @@ civicrm_relationship.is_active = 1 AND
   }
 
   /**
+   * Test that contact_a.id is used as a deterministic sort key.
+   */
+  public function testOrderByAlwaysIncludesContactId(): void {
+    // With no explicit sort, fall back to sort_name and contact_a.id.
+    $query = new CRM_Contact_BAO_Query();
+    $this->assertStringContainsString(
+      'ORDER BY `contact_a`.`sort_name` ASC, `contact_a`.`id`',
+      $query->getSearchSQL()
+    );
+
+    // Do not append contact_a.id a second time when it is already in the sort.
+    $query = new CRM_Contact_BAO_Query();
+    $this->assertSame(
+      1,
+      substr_count($query->getSearchSQL(0, 0, 'contact_a.id DESC'), '`contact_a`.`id`')
+    );
+  }
+
+  /**
    * Test the sorting on the contact ID query works with a profile search.
    *
    * Checking for lack of fatal.
