@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'TbsZip/tbszip.php';
-
 /**
  * Class CRM_Utils_PDF_Document.
  */
@@ -161,14 +159,28 @@ class CRM_Utils_PDF_Document {
    * @param string $docType  File type of document
    *
    * @return array
-   *   [string, clsTbsZip]
+   *   [string, ZipArchive]
    */
   public static function unzipDoc($filePath, $docType) {
     $dataFile = self::$ooxmlMap[$docType]['dataFile'];
 
-    $zip = new clsTbsZip();
-    $zip->Open($filePath);
-    $content = $zip->FileRead($dataFile);
+    $tempFile = CRM_Utils_File::tempnam('civi_doc_');
+    if (!copy($filePath, $tempFile)) {
+      @unlink($tempFile);
+      throw new CRM_Core_Exception(ts('Unable to read document template'));
+    }
+
+    $zip = new ZipArchive();
+    if ($zip->open($tempFile) !== TRUE) {
+      @unlink($tempFile);
+      throw new CRM_Core_Exception(ts('Unable to open document archive'));
+    }
+    $content = $zip->getFromName($dataFile);
+    if ($content === FALSE) {
+      $zip->close();
+      @unlink($tempFile);
+      throw new CRM_Core_Exception(ts('Unable to read content from document archive'));
+    }
 
     return [$content, $zip];
   }
@@ -184,17 +196,23 @@ class CRM_Utils_PDF_Document {
    *   Ex: "HelloWorld.odt".
    * @param string $docType
    *   Document type e.g. odt/docx
-   * @param clsTbsZip $zip
+   * @param ZipArchive $zip
    *   Zip archive
    * @param bool $returnFinalContent
    *   Return the content of file document as a string used in unit test
    *
-   * @return string
+   * @return string|void
    */
   public static function printDocuments($contents, $fileName, $docType, $zip, $returnFinalContent = FALSE) {
     $dataMap = self::$ooxmlMap[$docType];
+    $tempFile = $zip->filename;
 
-    $finalContent = $zip->FileRead($dataMap['dataFile']);
+    $finalContent = $zip->getFromName($dataMap['dataFile']);
+    if ($finalContent === FALSE) {
+      $zip->close();
+      @unlink($tempFile);
+      throw new CRM_Core_Exception(ts('Unable to read content from document archive'));
+    }
 
     // token-replaced document contents of each contact will be merged into final document
     foreach ($contents as $key => $content) {
@@ -214,13 +232,35 @@ class CRM_Utils_PDF_Document {
     }
 
     if ($returnFinalContent) {
+      $zip->close();
+      @unlink($tempFile);
       return $finalContent;
     }
 
-    // Replace the loaded document file content located at $filePath with $finaContent
-    $zip->FileReplace($dataMap['dataFile'], $finalContent, TBSZIP_STRING);
+    // Replace the loaded document file content with $finalContent and stream for download
+    $zip->addFromString($dataMap['dataFile'], $finalContent);
+    $zip->close();
 
-    $zip->Flush(TBSZIP_DOWNLOAD, $fileName);
+    $mimeType = CRM_Core_SelectValues::documentApplicationType()[$docType] ?? 'application/octet-stream';
+    CRM_Utils_System::setHttpHeader('Cache-Control', 'no-store');
+    CRM_Utils_System::setHttpHeader('Content-Type', $mimeType);
+    CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename="' . basename($fileName) . '"');
+    CRM_Utils_System::setHttpHeader('Content-Length', filesize($tempFile));
+    // Stream in 8 KB chunks to avoid buffering the whole archive in PHP memory.
+    $handle = fopen($tempFile, 'rb');
+    if ($handle === FALSE) {
+      @unlink($tempFile);
+      throw new CRM_Core_Exception(ts('Unable to read generated document archive'));
+    }
+    try {
+      while (!feof($handle)) {
+        echo fread($handle, 8192);
+      }
+    }
+    finally {
+      fclose($handle);
+      @unlink($tempFile);
+    }
   }
 
 }
