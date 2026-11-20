@@ -509,7 +509,7 @@ class Admin {
     }
     $exploded = explode('.', $field['name']);
     $bareFieldName = array_reverse($exploded)[0];
-    $targetKey = $field['fk_column'] ?: 'id';
+    $targetKey = $field['fk_column'] ?? 'id';
     $alias = "{$entity['name']}_{$targetEntity}_$bareFieldName";
     $joins = [];
     // For LineItem we have contribution_id and entity_id=contribution_id when entity_table=civicrm_contribution
