@@ -156,7 +156,8 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    */
   public static function del($id) {
     CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) static::deleteRecord(['id' => $id]);
+    static::deleteRecord(['id' => $id]);
+    return TRUE;
   }
 
   /**
