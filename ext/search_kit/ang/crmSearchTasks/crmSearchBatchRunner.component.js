@@ -75,7 +75,7 @@
           angular.extend(params, ctrl.displayCtrl.getApiParams(null));
           // Where clause is only relevant to updating > 1 record
           delete params.where;
-          params.rowKey = ctrl.ids[0];
+          params.rowKey = (typeof ctrl.isLink === 'string' || typeof ctrl.isLink === 'number') ? ctrl.isLink : ctrl.ids[0];
         } else if (ctrl.action !== 'create') {
           // For other batch actions (update, delete), add supplied ids to the where clause
           params.where = params.where || [];

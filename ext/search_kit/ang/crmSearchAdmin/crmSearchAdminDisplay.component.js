@@ -342,21 +342,24 @@
             '0': []
           };
           ctrl.links[''] = ctrl.links['*'].filter((link) => link.join === '');
-          searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
-            tasks.forEach(function (task) {
-              if (task.number === '> 0' || task.number === '=== 1') {
-                const link = {
-                  text: task.title,
-                  icon: task.icon,
-                  task: task.name,
-                  entity: task.entity,
-                  target: 'crm-popup',
-                  join: '',
-                  style: task.name === 'delete' ? 'danger' : 'default'
-                };
-                ctrl.links['*'].push(link);
-                ctrl.links[''].push(link);
-              }
+          ctrl.crmSearchAdmin.getActionableEntities().forEach((entityInfo) => {
+            searchMeta.getSearchTasks(entityInfo.entity).then(function(tasks) {
+              tasks.forEach(function (task) {
+                if (task.number === '> 0' || task.number === '=== 1') {
+                  const link = {
+                    text: (entityInfo.join ? entityInfo.label + ': ' : '') + task.title,
+                    icon: task.icon,
+                    task: task.name,
+                    entity: task.entity,
+                    target: 'crm-popup',
+                    join: entityInfo.join,
+                    style: task.name === 'delete' ? 'danger' : 'default'
+                  };
+                  ctrl.links['*'].push(link);
+                  ctrl.links[entityInfo.join] = ctrl.links[entityInfo.join] || [];
+                  ctrl.links[entityInfo.join].push(link);
+                }
+              });
             });
           });
         }

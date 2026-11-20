@@ -363,4 +363,173 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertSame('No results text', $result['settings']['noResultsText']);
   }
 
+  public function testGetSearchTasksWithGroupBy(): void {
+    // Grouping Email search by contact_id.id should present Contact tasks, not Email tasks
+    $tasks = SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch([
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['contact_id.id', 'COUNT(id) AS COUNT_id'],
+          'groupBy' => ['contact_id.id'],
+        ],
+      ])
+      ->setDisplay([
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+        ],
+      ])
+      ->execute()->indexBy('name');
+
+    $this->assertArrayHasKey('contact_id:delete', (array) $tasks);
+    $this->assertArrayHasKey('contact_id:update', (array) $tasks);
+    $this->assertArrayHasKey('download', (array) $tasks);
+    $this->assertArrayNotHasKey('delete', (array) $tasks);
+    $this->assertSame('Contact', $tasks['contact_id:delete']['entity']);
+    $this->assertSame('contact_id.id', $tasks['contact_id:delete']['idField']);
+    $this->assertSame(0, $tasks['contact_id:delete']['keyIndex']);
+    $this->assertTrue($tasks['contact_id:delete']['inMenu']);
+
+    // Grouping by non-PK field should only allow Download Spreadsheet
+    $nonPkTasks = SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch([
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['location_type_id', 'COUNT(id) AS COUNT_id'],
+          'groupBy' => ['location_type_id'],
+        ],
+      ])
+      ->setDisplay([
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+        ],
+      ])
+      ->execute()->indexBy('name');
+    $this->assertSame(['download'], array_keys((array) $nonPkTasks));
+
+    // Ungrouped aggregate query should only allow Download Spreadsheet
+    $aggTasks = SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch([
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['COUNT(id) AS COUNT_id'],
+        ],
+      ])
+      ->setDisplay([
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+        ],
+      ])
+      ->execute()->indexBy('name');
+    $this->assertSame(['download'], array_keys((array) $aggTasks));
+  }
+
+  public function testGetSearchTasksMultipleEntities(): void {
+    $savedSearch = [
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id', 'display_name', 'Contact_Email_contact_id_01.email'],
+        'join' => [
+          ['Email AS Contact_Email_contact_id_01', 'INNER', ['id', '=', 'Contact_Email_contact_id_01.contact_id']],
+        ],
+      ],
+    ];
+
+    // Both Contact and joined Email enabled in actions_entities
+    $result = SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch($savedSearch)
+      ->setDisplay([
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+          'actions_entities' => ['', 'Contact_Email_contact_id_01'],
+        ],
+      ])
+      ->execute();
+    $tasks = $result->indexBy('name');
+
+    $this->assertArrayHasKey('Contact', $result->editable['entityInfo']);
+    $this->assertArrayHasKey('Email', $result->editable['entityInfo']);
+
+    $this->assertArrayHasKey('delete', (array) $tasks);
+    $this->assertSame('Contact', $tasks['delete']['entity']);
+    $this->assertSame('id', $tasks['delete']['idField']);
+    $this->assertSame(0, $tasks['delete']['keyIndex']);
+    $this->assertTrue($tasks['delete']['inMenu']);
+
+    $this->assertArrayHasKey('Contact_Email_contact_id_01:delete', (array) $tasks);
+    $this->assertSame('Email', $tasks['Contact_Email_contact_id_01:delete']['entity']);
+    $this->assertSame('Contact_Email_contact_id_01.id', $tasks['Contact_Email_contact_id_01:delete']['idField']);
+    $this->assertSame(1, $tasks['Contact_Email_contact_id_01:delete']['keyIndex']);
+    $this->assertTrue($tasks['Contact_Email_contact_id_01:delete']['inMenu']);
+
+    $this->assertArrayHasKey('download', (array) $tasks);
+    $this->assertNull($tasks['download']['keyIndex']);
+
+    // Filtered actions array + in-row task link on joined entity not in menu
+    $filteredTasks = SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch($savedSearch)
+      ->setDisplay([
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => ['delete', 'download'],
+          'actions_entities' => [''],
+          'columns' => [
+            [
+              'type' => 'links',
+              'links' => [
+                ['entity' => 'Email', 'join' => 'Contact_Email_contact_id_01', 'task' => 'delete'],
+              ],
+            ],
+          ],
+        ],
+      ])
+      ->execute()->indexBy('name');
+
+    $this->assertTrue($filteredTasks['delete']['inMenu']);
+    $this->assertTrue($filteredTasks['download']['inMenu']);
+    $this->assertArrayNotHasKey('update', (array) $filteredTasks);
+    $this->assertArrayHasKey('Contact_Email_contact_id_01:delete', (array) $filteredTasks);
+    $this->assertFalse($filteredTasks['Contact_Email_contact_id_01:delete']['inMenu']);
+    $this->assertSame(1, $filteredTasks['Contact_Email_contact_id_01:delete']['keyIndex']);
+
+    // Implicit FK field without explicit join
+    $fkTasks = SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch([
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'email', 'contact_id'],
+        ],
+      ])
+      ->setDisplay([
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+          'actions_entities' => ['', 'contact_id'],
+        ],
+      ])
+      ->execute()->indexBy('name');
+
+    $this->assertArrayHasKey('delete', (array) $fkTasks);
+    $this->assertSame('Email', $fkTasks['delete']['entity']);
+    $this->assertSame(0, $fkTasks['delete']['keyIndex']);
+    $this->assertArrayHasKey('contact_id:delete', (array) $fkTasks);
+    $this->assertSame('Contact', $fkTasks['contact_id:delete']['entity']);
+    $this->assertSame('contact_id', $fkTasks['contact_id:delete']['idField']);
+    $this->assertSame(1, $fkTasks['contact_id:delete']['keyIndex']);
+  }
+
 }

@@ -4425,4 +4425,113 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($childGroup['id'], $returnedIds, 'Matching child group should be returned when filtering by title');
   }
 
+  public function testMultiEntityAndGroupByRowKeys(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $cids = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Fred'],
+        ['first_name' => 'Ford'],
+      ],
+      'defaults' => ['last_name' => $lastName],
+    ])->column('id');
+
+    $emailIds = $this->saveTestRecords('Email', [
+      'records' => [
+        ['contact_id' => $cids[0], 'email' => 'fred1@example.com'],
+        ['contact_id' => $cids[0], 'email' => 'fred2@example.com'],
+        ['contact_id' => $cids[1], 'email' => 'ford1@example.com'],
+      ],
+    ])->column('id');
+
+    // 1. Group By contact_id.id (dev/core#6894): row.key, return:'id', and download rowKeys all use contact_id.id
+    $groupedParams = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['contact_id.id', 'COUNT(id) AS COUNT_id'],
+          'where' => [['contact_id.last_name', '=', $lastName]],
+          'groupBy' => ['contact_id.id'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+          'columns' => [
+            ['type' => 'field', 'key' => 'contact_id.id', 'label' => 'Contact ID'],
+            ['type' => 'field', 'key' => 'COUNT_id', 'label' => 'Emails'],
+          ],
+          'sort' => [['contact_id.id', 'ASC']],
+        ],
+      ],
+    ];
+    $groupedPage = civicrm_api4('SearchDisplay', 'run', $groupedParams + ['return' => 'page:1']);
+    $this->assertSame($cids, $groupedPage->column('key'));
+    $groupedIds = civicrm_api4('SearchDisplay', 'run', $groupedParams + ['return' => 'id']);
+    $this->assertSame($cids, (array) $groupedIds);
+
+    $groupedDownload = (array) civicrm_api4('SearchDisplay', 'download', $groupedParams + [
+      'format' => 'array',
+      'rowKeys' => [$cids[1]],
+    ]);
+    $this->assertCount(2, $groupedDownload);
+    $this->assertSame($cids[1], $groupedDownload[1][0]);
+
+    // 2. Multi-entity join without groupBy: composite row.key + in-row joined task link + download rowKeys
+    $multiParams = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'first_name', 'Contact_Email_contact_id_01.email'],
+          'where' => [['last_name', '=', $lastName]],
+          'join' => [
+            ['Email AS Contact_Email_contact_id_01', 'INNER', ['id', '=', 'Contact_Email_contact_id_01.contact_id']],
+          ],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+          'actions_entities' => ['', 'Contact_Email_contact_id_01'],
+          'columns' => [
+            ['type' => 'field', 'key' => 'first_name', 'label' => 'First Name'],
+            ['type' => 'field', 'key' => 'Contact_Email_contact_id_01.email', 'label' => 'Email'],
+            [
+              'type' => 'links',
+              'links' => [
+                ['entity' => 'Email', 'join' => 'Contact_Email_contact_id_01', 'task' => 'delete'],
+              ],
+            ],
+          ],
+          'sort' => [['Contact_Email_contact_id_01.id', 'ASC']],
+        ],
+      ],
+    ];
+    $expectedKeys = [
+      "{$cids[0]},{$emailIds[0]}",
+      "{$cids[0]},{$emailIds[1]}",
+      "{$cids[1]},{$emailIds[2]}",
+    ];
+    $multiPage = civicrm_api4('SearchDisplay', 'run', $multiParams + ['return' => 'page:1']);
+    $this->assertSame($expectedKeys, $multiPage->column('key'));
+    $this->assertSame('Contact_Email_contact_id_01:delete', $multiPage[0]['columns'][2]['links'][0]['task']);
+
+    $multiIds = civicrm_api4('SearchDisplay', 'run', $multiParams + ['return' => 'id']);
+    $this->assertSame($expectedKeys, (array) $multiIds);
+
+    $multiDownload = (array) civicrm_api4('SearchDisplay', 'download', $multiParams + [
+      'format' => 'array',
+      'rowKeys' => ["{$cids[0]},{$emailIds[1]}"],
+    ]);
+    $this->assertCount(2, $multiDownload);
+    $this->assertSame('fred2@example.com', $multiDownload[1][1]);
+  }
+
 }

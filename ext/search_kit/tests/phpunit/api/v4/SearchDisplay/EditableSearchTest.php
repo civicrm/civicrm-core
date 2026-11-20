@@ -906,4 +906,77 @@ class EditableSearchTest extends Api4TestBase {
 
   }
 
+  public function testInlineEditOneToManyJoin(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $cids = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'One'],
+        ['first_name' => 'Two'],
+      ],
+      'defaults' => ['last_name' => $lastName],
+    ])->column('id');
+    $emailIds = $this->saveTestRecords('Email', [
+      'records' => [
+        ['contact_id' => $cids[0], 'email' => 'first@example.com'],
+        ['contact_id' => $cids[0], 'email' => 'second@example.com'],
+      ],
+    ])->column('id');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'Contact_Email_contact_id_01.email'],
+          'where' => [['last_name', '=', $lastName]],
+          'join' => [
+            ['Email AS Contact_Email_contact_id_01', 'LEFT', ['id', '=', 'Contact_Email_contact_id_01.contact_id']],
+          ],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+          'actions_entities' => ['', 'Contact_Email_contact_id_01'],
+          'pager' => FALSE,
+          'columns' => [
+            ['key' => 'first_name', 'label' => 'Name', 'type' => 'field', 'editable' => TRUE],
+            ['key' => 'Contact_Email_contact_id_01.email', 'label' => 'Email', 'type' => 'field', 'editable' => TRUE],
+          ],
+          'sort' => [['id', 'ASC'], ['Contact_Email_contact_id_01.id', 'ASC']],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params + ['return' => 'page:1']);
+    $this->assertSame([
+      "{$cids[0]},{$emailIds[0]}",
+      "{$cids[0]},{$emailIds[1]}",
+      "{$cids[1]},",
+    ], $result->column('key'));
+
+    // Edit the second email of contact 0 using its composite rowKey
+    $edited = civicrm_api4('SearchDisplay', 'inlineEdit', $params + [
+      'rowKey' => "{$cids[0]},{$emailIds[1]}",
+      'values' => ['Contact_Email_contact_id_01.email' => 'updated-second@example.com'],
+    ]);
+    $this->assertCount(1, $edited);
+    $this->assertSame("{$cids[0]},{$emailIds[1]}", $edited[0]['key']);
+    $this->assertSame('updated-second@example.com', $edited[0]['columns'][1]['val']);
+    $this->assertSame('first@example.com', Email::get(FALSE)->addWhere('id', '=', $emailIds[0])->execute()->single()['email']);
+
+    // Create an email for contact 1 whose joined email key part is empty
+    $created = civicrm_api4('SearchDisplay', 'inlineEdit', $params + [
+      'rowKey' => "{$cids[1]},",
+      'values' => ['Contact_Email_contact_id_01.email' => 'created@example.com'],
+    ]);
+    $this->assertCount(1, $created);
+    $this->assertSame('created@example.com', $created[0]['columns'][1]['val']);
+    $newEmailId = $created[0]['data']['Contact_Email_contact_id_01.id'];
+    $this->assertSame("{$cids[1]},{$newEmailId}", $created[0]['key']);
+  }
+
 }

@@ -9,9 +9,11 @@
   {{:: ts('Action') }} <span class="caret"></span>
 </button>
 <ul class="dropdown-menu" ng-if="$ctrl.openMenu">
-  <li ng-class="{disabled: !$ctrl.isActionAllowed(action)}" ng-repeat="action in $ctrl.taskManager.tasks" title="{{ $ctrl.getActionTitle(action) }}">
+  <li ng-repeat-start="group in $ctrl.taskGroups" ng-if="$ctrl.taskGroups.length > 1 && group.label" class="dropdown-header">{{:: group.label }}</li>
+  <li ng-class="{disabled: !$ctrl.isActionAllowed(action)}" ng-repeat="action in group.tasks" title="{{ $ctrl.getActionTitle(action) }}">
     <a href ng-click="$ctrl.doAction(action); $ctrl.openMenu = false;"><i class="crm-i {{:: action.icon }}" role="img" aria-hidden="true"></i> {{:: action.title }}</a>
   </li>
+  <li ng-repeat-end ng-if="$ctrl.taskGroups.length > 1 && !$last" role="separator" class="divider"></li>
   <li class="disabled" ng-if="!$ctrl.taskManager.tasks">
     <a href><i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i></a>
   </li>
