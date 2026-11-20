@@ -1,11 +1,18 @@
 <?php
 
-use CRM_Ewaysingle_ExtensionUtil as E;
+use Civi\Api4\PaymentProcessor;
+use Civi\Payment\Exception\PaymentProcessorException;
+use Civi\Payment\System;
+use Civi\Test;
+use Civi\Test\GuzzleTestTrait;
+use Civi\Test\LookupHelperTrait;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
+use PHPUnit\Framework\TestCase;
+use Civi\Test\EntityTrait;
 
 /**
- * FIXME - Add test description.
+ * eWAY processor test.
  *
  * Tips:
  *  - With HookInterface, you may implement CiviCRM hooks directly in the test class.
@@ -18,115 +25,103 @@ use Civi\Core\HookInterface;
  *
  * @group headless
  */
-class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface {
+class CRM_Core_Payment_EwayTest extends TestCase implements HeadlessInterface, HookInterface {
 
-  use \Civi\Test\GuzzleTestTrait;
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\LookupHelperTrait;
-
-  /**
-   * Instance of CRM_Core_Payment_eWay|null
-   * @var CRM_Core_Payment_eWay
-   */
-  protected $processor;
+  use GuzzleTestTrait;
+  use LookupHelperTrait;
+  use EntityTrait;
 
   /**
-   * Created Object Ids
-   * @var array
+   * @var CRM_Core_Payment_eWAY
    */
-  public $ids;
+  protected CRM_Core_Payment $processor;
 
-  public function setUpHeadless() {
+  /**
+   * @throws \CRM_Extension_Exception_ParseException
+   */
+  public function setUpHeadless(): Test\CiviEnvBuilder {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
-    return \Civi\Test::headless()
+    return Test::headless()
       ->installMe(__DIR__)
       ->apply();
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function setUp(): void {
     $this->setUpEwayProcessor();
-    $this->processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['eWAY']);
+    $this->processor = System::singleton()->getById($this->ids['PaymentProcessor']['Eway']);
     parent::setUp();
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown(): void {
-    $this->callAPISuccess('PaymentProcessor', 'delete', ['id' => $this->ids['PaymentProcessor']['eWAY']]);
+    if (!empty($this->ids['PaymentProcessor']['Eway'])) {
+      PaymentProcessor::delete(FALSE)
+        ->addWhere('id', '=', $this->ids['PaymentProcessor']['Eway'])
+        ->execute();
+    }
     parent::tearDown();
   }
 
   /**
    * Test making a once off payment
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSinglePayment(): void {
     $this->setupMockHandler();
-    $params = $this->getBillingParams();
+    $params = $this->getPaymentParams();
     $params['amount'] = 10.00;
-    $params['currency'] = 'AUD';
-    $params['description'] = 'Test Contribution';
-    $params['invoiceID'] = 'xyz';
-    $params['email'] = 'unittesteway@civicrm.org';
-    $params['ip_address'] = '127.0.0.1';
-    foreach ($params as $key => $value) {
-      // Paypal is super special and requires this. Leaving out of the more generic
-      // get billing params for now to make it more obvious.
-      // When/if PropertyBag supports all the params paypal needs we can convert & simplify this.
-      $params[str_replace('-' . $this->getLocationTypeID('Billing'), '', str_replace('billing_', '', $key))] = $value;
-    }
-    $params['state_province'] = 'NSW';
-    $params['country'] = 'AU';
     $this->processor->doPayment($params);
     $this->assertEquals($this->getExpectedSinglePaymentRequests(), $this->getRequestBodies());
   }
 
   /**
    * Test making a failed once off payment
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testErrorSinglePayment(): void {
     $this->setupMockHandler(NULL, TRUE);
-    $params = $this->getBillingParams();
+    $params = $this->getPaymentParams();
     $params['amount'] = 5.24;
-    $params['currency'] = 'AUD';
-    $params['description'] = 'Test Contribution';
-    $params['invoiceID'] = 'xyz';
-    $params['email'] = 'unittesteway@civicrm.org';
-    $params['ip_address'] = '127.0.0.1';
-    foreach ($params as $key => $value) {
-      // Paypal is super special and requires this. Leaving out of the more generic
-      // get billing params for now to make it more obvious.
-      // When/if PropertyBag supports all the params paypal needs we can convert & simplify this.
-      $params[str_replace('-' . $this->getLocationTypeID('Billing'), '', str_replace('billing_', '', $key))] = $value;
-    }
-    $params['state_province'] = 'NSW';
-    $params['country'] = 'AU';
     try {
       $this->processor->doPayment($params);
       $this->fail('Test was meant to throw an exception');
     }
-    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+    catch (PaymentProcessorException $e) {
       $this->assertSame('Error: [24] - Do Not Honour(Test Gateway).', $e->getMessage());
       $this->assertSame(9008, $e->getErrorCode());
     }
   }
 
   /**
-   * Get some basic billing parameters.
-   *
-   * These are what are entered by the form-filler.
+   * Get the payment parameters, keyed as the processor reads them.
    *
    * @return array
    */
-  protected function getBillingParams(): array {
-    $billingLocationTypeID = $this->getLocationTypeID('Billing');
+  protected function getPaymentParams(): array {
     return [
-      'billing_first_name' => 'John',
-      'billing_middle_name' => '',
-      'billing_last_name' => "O'Connor",
-      "billing_street_address-$billingLocationTypeID" => '8 Hobbitton Road',
-      "billing_city-$billingLocationTypeID" => 'The Shire',
-      "billing_state_province_id-$billingLocationTypeID" => 1012,
-      "billing_postal_code-$billingLocationTypeID" => 5010,
-      "billing_country_id-$billingLocationTypeID" => 1228,
+      'first_name' => 'John',
+      'middle_name' => '',
+      'last_name' => "O'Connor",
+      'street_address' => '8 Hobbitton Road',
+      'city' => 'The Shire',
+      'state_province_id' => 1012,
+      'state_province' => 'NSW',
+      'postal_code' => 5010,
+      'country_id' => 1228,
+      'country' => 'AU',
+      'email' => 'unittesteway@civicrm.org',
+      'ip_address' => '127.0.0.1',
+      'currency' => 'AUD',
+      'description' => 'Test Contribution',
+      'invoiceID' => 'xyz',
       'credit_card_number' => '4444333322221111',
       'cvv2' => '123',
       'credit_card_exp_date' => [
@@ -139,12 +134,15 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
     ];
   }
 
-  public function setUpEwayProcessor(): void {
-    $params = [
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  private function setUpEwayProcessor(): void {
+    $this->createTestEntity('PaymentProcessor', [
       'name' => 'demo',
       'title' => 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
-      'payment_processor_type_id' => 'eWAY',
+      'payment_processor_type_id:name' => 'eWAY',
       'is_active' => 1,
       'is_default' => 0,
       'is_test' => 0,
@@ -152,23 +150,11 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
       'url_site' => 'https://www.eway.com.au/gateway/xmltest/testpage.asp',
       'class_name' => 'Payment_eWAY',
       'billing_mode' => 1,
-      'financial_type_id' => 1,
       'financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
       // Credit card = 1 so can pass 'by accident'.
-      'payment_instrument_id' => 'Debit Card',
-    ];
-    if (!is_numeric($params['payment_processor_type_id'])) {
-      // really the api should handle this through getoptions but it's not exactly api call so lets just sort it
-      //here
-      $params['payment_processor_type_id'] = $this->callAPISuccess('payment_processor_type', 'getvalue', [
-        'name' => $params['payment_processor_type_id'],
-        'return' => 'id',
-      ], 'integer');
-    }
-    $result = $this->callAPISuccess('payment_processor', 'create', $params);
-    $processorID = $result['id'];
-    $this->setupMockHandler($processorID);
-    $this->ids['PaymentProcessor']['eWAY'] = $processorID;
+      'payment_instrument_id:name' => 'Debit Card',
+    ], 'Eway');
+    $this->setupMockHandler($this->ids['PaymentProcessor']['Eway']);
   }
 
   /**
@@ -181,7 +167,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
    */
   protected function setupMockHandler($id = NULL, $error = FALSE): void {
     if ($id) {
-      $this->processor = Civi\Payment\System::singleton()->getById($id);
+      $this->processor = System::singleton()->getById($id);
     }
     $responses = $error ? $this->getExpectedSinglePaymentErrorResponses() : $this->getExpectedSinglePaymentResponses();
     // Comment the next line out when trying to capture the response.
@@ -203,7 +189,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
   }
 
   /**
-   *  Get the expected request from eWAY.
+   * Get the expected request to eWAY.
    *
    * @return array
    */
