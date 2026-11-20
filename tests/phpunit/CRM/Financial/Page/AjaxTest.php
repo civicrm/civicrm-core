@@ -15,6 +15,8 @@
  */
 class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   public function setUp(): void {
     parent::setUp();
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
@@ -42,7 +44,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     $individualID = $this->individualCreate();
     $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => '12345']);
     $financialTrxnIDs = \Civi\Api4\FinancialTrxn::get(FALSE)->addOrderBy('id')->execute()->column('id');
-    $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
+    $batch = $this->createTestEntity('Batch', ['title' => 'test', 'status_id:name' => 'Open']);
     $this->createTestEntity('EntityBatch', [
       'entity_table' => 'civicrm_financial_trxn',
       'entity_id' => $financialTrxnIDs[0],
@@ -66,7 +68,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     $individualID = $this->individualCreate();
     $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => '12345']);
     $financialTrxnIDs = \Civi\Api4\FinancialTrxn::get(FALSE)->addOrderBy('id')->execute()->column('id');
-    $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
+    $batch = $this->createTestEntity('Batch', ['title' => 'test', 'status_id:name' => 'Open']);
     $this->createTestEntity('EntityBatch', [
       'entity_table' => 'civicrm_financial_trxn',
       'entity_id' => $financialTrxnIDs[0],

@@ -35,6 +35,7 @@ use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\DedupeRule;
+use Civi\Api4\EntityFinancialAccount;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\ExampleData;
 use Civi\Api4\FinancialAccount;
@@ -2946,10 +2947,13 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * Enable Tax and Invoicing
    */
   protected function disableTaxAndInvoicing(): void {
-    $accounts = $this->callAPISuccess('EntityFinancialAccount', 'get', ['account_relationship' => 'Sales Tax Account is'])['values'];
+    $accounts = EntityFinancialAccount::get(FALSE)
+      ->addSelect('id', 'financial_account_id')
+      ->addWhere('account_relationship:name', '=', 'Sales Tax Account is')
+      ->execute();
     foreach ($accounts as $account) {
-      $this->callAPISuccess('EntityFinancialAccount', 'delete', ['id' => $account['id']]);
-      $this->callAPISuccess('FinancialAccount', 'delete', ['id' => $account['financial_account_id']]);
+      EntityFinancialAccount::delete(FALSE)->addWhere('id', '=', $account['id'])->execute();
+      FinancialAccount::delete(FALSE)->addWhere('id', '=', $account['financial_account_id'])->execute();
     }
 
     if (!empty(\Civi::$statics['CRM_Core_PseudoConstant']) && isset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates'])) {
