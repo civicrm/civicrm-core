@@ -2,19 +2,22 @@
 
 use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
-use Civi\Test\Api3TestTrait;
 use Civi\Test\CiviEnvBuilder;
+use Civi\Test\EntityTrait;
 use Civi\Test\FormTrait;
 use Civi\Test\LookupHelperTrait;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\Contact;
+use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
+use Civi\Api4\Order;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\Relationship;
 use Civi\Api4\Event;
 use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
 use Civi\Api4\Participant;
 use PHPUnit\Framework\TestCase;
 use Civi\Test\ContactTestTrait;
@@ -35,17 +38,10 @@ use Civi\Test\ContactTestTrait;
  */
 class CancelTest extends TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
 
-  use Api3TestTrait;
   use ContactTestTrait;
+  use EntityTrait;
   use FormTrait;
   use LookupHelperTrait;
-
-  /**
-   * Created ids.
-   *
-   * @var array
-   */
-  protected $ids = [];
 
   /**
    * The setupHeadless function runs at the start of each test case, right
@@ -86,8 +82,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
 
     $this->createMembershipOrder();
 
-    $memberships = $this->callAPISuccess('Membership', 'get')['values'];
-    $this->assertCount(2, $memberships);
+    $this->assertCount(2, Membership::get(FALSE)->execute());
 
     $ipn = new CRM_Core_Payment_PayPalProIPN([
       'rp_invoice_id' => http_build_query([
@@ -101,8 +96,8 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'processor_id' => $this->createPaymentProcessor(),
     ]);
     $ipn->main();
-    $this->callAPISuccessGetCount('Contribution', ['contribution_status_id' => 'Cancelled'], 1);
-    $this->callAPISuccessGetCount('Membership', ['status_id' => 'Cancelled'], 2);
+    $this->assertCount(1, Contribution::get(FALSE)->addWhere('contribution_status_id:name', '=', 'Cancelled')->execute());
+    $this->assertCount(2, Membership::get(FALSE)->addWhere('status_id:name', '=', 'Cancelled')->execute());
   }
 
   /**
@@ -110,49 +105,42 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    *
    */
   protected function createMembershipOrder(): void {
-    $priceFieldID = $this->callAPISuccessGetValue('price_field', [
-      'return' => 'id',
-      'label' => 'Membership Amount',
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
-    $generalPriceFieldValueID = $this->callAPISuccessGetValue('price_field_value', [
-      'return' => 'id',
-      'label' => 'General',
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
+    $priceFieldID = PriceField::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('label', '=', 'Membership Amount')
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()->first()['id'];
+    $generalPriceFieldValueID = PriceFieldValue::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('label', '=', 'General')
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()->first()['id'];
 
-    $orderID = $this->callAPISuccess('Order', 'create', [
-      'financial_type_id' => 'Member Dues',
-      'contact_id' => $this->ids['contact'][0],
-      'is_test' => 0,
-      'payment_instrument_id' => 'Credit card',
-      'receive_date' => '2019-07-25 07:34:23',
-      'invoice_id' => 'zyx',
-      'line_items' => [
-        [
-          'params' => [
-            'contact_id' => $this->ids['contact'][0],
-            'source' => 'Payment',
-            'membership_type_id' => 'General',
-            // This is interim needed while we improve the BAO - if the test passes without it it can go!
-            'skipStatusCal' => TRUE,
-          ],
-          'line_item' => [
-            [
-              'label' => 'General',
-              'qty' => 1,
-              'unit_price' => 200,
-              'line_total' => 200,
-              'financial_type_id' => $this->getFinancialTypeID('Donation'),
-              'entity_table' => 'civicrm_membership',
-              'price_field_id' => $priceFieldID,
-              'price_field_value_id' => $generalPriceFieldValueID,
-            ],
-          ],
-        ],
-      ],
-    ])['id'];
-    $this->ids['Contribution'][0] = $orderID;
+    $this->ids['Contribution'][0] = Order::create(FALSE)
+      ->setContributionValues([
+        'financial_type_id:name' => 'Member Dues',
+        'contact_id' => $this->ids['contact'][0],
+        'is_test' => FALSE,
+        'payment_instrument_id:name' => 'Credit Card',
+        'receive_date' => '2019-07-25 07:34:23',
+        'invoice_id' => 'zyx',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_membership',
+        'entity_id.contact_id' => $this->ids['contact'][0],
+        'entity_id.source' => 'Payment',
+        'entity_id.membership_type_id' => $this->ids['MembershipType']['General'],
+        'label' => 'General',
+        'qty' => 1,
+        'unit_price' => 200,
+        'line_total' => 200,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
+        'price_field_id' => $priceFieldID,
+        'price_field_value_id' => $generalPriceFieldValueID,
+      ])
+      ->execute()->single()['id'];
   }
 
   /**
@@ -161,7 +149,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @throws \CRM_Core_Exception
    */
   protected function createMembershipType(): void {
-    MembershipType::create()->setValues([
+    $this->ids['MembershipType']['General'] = MembershipType::create()->setValues([
       'name' => 'General',
       'duration_unit' => 'year',
       'duration_interval' => 1,
@@ -174,24 +162,26 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'is_active' => 1,
       'sequential' => 1,
       'visibility' => 'Public',
-    ])->execute();
+    ])->execute()->first()['id'];
   }
 
   /**
    * Create a payment processor.
    *
-   * @param array $params
+   * @param string $processorType
+   *   Name of the payment processor type.
    *
    * @return int
    */
-  public function createPaymentProcessor(array $params = []): int {
-    $params = array_merge([
-      'title' => $params['name'] ?? 'demo',
+  public function createPaymentProcessor(string $processorType = 'PayPal'): int {
+    return $this->createTestEntity('PaymentProcessor', [
+      'name' => 'demo',
+      'title' => 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
-      'payment_processor_type_id' => 'PayPal',
-      'is_active' => 1,
-      'is_default' => 0,
-      'is_test' => 1,
+      'payment_processor_type_id:name' => $processorType,
+      'is_active' => TRUE,
+      'is_default' => FALSE,
+      'is_test' => TRUE,
       'user_name' => 'sunil._1183377782_biz_api1.webaccess.co.in',
       'password' => '1183377788',
       'signature' => 'APixCoQ-Zsaj-u3IH7mD5Do-7HUqA9loGnLSzsZga9Zr-aNmaJa3WGPH',
@@ -200,21 +190,10 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'url_button' => 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',
       'class_name' => 'Payment_PayPalImpl',
       'billing_mode' => 3,
-      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
       // Credit card = 1 so can pass 'by accident'.
-      'payment_instrument_id' => 'Debit Card',
-    ], $params);
-    if (!is_numeric($params['payment_processor_type_id'])) {
-      // really the api should handle this through getoptions but it's not exactly api call so lets just sort it
-      //here
-      $params['payment_processor_type_id'] = $this->callAPISuccess('payment_processor_type', 'getvalue', [
-        'name' => $params['payment_processor_type_id'],
-        'return' => 'id',
-      ], 'integer');
-    }
-    $result = $this->callAPISuccess('payment_processor', 'create', $params);
-    return (int) $result['id'];
+      'payment_instrument_id:name' => 'Debit Card',
+    ], $processorType)['id'];
   }
 
   /**
@@ -234,11 +213,11 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'eventID' => $this->ids['Event'][0],
       'participantID' => Participant::get()->addWhere('event_id', '=', $this->ids['Event'][0])->addSelect('id')->execute()->first()['id'],
       'payment_status' => 'Refunded',
-      'processor_id' => $this->createPaymentProcessor(['payment_processor_type_id' => 'PayPal_Standard']),
+      'processor_id' => $this->createPaymentProcessor('PayPal_Standard'),
     ]);
     $ipn->main();
-    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
-    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 1);
+    Contribution::get(FALSE)->addWhere('contribution_status_id:name', '=', 'Cancelled')->execute()->single();
+    $this->assertCount(1, Participant::get(FALSE)->addWhere('status_id:name', '=', 'Cancelled')->execute());
   }
 
   /**
@@ -287,15 +266,17 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       ->addSelect('contribution_status_id:name')
       ->execute()->first();
     $this->assertSame('Cancelled', $contribution['contribution_status_id:name']);
-    $membership = $this->callAPISuccessGetSingle('Membership', []);
-    $this->assertSame('Cancelled', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
-    $this->assertSame('1', $membership['is_override']);
+    $membership = Membership::get(FALSE)
+      ->addSelect('id', 'status_id:name', 'is_override')
+      ->execute()->single();
+    $this->assertSame('Cancelled', $membership['status_id:name']);
+    $this->assertTrue($membership['is_override']);
     $membershipSignupActivity = Activity::get()
       ->addSelect('subject', 'source_record_id', 'status_id')
       ->addWhere('activity_type_id:name', '=', 'Membership Signup')
       ->execute();
     $this->assertCount(1, $membershipSignupActivity);
-    $this->assertEquals($membership['id'], $membershipSignupActivity->first()['source_record_id']);
+    $this->assertSame($membership['id'], $membershipSignupActivity->first()['source_record_id']);
     $this->assertSame('General - Payment - Status: Pending', $membershipSignupActivity->first()['subject']);
     $activity = Activity::get()
       ->addSelect('subject', 'source_record_id', 'status_id')
@@ -322,29 +303,24 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    */
   protected function createEventOrder(): int {
     $this->ids['Event'][0] = (int) Event::create()->setValues(['title' => 'Event', 'start_date' => 'tomorrow', 'event_type_id:name' => 'Workshop'])->execute()->first()['id'];
-    $order = $this->callAPISuccess('Order', 'create', [
-      'contact_id' => $this->ids['contact'][0],
-      'financial_type_id' => 'Donation',
-      'invoice_id' => '123',
-      'line_items' => [
-        [
-          'line_item' => [
-            [
-              'line_total' => 5,
-              'qty' => 1,
-              'financial_type_id' => $this->getFinancialTypeID('Donation'),
-              'entity_table' => 'civicrm_participant',
-              'price_field_id' => PriceField::get()->addSelect('id')->addWhere('name', '=', 'contribution_amount')->execute()->first()['id'],
-            ],
-          ],
-          'params' => [
-            'contact_id' => $this->ids['contact'][0],
-            'event_id' => $this->ids['Event'][0],
-          ],
-        ],
-      ],
-    ]);
-    return (int) $order['id'];
+    return Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['contact'][0],
+        'financial_type_id:name' => 'Donation',
+        'invoice_id' => '123',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id.contact_id' => $this->ids['contact'][0],
+        'entity_id.event_id' => $this->ids['Event'][0],
+        'entity_id.status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Pending from incomplete transaction'),
+        'line_total' => 5,
+        'unit_price' => 5,
+        'qty' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
+        'price_field_id' => PriceField::get(FALSE)->addSelect('id')->addWhere('name', '=', 'contribution_amount')->execute()->first()['id'],
+      ])
+      ->execute()->single()['id'];
   }
 
   /**
@@ -375,27 +351,19 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'registered_by_id' => $participantID,
       'status_id:name' => 'Pending from incomplete transaction',
     ])->execute()->first()['id'];
-    if ($status === 'Cancelled') {
-      $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
-    }
-    else {
-      Contribution::update()
-        ->setValues(['contribution_status_id:name' => $status])
-        ->addWhere('id', '=', $orderID)
-        ->execute();
-    }
-    $this->callAPISuccess('Order', 'get', ['contribution_id' => $orderID]);
-    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => $status]);
-    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 2);
+    Contribution::update(FALSE)
+      ->setValues(['contribution_status_id:name' => $status])
+      ->addWhere('id', '=', $orderID)
+      ->execute();
+    Contribution::get(FALSE)->addWhere('contribution_status_id:name', '=', $status)->execute()->single();
+    $this->assertCount(2, Participant::get(FALSE)->addWhere('status_id:name', '=', 'Cancelled')->execute());
 
-    $cancelledActivatesCount = civicrm_api3('Activity', 'get', [
-      'sequential' => 1,
-      'activity_type_id' => 'Event Registration',
-      'subject' => ['LIKE' => '%Cancelled%'],
-      'source_record_id' => ['IN' => [$participantID, $additionalParticipantID]],
-    ]);
-
-    $this->assertSame(2, $cancelledActivatesCount['count']);
+    $cancelledActivities = Activity::get(FALSE)
+      ->addWhere('activity_type_id:name', '=', 'Event Registration')
+      ->addWhere('subject', 'LIKE', '%Cancelled%')
+      ->addWhere('source_record_id', 'IN', [$participantID, $additionalParticipantID])
+      ->execute();
+    $this->assertCount(2, $cancelledActivities);
   }
 
 }
