@@ -31,6 +31,8 @@
  */
 class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   /**
    * Cleanup after test.
    *
@@ -160,9 +162,7 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
    */
   public function testExportFinancialBatch(): void {
     $this->createLoggedInUser();
-    $batchParams = ['title' => 'Test Batch'];
-    $batchParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Exported');
-    $batch = $this->callAPISuccess('Batch', 'create', $batchParams);
+    $batch = $this->createTestEntity('Batch', ['title' => 'Test Batch', 'status_id:name' => 'Exported']);
     CRM_Batch_BAO_Batch::exportFinancialBatch([$batch['id']], 'CSV', NULL);
   }
 
