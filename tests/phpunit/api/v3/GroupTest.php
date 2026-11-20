@@ -326,7 +326,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 0);
     $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupAllGroups']);
-    unset(Civi::$statics['CRM_ACL_API']);
+    unset(Civi::$statics['CRM_ACL_API'], Civi::$statics['CRM_ACL_BAO_ACL']['permissioned_groups']);
     $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 1);
   }
 
