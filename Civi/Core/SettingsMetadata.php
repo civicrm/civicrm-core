@@ -77,6 +77,24 @@ class SettingsMetadata {
   }
 
   /**
+   * Convert a string given for a setting to the type the setting declares.
+   *
+   * A Boolean setting takes yes/no/true/false; any other value is returned as given.
+   *
+   * @param array $spec
+   *   Metadata of the setting.
+   * @param mixed $value
+   * @return mixed
+   */
+  public static function castValue(array $spec, $value) {
+    if (($spec['type'] ?? NULL) === 'Boolean' && is_string($value) && !is_numeric($value)) {
+      $bool = \CRM_Utils_String::strtoboolstr($value);
+      return $bool === FALSE ? $value : (bool) $bool;
+    }
+    return $value;
+  }
+
+  /**
    * Get the final metadata for all settings
    *  - sources from extensions etc using alterSettingsFolders / alterSettingsMetadata hooks
    *
