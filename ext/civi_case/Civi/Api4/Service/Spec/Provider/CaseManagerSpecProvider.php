@@ -66,7 +66,16 @@ class CaseManagerSpecProvider extends \Civi\Core\Service\AutoService implements 
 
     $whenClauses = [];
     foreach ($caseTypeNames as $caseTypeId => $caseTypeName) {
-      $managerRoleId = $xmlProcessor->getCaseManagerRoleId($caseTypeName);
+      try {
+        $managerRoleId = $xmlProcessor->getCaseManagerRoleId($caseTypeName);
+      }
+      catch (\Throwable $e) {
+        \Civi::log()->warning('Failed to load CaseType XML for {caseType}: {message}', [
+          'caseType' => $caseTypeName,
+          'message' => $e->getMessage(),
+        ]);
+        continue;
+      }
       if (empty($managerRoleId)) {
         continue;
       }
