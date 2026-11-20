@@ -62,7 +62,7 @@ class CRM_Core_CodeGen_PhpSchema extends CRM_Core_CodeGen_BaseTask {
   }
 
   public function generateNavigation() {
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
+    $template = new CRM_Core_CodeGen_Util_Template();
     return ['civicrm_navigation.mysql' => $template->fetch('civicrm_navigation.tpl')];
   }
 
@@ -72,7 +72,7 @@ class CRM_Core_CodeGen_PhpSchema extends CRM_Core_CodeGen_BaseTask {
    * @return array
    */
   public function generateLocaleDataSql($locale) {
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
+    $template = new CRM_Core_CodeGen_Util_Template();
     CRM_Core_CodeGen_Util_MessageTemplates::assignSmartyVariables($template->getSmarty());
     global $tsLocale;
     $oldTsLocale = $tsLocale;
@@ -110,7 +110,7 @@ class CRM_Core_CodeGen_PhpSchema extends CRM_Core_CodeGen_BaseTask {
    *   List of files
    */
   public function generateSample() {
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
+    $template = new CRM_Core_CodeGen_Util_Template();
     $sections = [
       'civicrm_sample.tpl',
       'civicrm_acl.tpl',

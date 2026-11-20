@@ -27,14 +27,6 @@ class CRM_Core_CodeGen_Main {
   public $schemaPath;
 
   /**
-   * Definitions of all tables.
-   *
-   * @var array
-   *   Ex: $tables['civicrm_address_format']['className'] = 'CRM_Core_DAO_AddressFormat';
-   */
-  public $tables;
-
-  /**
    * @var array
    *   Ex: $database['tableAttributes_modern'] = "ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
    */
@@ -140,25 +132,10 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
    * @throws \Exception
    */
   public function getTasks() {
-    $this->init();
-
     $tasks = [];
     $tasks[] = new CRM_Core_CodeGen_Config($this);
-    // $tasks[] = new CRM_Core_CodeGen_Reflection($this);
     $tasks[] = new CRM_Core_CodeGen_PhpSchema($this);
-    //  foreach (array_keys($this->tables) as $name) {
-    //    $tasks[] = new CRM_Core_CodeGen_DAO($this, $name);
-    //  }
-    // $tasks[] = new CRM_Core_CodeGen_I18n($this);
     return $tasks;
-  }
-
-  /**
-   * @return static
-   */
-  public function init() {
-    $this->tables = [];
-    return $this;
   }
 
 }
