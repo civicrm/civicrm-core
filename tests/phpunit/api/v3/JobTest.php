@@ -2503,6 +2503,64 @@ ENDSQLUPDATE;
   }
 
   /**
+   * Test that skip_empty suppresses email when the report has no rows,
+   * while still sending when rows exist or skip_empty is false.
+   */
+  public function testMailReportSkipEmpty(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $nonEmptyInstance = $this->createReportInstance();
+    $emptyInstance = $this->callAPISuccess('ReportInstance', 'create', [
+      'report_id' => 'contact/summary',
+      'title' => 'empty test report',
+      'form_values' => [
+        'fields' => ['sort_name' => '1'],
+        'sort_name_op' => 'has',
+        'sort_name_value' => 'nonexistent_contact_xyz_12345',
+      ],
+      'email_subject' => 'This is the email subject',
+      'email_to' => 'reportperson@example.com',
+    ]);
+
+    if (empty($_SERVER['QUERY_STRING'])) {
+      $_SERVER['QUERY_STRING'] = 'reset=1';
+    }
+
+    // Empty report with skip_empty = TRUE should not send an email.
+    ob_start();
+    $this->callApiV3Success('Job', 'mail_report', [
+      'instanceId' => $emptyInstance['id'],
+      'format' => 'print',
+      'skip_empty' => TRUE,
+    ]);
+    ob_end_clean();
+    $mut->assertMailLogEmpty();
+
+    // Empty report with skip_empty = FALSE should still send an email.
+    ob_start();
+    $this->callApiV3Success('Job', 'mail_report', [
+      'instanceId' => $emptyInstance['id'],
+      'format' => 'print',
+      'skip_empty' => FALSE,
+    ]);
+    ob_end_clean();
+    $this->assertCount(1, $mut->getAllMessages());
+    $mut->clearMessages();
+
+    // Non-empty report with skip_empty = TRUE should send an email.
+    ob_start();
+    $this->callApiV3Success('Job', 'mail_report', [
+      'instanceId' => $nonEmptyInstance['id'],
+      'format' => 'print',
+      'skip_empty' => TRUE,
+    ]);
+    ob_end_clean();
+    $this->assertCount(1, $mut->getAllMessages());
+
+    $mut->clearMessages();
+    $mut->stop();
+  }
+
+  /**
    * Helper to create a report instance of the contact summary report.
    *
    * @return array
