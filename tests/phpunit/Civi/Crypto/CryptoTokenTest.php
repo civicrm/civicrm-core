@@ -155,6 +155,22 @@ class CryptoTokenTest extends \CiviUnitTestCase {
 
   }
 
+  /**
+   * @dataProvider getHardcodedTokens
+   */
+  public function testDecryptHardcodedTokens(string $token, string $expectedPlainText): void {
+    $this->assertSame($expectedPlainText, \Civi::service('crypto.token')->decrypt($token));
+  }
+
+  public static function getHardcodedTokens(): array {
+    return [
+      ["\x02CTK?k=asdf-key-0&t=Wq9JBZljt0l7CdfDmByXiN_tePEe_W0jQL5Il4eRq0qiUZPJ4pvPCMH0-LSm6MSH", 'hello world (asdf-key-0)'],
+      ["\x02CTK?k=asdf-key-1&t=my-ynH7h6QpU9yHu1GaFPvv9kqcLdmFeuhJv2p7QnFPbkkJTi1Qk4ywr3n99bu-J", 'hello world (asdf-key-1)'],
+      ["\x02CTK?k=asdf-key-2&t=Tm9fLYb-IQh6SzMR9OtYu2dbjm65PM-Uz9-OLCavDN-E2qmkHbYgjQ", 'hello world (asdf-key-2)'],
+      ["\x02CTK?k=asdf-key-3&t=xFxwr7Qw1s7Zr2-mkhEScyOtfeB56ulxNXFvxNAHa_-wl06NIfRs6CTppL-lZa4RgINFPWoLc6zeQOXuqQbwFoopLHA8MN-UoMwj4Kccz60", 'hello world (asdf-key-3)'],
+    ];
+  }
+
   public function testReadPlainTextWithoutRegistry(): void {
     // This is performance optimization - don't initialize crypto.registry unless
     // you actually need it.
