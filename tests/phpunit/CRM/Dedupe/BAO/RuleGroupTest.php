@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Group;
+
 class CRM_Dedupe_DAO_TestEntity extends CRM_Core_DAO {
 
   public static $_tableName = 'civicrm_dedupe_test_table';
@@ -54,19 +56,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
-  /**
-   * IDs of created contacts.
-   *
-   * @var array
-   */
-  protected array $contactIDs = [];
-
-  /**
-   * ID of the group holding the contacts.
-   *
-   * @var int
-   */
-  protected $groupID;
+  protected $_apiversion = 4;
 
   /**
    * @var \Civi\API\Kernel
@@ -84,17 +74,10 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-
-    foreach ($this->contactIDs as $contactId) {
-      $this->contactDelete($contactId);
-    }
-    if ($this->groupID) {
-      $this->callAPISuccess('group', 'delete', ['id' => $this->groupID]);
+    if (!empty($this->ids['Group'])) {
+      Group::delete(FALSE)->addWhere('id', 'IN', $this->ids['Group'])->execute();
     }
     $this->quickCleanup(['civicrm_contact', 'civicrm_address'], TRUE);
-    CRM_Core_DAO::executeQuery("DELETE r FROM civicrm_dedupe_rule_group rg INNER JOIN civicrm_dedupe_rule r ON rg.id = r.dedupe_rule_group_id WHERE rg.is_reserved = 0 AND used = 'General'");
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_dedupe_rule_group WHERE is_reserved = 0 AND used = 'General'");
-
     parent::tearDown();
   }
 
@@ -265,7 +248,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
   public function testSupportedCustomFieldsSubtype(): void {
 
     //Create custom group with fields of all types to test.
-    $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
+    $this->createTestEntity('ContactType', ['name' => 'Big_Bank', 'label' => 'biggee', 'parent_id:name' => 'Organization']);
     $this->createCustomGroup(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
 
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
@@ -330,66 +313,38 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
 
     CRM_Core_DAO::executeQuery($sql);
 
-    $params = [
+    $groupID = $this->createTestEntity('Group', [
       'name' => 'Dupe Group',
       'title' => 'New Test Dupe Group',
-      'domain_id' => 1,
-      'is_active' => 1,
+      'is_active' => TRUE,
       'visibility' => 'Public Pages',
-    ];
+    ])['id'];
 
-    $result = $this->callAPISuccess('group', 'create', $params);
-    $this->groupID = $result['id'];
-
-    $params = [
-      [
-        'first_name' => 'robin',
-        'last_name' => 'hood',
+    $rowID = 1;
+    foreach (['robin' => 'hood', 'bob' => 'dobbs'] as $firstName => $lastName) {
+      $contactID = $this->createTestEntity('Contact', [
         'contact_type' => 'Individual',
-      ],
-      [
-        'first_name' => 'bob',
-        'last_name' => 'dobbs',
-        'contact_type' => 'Individual',
-      ],
-    ];
-
-    $count = 1;
-    foreach ($params as $param) {
-      $contact = $this->callAPISuccess('contact', 'create', $param);
-      $this->contactIDs[$count++] = $contact['id'];
-
-      $grpParams = [
-        'contact_id' => $contact['id'],
-        'group_id' => $this->groupID,
-      ];
-      $this->callAPISuccess('group_contact', 'create', $grpParams);
-
-      CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_dedupe_test_table` (`id`, `contact_id`, `dedupe_test_field`) VALUES (" . $count . "," . $contact['id'] . ", 'duplicate');");
-      $contact_id = $contact['id'];
+        'first_name' => $firstName,
+        'last_name' => $lastName,
+      ], $firstName)['id'];
+      $this->createTestEntity('GroupContact', ['contact_id' => $contactID, 'group_id' => $groupID], $firstName);
+      CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_dedupe_test_table` (`id`, `contact_id`, `dedupe_test_field`) VALUES (" . $rowID++ . ", $contactID, 'duplicate')");
     }
 
-    // verify that all contacts have been created separately
-    $this->assertSame(2, count($this->contactIDs), 'Check for number of contacts.');
-
-    // Create our RuleGroup with one rule.
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+    $ruleGroupID = $this->createTestEntity('DedupeRuleGroup', [
       'contact_type' => 'Individual',
       'threshold' => 10,
       'used' => 'General',
       'name' => 'TestRule',
       'title' => 'TestRule',
-      'is_reserved' => 0,
+      'is_reserved' => FALSE,
+    ])['id'];
+    $this->createTestEntity('DedupeRule', [
+      'dedupe_rule_group_id' => $ruleGroupID,
+      'rule_weight' => 10,
+      'rule_field' => 'dedupe_test_field',
+      'rule_table' => 'civicrm_dedupe_test_table',
     ]);
-
-    foreach (['dedupe_test_field'] as $field) {
-      $rules[$field] = $this->callAPISuccess('Rule', 'create', [
-        'dedupe_rule_group_id' => $ruleGroup['id'],
-        'rule_weight' => 10,
-        'rule_field' => $field,
-        'rule_table' => 'civicrm_dedupe_test_table',
-      ]);
-    }
 
     // Test op supportedFields
     $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Individual');
@@ -398,14 +353,14 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     ], $fields['civicrm_dedupe_test_table']);
 
     // Test rule finds a match.
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroupID, $groupID);
 
     $this->assertCount(1, $foundDupes);
 
     // Test rule finds no match.
-    CRM_Core_DAO::executeQuery("UPDATE `civicrm_dedupe_test_table` SET dedupe_test_field = 'not a duplicate' WHERE contact_id = $contact_id;");
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_dedupe_test_table` SET dedupe_test_field = 'not a duplicate' WHERE contact_id = " . $this->ids['Contact']['bob']);
 
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroupID, $groupID);
 
     $this->assertCount(0, $foundDupes);
 
