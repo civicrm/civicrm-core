@@ -254,6 +254,31 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
   }
 
   /**
+   * A Contribution entity with no user-entered fields is still created from line items on other entities.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionCreateFromParticipantOnly(): void {
+    $response = Afform::submit(FALSE)
+      ->setName('testAfformContribution')
+      ->setValues([
+        'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+        'Participant1' => [['fields' => ['event_id' => $this->eventId, 'participant_fields.ticket_option' => $this->inPersonPriceFieldValueId]]],
+        'Contribution1' => [['fields' => []]],
+      ])
+      ->execute()
+      ->single();
+
+    $contributionId = $response['Contribution1'][0]['id'] ?? NULL;
+    $this->assertGreaterThan(0, $contributionId);
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionId)
+      ->execute()
+      ->single();
+    $this->assertSame(10.0, $contribution['total_amount']);
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testValidateLineItems(): void {

@@ -252,9 +252,11 @@ EOHTML;
   }
 
   public function testSubmitWithMultiselectMinMaxValidation(): void {
+    $contactId = $this->createTestRecord('Individual')['id'];
+    $eventId = $this->createTestRecord('Event')['id'];
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity type="Participant" name="Participant1" label="Participant 1" actions="{create: true}" security="RBAC"  />
+  <af-entity type="Participant" name="Participant1" label="Participant 1" actions="{create: true}" security="RBAC" data="{contact_id: $contactId, event_id: $eventId}" />
   <fieldset af-fieldset="Participant1" class="af-container" af-title="Participant 1">
     <af-field name="role_id" defn="{input_attrs: {min: 2, max: 3}}" />
   </fieldset>
@@ -306,6 +308,8 @@ EOHTML;
       ->setName($this->formName)
       ->setValues(['Participant1' => [['fields' => ['role_id' => [1, 2]]]]])
       ->execute();
+    $participant = \Civi\Api4\Participant::get(FALSE)->addWhere('event_id', '=', $eventId)->execute()->single();
+    $this->assertSame(['1', '2'], $participant['role_id']);
   }
 
   public function testValidateAction(): void {

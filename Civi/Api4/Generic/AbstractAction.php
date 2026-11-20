@@ -564,9 +564,10 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * @param $values
    * @return array
+   *   Names of the required fields missing from $values.
    * @throws \CRM_Core_Exception
    */
-  protected function checkRequiredFields($values) {
+  public function checkRequiredFields($values) {
     $unmatched = [];
     foreach ($this->entityFields() as $fieldName => $fieldInfo) {
       if (!isset($values[$fieldName]) || $values[$fieldName] === '') {

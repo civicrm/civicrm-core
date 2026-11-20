@@ -12,7 +12,15 @@ class TestCheckoutOption extends CheckoutOption implements AfformCheckoutOptionI
     return 'TEST';
   }
 
+  /**
+   * Whether the last checkout started inside a database transaction.
+   *
+   * @var bool|null
+   */
+  public static ?bool $startedInTransaction = NULL;
+
   public function startCheckout(CheckoutSession $session): void {
+    self::$startedInTransaction = \CRM_Core_Transaction::isActive();
     $session->setPendingUrl("https://now.go.to/{$session->getContributionId()}");
     $session->setResponseItem('test_session_token', $session->tokenise());
   }
