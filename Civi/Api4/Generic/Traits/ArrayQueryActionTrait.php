@@ -125,8 +125,6 @@ trait ArrayQueryActionTrait {
   public static function compareValues($value, string $operator, $expected): bool {
     switch ($operator) {
       case '=':
-      case '!=':
-      case '<>':
         // For parity with SQL operators, do case-insensitive matching
         if (is_string($value)) {
           $value = strtolower($value);
@@ -143,15 +141,23 @@ trait ArrayQueryActionTrait {
         if ($expected === '') {
           $equal = ($value === '');
         }
-        return $equal == ($operator == '=');
+        return $equal;
+
+      case '<>':
+      case '!=':
+        return !self::compareValues($value, '=', $expected);
 
       case 'IS NULL':
+        return is_null($value);
+
       case 'IS NOT NULL':
-        return is_null($value) == ($operator == 'IS NULL');
+        return !self::compareValues($value, 'IS NULL', $expected);
 
       case 'IS EMPTY':
+        return empty($value);
+
       case 'IS NOT EMPTY':
-        return empty($value) == ($operator == 'IS EMPTY');
+        return !self::compareValues($value, 'IS EMPTY', $expected);
 
       case '>':
         return $value > $expected;
@@ -166,22 +172,23 @@ trait ArrayQueryActionTrait {
         return $value <= $expected;
 
       case 'BETWEEN':
+        return ($value >= $expected[0] && $value <= $expected[1]);
+
       case 'NOT BETWEEN':
-        $between = ($value >= $expected[0] && $value <= $expected[1]);
-        return $between == ($operator == 'BETWEEN');
+        return !self::compareValues($value, 'BETWEEN', $expected);
 
       case 'LIKE':
-      case 'NOT LIKE':
         if ($value === NULL) {
           return FALSE;
         }
         $pattern = '/^' . str_replace('%', '.*', preg_quote($expected, '/')) . '$/i';
-        return !preg_match($pattern, $value) == ($operator != 'LIKE');
+        return !!preg_match($pattern, $value);
+
+      case 'NOT LIKE':
+        return !self::compareValues($value, 'LIKE', $expected);
 
       case 'REGEXP':
-      case 'NOT REGEXP':
       case 'REGEXP BINARY':
-      case 'NOT REGEXP BINARY':
         if ($value === NULL) {
           return FALSE;
         }
@@ -189,60 +196,78 @@ trait ArrayQueryActionTrait {
         // Perform case-sensitive matching for BINARY operator, otherwise insensitive
         $i = str_ends_with($operator, 'BINARY') ? '' : 'i';
         $pattern = '/' . str_replace('/', '\\/', $expected) . "/$i";
-        return !preg_match($pattern, $value) == str_starts_with($operator, 'NOT');
+        return !!preg_match($pattern, $value);
+
+      case 'NOT REGEXP':
+        if ($value === NULL) {
+          // preexisting behaviour, but seems wrong?
+          return FALSE;
+        }
+        return !self::compareValues($value, 'REGEXP', $expected);
+
+      case 'NOT REGEXP BINARY':
+        if ($value === NULL) {
+          // preexisting behaviour, but seems wrong?
+          return FALSE;
+        }
+        return !self::compareValues($value, 'REGEXP BINARY', $expected);
 
       case 'IN':
         return in_array($value, $expected);
 
       case 'NOT IN':
-        return !in_array($value, $expected);
+        return !self::compareValues($value, 'IN', $expected);
 
       case 'CONTAINS':
-      case 'NOT CONTAINS':
         if (is_array($value) && is_array($expected)) {
-          return empty(array_diff($expected, $value)) == ($operator == 'CONTAINS');
+          return empty(array_diff($expected, $value));
         }
 
         if (!is_array($value) && is_array($expected)) {
-          return in_array($value, $expected) == ($operator == 'CONTAINS');
+          return in_array($value, $expected);
         }
 
         if (is_array($value) && !is_array($expected)) {
-          return in_array($expected, $value) == ($operator == 'CONTAINS');
+          return in_array($expected, $value);
         }
 
         if (is_string($value) || is_numeric($value)) {
           // Lowercase check if string contains string
-          return (str_contains(strtolower((string) $value), strtolower((string) $expected))) == ($operator == 'CONTAINS');
+          return str_contains(strtolower((string) $value), strtolower((string) $expected));
         }
-        return ($value == $expected) == ($operator == 'CONTAINS');
+        return $value == $expected;
+
+      case 'NOT CONTAINS':
+        return !self::compareValues($value, 'CONTAINS', $expected);
 
       case 'CONTAINS ONE OF':
-      case 'NOT CONTAINS ONE OF':
         if (is_array($value) && is_array($expected)) {
           if (is_array($value) && is_array($expected)) {
             foreach ($value as $v) {
               if (in_array($v, $expected)) {
-                return TRUE == ($operator == 'CONTAINS ONE OF');
+                return TRUE;
               }
             }
-            return FALSE == ($operator == 'CONTAINS ONE OF');
+            return FALSE;
           }
         }
 
         if (!is_array($value) && is_array($expected)) {
-          return in_array($value, $expected) == ($operator == 'CONTAINS ONE OF');
+          return in_array($value, $expected);
         }
 
         if (is_array($value) && !is_array($expected)) {
-          return in_array($expected, $value) == ($operator == 'CONTAINS ONE OF');
+          return in_array($expected, $value);
         }
 
         if (is_string($value) || is_numeric($value)) {
           // Lowercase check if string contains string
-          return (strpos(strtolower((string) $value), strtolower((string) $expected)) !== FALSE) == ($operator == 'CONTAINS ONE OF');
+          return strpos(strtolower((string) $value), strtolower((string) $expected)) !== FALSE;
         }
-        return ($value == $expected) == ($operator == 'CONTAINS ONE OF');
+        return $value == $expected;
+
+      case 'NOT CONTAINS ONE OF':
+        return !self::compareValues($value, 'CONTAINS ONE OF', $expected);
 
       default:
         throw new NotImplementedException("Unsupported operator: '$operator' cannot be used with array data");
