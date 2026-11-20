@@ -115,6 +115,7 @@ class CRM_Upgrade_Incremental_php_SixTwentyOne extends CRM_Upgrade_Incremental_B
         'format_type' => 'mailing',
       ],
     ]);
+    $this->addTask('Remove index civicrm_country.UI_iso_code', 'dropIndex', 'civicrm_country', 'UI_iso_code');
   }
 
   /**

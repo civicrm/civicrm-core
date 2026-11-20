@@ -25,6 +25,11 @@ class CRM_Upgrade_Incremental_php_SixTwentyTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("UPDATE civicrm_domain SET locale_custom_strings = NULL WHERE id = %1", [
       1 => [CRM_Core_Config::domainID(), 'Integer'],
     ]);
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_country WHERE name LIKE 'TestDup%'", i18nRewrite: FALSE);
+    Civi::schemaHelper()->createIndex('civicrm_country', 'UI_name', [
+      'fields' => ['name' => TRUE],
+      'unique' => TRUE,
+    ]);
     unset(Civi::$statics['CRM_Core_BAO_Domain']['version']);
     parent::tearDown();
   }
@@ -117,6 +122,68 @@ class CRM_Upgrade_Incremental_php_SixTwentyTest extends CiviUnitTestCase {
         ],
       ],
     ], $result);
+  }
+
+  /**
+   * Test ensureCountryNameUnique disambiguates duplicate country names and creates UI_name.
+   */
+  public function testEnsureCountryNameUnique(): void {
+    Civi::schemaHelper()->dropIndex('civicrm_country', 'UI_name');
+    $this->assertFalse(Civi::schemaHelper()->indexExists('civicrm_country', 'UI_name'));
+
+    // 1. Duplicate name where inactive row has lower id: active row keeps name, inactive is suffixed.
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_country (name, iso_code, country_code, region_id, is_active)
+      VALUES ('TestDupActive', 'T1', NULL, 1, 0)
+    ", i18nRewrite: FALSE);
+    $inactiveCountryId = (int) CRM_Core_DAO::singleValueQuery("SELECT LAST_INSERT_ID()");
+
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_country (name, iso_code, country_code, region_id, is_active)
+      VALUES ('TestDupActive', 'T2', NULL, 1, 1)
+    ", i18nRewrite: FALSE);
+    $activeCountryId = (int) CRM_Core_DAO::singleValueQuery("SELECT LAST_INSERT_ID()");
+
+    // 2. Duplicate 64-char name where both are active: lower id keeps name, higher id is truncated + suffixed.
+    $longName = str_pad('TestDupLong', 64, 'X');
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_country (name, iso_code, country_code, region_id, is_active)
+      VALUES (%1, 'T3', '33', 1, 1)
+    ", [1 => [$longName, 'String']], i18nRewrite: FALSE);
+    $longKeepId = (int) CRM_Core_DAO::singleValueQuery("SELECT LAST_INSERT_ID()");
+
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_country (name, iso_code, country_code, region_id, is_active)
+      VALUES (%1, 'T4', '44', 1, 1)
+    ", [1 => [$longName, 'String']], i18nRewrite: FALSE);
+    $longRenameId = (int) CRM_Core_DAO::singleValueQuery("SELECT LAST_INSERT_ID()");
+
+    // Run upgrader task
+    $ctx = new CRM_Queue_TaskContext();
+    $this->assertTrue(CRM_Upgrade_Incremental_php_SixTwenty::ensureCountryNameUnique($ctx));
+    $this->assertTrue(Civi::schemaHelper()->indexExists('civicrm_country', 'UI_name'));
+
+    // Verify Case 1: active row keeps original name, inactive row is suffixed.
+    $this->assertSame('TestDupActive', CRM_Core_DAO::singleValueQuery(
+      "SELECT name FROM civicrm_country WHERE id = %1",
+      [1 => [$activeCountryId, 'Integer']]
+    ));
+    $this->assertSame("TestDupActive ({$inactiveCountryId})", CRM_Core_DAO::singleValueQuery(
+      "SELECT name FROM civicrm_country WHERE id = %1",
+      [1 => [$inactiveCountryId, 'Integer']]
+    ));
+
+    // Verify Case 2: long name kept on first row, truncated + suffixed on second row.
+    $this->assertSame($longName, CRM_Core_DAO::singleValueQuery(
+      "SELECT name FROM civicrm_country WHERE id = %1",
+      [1 => [$longKeepId, 'Integer']]
+    ));
+    $renamedLong = CRM_Core_DAO::singleValueQuery(
+      "SELECT name FROM civicrm_country WHERE id = %1",
+      [1 => [$longRenameId, 'Integer']]
+    );
+    $this->assertLessThanOrEqual(64, strlen($renamedLong));
+    $this->assertStringEndsWith(" ({$longRenameId})", $renamedLong);
   }
 
 }
