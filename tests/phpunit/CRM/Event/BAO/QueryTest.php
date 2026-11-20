@@ -1,9 +1,13 @@
 <?php
 
+use Civi\Api4\Event;
+
 /**
  * @group headless
  */
 class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
+
+  protected $_apiversion = 4;
 
   public function setUp(): void {
     parent::setUp();
@@ -84,11 +88,11 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
 
     $this->assertEquals($contactId, $result->contact_id);
     $this->assertEquals($event['id'], $result->event_id);
-    $eventTypeId = $this->callAPISuccessGetValue('Event', [
-      'id' => $event['id'],
-      'return' => 'event_type_id',
-    ]);
-    $this->assertEquals($eventTypeId, $result->event_type_id);
+    $eventTypeID = Event::get(FALSE)
+      ->addSelect('event_type_id')
+      ->addWhere('id', '=', $event['id'])
+      ->execute()->single()['event_type_id'];
+    $this->assertSame($eventTypeID, (int) $result->event_type_id);
   }
 
   /**
