@@ -38,9 +38,9 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    * Get the next item.
    *
    * The SELECT then guarded UPDATE prevents two processes from claiming the same
-   * item without requiring table-level locking. The subquery picks the head of
-   * the queue regardless of if it has been claimed; the outer WHERE returns it
-   * only if it's available, so we don't fall through to the next item
+   * item without requiring table-level locking. The SELECT picks the head of
+   * the queue regardless of if it has been claimed, and is_claimable tells if
+   * it's available, so we don't fall through to the next item
    * (see testBasicLinearPolling).
    * Retry rather than directly returning NULL so this doesn't falsely indicate
    * that the queue is empty.
@@ -60,23 +60,25 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
 
     $maxAttempts = 5;
     for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+      // Select the head flat and test its lease in the select list: a derived
+      // table needs a temporary table, which MariaDB writes to disk because
+      // of the data column.
       $dao = CRM_Core_DAO::executeQuery('
-          SELECT first_in_queue.* FROM (
-            SELECT id, queue_name, submit_time, release_time, run_count, data
-            FROM civicrm_queue_item
-            WHERE queue_name = %1
-            ORDER BY weight, id
-            LIMIT 1
-          ) first_in_queue
-          WHERE release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2
+          SELECT id, queue_name, submit_time, release_time, run_count, data,
+            (release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2) AS is_claimable
+          FROM civicrm_queue_item
+          WHERE queue_name = %1
+          ORDER BY weight, id
+          LIMIT 1
         ', [
           1 => [$this->getName(), 'String'],
           2 => [CRM_Utils_Time::time(), 'Integer'],
         ], TRUE, 'CRM_Queue_DAO_QueueItem');
 
-      if (!$dao->fetch()) {
+      if (!$dao->fetch() || !$dao->is_claimable) {
         return NULL;
       }
+      unset($dao->is_claimable);
 
       if ($this->attemptClaim($dao, $lease_time)) {
         $dao->run_count++;
