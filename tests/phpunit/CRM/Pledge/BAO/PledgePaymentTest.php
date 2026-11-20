@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PledgePayment;
+
 /**
  * Test class for CRM_Pledge_BAO_PledgePayment BAO
  *
@@ -16,6 +18,8 @@
  * @group headless
  */
 class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
+
+  protected $_apiversion = 4;
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -285,21 +289,15 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
     $contact_id = $this->individualCreate();
 
-    $pledge = $this->callAPISuccess('Pledge', 'create', [
+    $pledgeID = $this->pledgeCreate([
       'contact_id' => $contact_id,
-      'pledge_create_date' => date('Ymd'),
-      'start_date' => date('Ymd'),
       'scheduled_date' => $scheduled_date,
       'amount' => 1618.80,
-      'pledge_status_id' => 2,
-      'pledge_financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'pledge_original_installment_amount' => 134.90,
       'original_installment_amount' => 134.90,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'frequency_day' => 1,
       'installments' => 12,
-      'sequential' => 1,
     ]);
 
     $contributionID = $this->contributionCreate([
@@ -315,16 +313,13 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ]);
 
     // Fetch the first planned pledge payment/installment
-    $pledgePayments = civicrm_api3('PledgePayment', 'get', [
-      'pledge_id' => $pledge['id'],
-      'sequential' => 1,
-    ]);
+    $pledgePayments = $this->getPledgePayments($pledgeID);
 
     // Does all sorts of shenanigans if the amount was not the expected amount,
     // and this is what we really want to test in this function.
     CRM_Contribute_BAO_Contribution::updateRelatedPledge(
       CRM_Core_Action::ADD,
-      $pledgePayments['values'][0]['id'],
+      $pledgePayments[0]['id'],
       $contributionID,
       // adjustTotalAmount
       NULL,
@@ -338,23 +333,20 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
     // Fetch the pledge payments again to see if the amounts and statuses
     // have been updated correctly.
-    $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', [
-      'pledge_id' => $pledge['id'],
-      'sequential' => 1,
-    ]);
+    $pledgePayments = $this->getPledgePayments($pledgeID);
 
     // The status of the first 3 pledges should be set to complete
-    $this->assertSame('1', $pledgePayments['values'][0]['status_id']);
-    $this->assertSame('404.70', $pledgePayments['values'][0]['actual_amount']);
+    $this->assertSame('Completed', $pledgePayments[0]['status_id:name']);
+    $this->assertSame(404.7, $pledgePayments[0]['actual_amount']);
 
-    $this->assertSame('1', $pledgePayments['values'][1]['status_id']);
-    $this->assertSame('0.00', $pledgePayments['values'][1]['actual_amount']);
+    $this->assertSame('Completed', $pledgePayments[1]['status_id:name']);
+    $this->assertSame(0.0, $pledgePayments[1]['actual_amount']);
 
-    $this->assertSame('1', $pledgePayments['values'][2]['status_id']);
-    $this->assertSame('0.00', $pledgePayments['values'][2]['actual_amount']);
+    $this->assertSame('Completed', $pledgePayments[2]['status_id:name']);
+    $this->assertSame(0.0, $pledgePayments[2]['actual_amount']);
 
     // Fourth pledge should still be pending
-    $this->assertSame('2', $pledgePayments['values'][3]['status_id']);
+    $this->assertSame('Pending', $pledgePayments[3]['status_id:name']);
   }
 
   /**
@@ -373,24 +365,17 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
     $contact_id = $this->individualCreate();
 
-    $params = [
+    $pledgeID = $this->pledgeCreate([
       'contact_id' => $contact_id,
-      'pledge_create_date' => date('Ymd'),
-      'start_date' => date('Ymd'),
       'scheduled_date' => $scheduled_date,
       'amount' => 100.00,
-      'pledge_status_id' => 2,
-      'pledge_financial_type_id' => $this->getFinancialTypeID('Donation'),
       // the API does not allow this
       'original_installment_amount' => (100 / 12),
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'frequency_day' => 1,
       'installments' => 12,
-      'sequential' => 1,
-    ];
-
-    $pledge = $this->callAPISuccess('Pledge', 'create', $params);
+    ]);
 
     $contributionID = $this->contributionCreate([
       'contact_id' => $contact_id,
@@ -405,15 +390,11 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ]);
 
     // Fetch the first planned pledge payment/installment
-    $pledgePayments = civicrm_api3('PledgePayment', 'get', [
-      'pledge_id' => $pledge['id'],
-      'sequential' => 1,
-    ]);
+    $pledgePayments = $this->getPledgePayments($pledgeID);
 
     // The last pledge payment is 8.37 because 12*8.33 = 99.96
     // So CiviCRM automatically creates a larger final pledge to catch the missing cents.
-    $last_pp_idx = count($pledgePayments['values']) - 1;
-    $this->assertEqualsWithDelta(8.37, $pledgePayments['values'][$last_pp_idx]['scheduled_amount'], 0.01);
+    $this->assertSame(8.37, $pledgePayments[count($pledgePayments) - 1]['scheduled_amount']);
 
     // Does all sorts of shenanigans if the amount was not the expected amount,
     // and this is what we really want to test in this function.
@@ -421,7 +402,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     // the last pledge payment would have 4¢ left and still be pending.
     CRM_Contribute_BAO_Contribution::updateRelatedPledge(
       CRM_Core_Action::ADD,
-      $pledgePayments['values'][0]['id'],
+      $pledgePayments[0]['id'],
       $contributionID,
     // adjustTotalAmount
       NULL,
@@ -435,27 +416,40 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
     // Fetch the pledge payments again to see if the amounts and statuses
     // have been updated correctly.
-    $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', [
-      'pledge_id' => $pledge['id'],
-      'sequential' => 1,
-    ]);
+    $pledgePayments = $this->getPledgePayments($pledgeID);
 
-    foreach ($pledgePayments['values'] as $key => $pp) {
-      if ($key == 0) {
+    foreach ($pledgePayments as $key => $pp) {
+      if ($key === 0) {
         // First pledge payment has the full amount.
-        $this->assertSame('8.33', $pp['scheduled_amount']);
-        $this->assertSame('100.00', $pp['actual_amount']);
+        $this->assertSame(8.33, $pp['scheduled_amount']);
+        $this->assertSame(100.0, $pp['actual_amount']);
       }
       else {
-        $this->assertSame('0.00', $pp['scheduled_amount']);
-        $this->assertSame('0.00', $pp['actual_amount']);
+        $this->assertSame(0.0, $pp['scheduled_amount']);
+        $this->assertSame(0.0, $pp['actual_amount']);
       }
 
       // All pledge payments must be set as 'completed'.
-      $this->assertSame('1', $pp['status_id']);
+      $this->assertSame('Completed', $pp['status_id:name']);
     }
 
-    $this->assertEquals(count($pledgePayments['values']), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], 2));
+    $this->assertEquals(count($pledgePayments), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledgeID, 2));
+  }
+
+  /**
+   * Get the payments of a pledge, in the order they were scheduled.
+   *
+   * @param int $pledgeID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getPledgePayments(int $pledgeID): array {
+    return (array) PledgePayment::get(FALSE)
+      ->addSelect('id', 'status_id:name', 'scheduled_amount', 'actual_amount')
+      ->addWhere('pledge_id', '=', $pledgeID)
+      ->addOrderBy('id')
+      ->execute();
   }
 
 }
