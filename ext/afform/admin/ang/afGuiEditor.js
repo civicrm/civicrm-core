@@ -214,6 +214,9 @@
 
         getEntity: getEntity,
 
+        // Get the parent of a facade entity (e.g. 'Contact' for 'Individual'), or the entity name if it is not a facade
+        resolveFacade: (entityName) => getEntity(entityName)?.facade_of || entityName,
+
         getField: function(entityName, fieldName) {
           const fields = CRM.afGuiEditor.entities[entityName].fields;
 

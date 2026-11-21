@@ -191,8 +191,8 @@
         $scope.blockTitles.length = 0;
         Object.entries(afGui.meta.blocks).forEach(([directive, block]) => {
           if ((!search || directive.includes(search) || block.name.toLowerCase().includes(search) || block.title.toLowerCase().includes(search)) &&
-            // A block of type "Contact" also applies to "Individual", "Organization" & "Household".
-            (block.entity_type === ctrl.entity.type || (block.entity_type === 'Contact' && ['Individual', 'Household', 'Organization'].includes(ctrl.entity.type))) &&
+            // A block for an entity also applies to its facades, e.g. a "Contact" block applies to "Individual".
+            [ctrl.entity.type, afGui.resolveFacade(ctrl.entity.type)].includes(block.entity_type) &&
             // Prevent recursion
             block.name !== ctrl.editor.getAfform().name
           ) {

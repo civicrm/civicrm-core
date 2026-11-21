@@ -17,6 +17,7 @@ use Civi\API\Request;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Service\Schema\SchemaMap;
+use Civi\Schema\EntityRepository;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
@@ -39,10 +40,7 @@ class CoreUtil {
       $dao = \Civi\Api4\CustomValue::getInfo()['dao'];
     }
     else {
-      $dao = AllCoreTables::getDAONameForEntity($entityName);
-    }
-    if (!$dao && self::isContact($entityName)) {
-      $dao = 'CRM_Contact_DAO_Contact';
+      $dao = AllCoreTables::getDAONameForEntity(self::resolveFacade($entityName));
     }
     // Last resort (added for the sake of SqlView APIs which are not registered with AllCoreTables).
     // Again, all this could be avoided if we could just call self::getInfoItem.
@@ -79,10 +77,22 @@ class CoreUtil {
   }
 
   /**
-   * Returns TRUE if `entityName` is 'Contact', 'Individual', 'Organization' or 'Household'
+   * Returns TRUE if `entityName` is 'Contact' or one of its facades: 'Individual', 'Organization' or 'Household'
    */
   public static function isContact(string $entityName): bool {
-    return $entityName === 'Contact' || in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE);
+    return self::resolveFacade($entityName) === 'Contact';
+  }
+
+  /**
+   * Get the entity whose records a facade presents.
+   *
+   * @param string $entityName
+   *   e.g. 'Individual'
+   * @return string
+   *   e.g. 'Contact'. If $entityName is not a facade it is returned unchanged.
+   */
+  public static function resolveFacade(string $entityName): string {
+    return EntityRepository::getFacadeParent($entityName) ?? $entityName;
   }
 
   /**
@@ -232,14 +242,19 @@ class CoreUtil {
     }
     $customGroupExtends = array_column(\CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), NULL, 'id');
     $extendsSubGroups = \CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions();
-    if (array_key_exists($entityName, $customGroupExtends)) {
-      return [
-        'extends' => [$entityName],
-        'column' => 'id',
-        'grouping' => ($customGroupExtends[$entityName]['grouping'] ?: array_column(\CRM_Utils_Array::filter($extendsSubGroups, ['extends' => $entityName]), 'grouping', 'id')) ?: NULL,
-      ];
+    // Like contact types: a facade has the custom fields of its parent plus its own,
+    // and a parent also has the custom fields of its facades.
+    $facadeParent = EntityRepository::getFacadeParent($entityName);
+    $baseEntity = $facadeParent ?? $entityName;
+    if (!array_key_exists($baseEntity, $customGroupExtends)) {
+      return NULL;
     }
-    return NULL;
+    $extends = $facadeParent ? [$facadeParent, $entityName] : [$entityName, ...EntityRepository::getFacadesOf($entityName)];
+    return [
+      'extends' => array_values(array_intersect($extends, array_keys($customGroupExtends))),
+      'column' => 'id',
+      'grouping' => ($customGroupExtends[$baseEntity]['grouping'] ?: array_column(\CRM_Utils_Array::filter($extendsSubGroups, ['extends' => $baseEntity]), 'grouping', 'id')) ?: NULL,
+    ];
   }
 
   /**

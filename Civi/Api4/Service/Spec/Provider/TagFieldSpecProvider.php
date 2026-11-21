@@ -40,12 +40,8 @@ class TagFieldSpecProvider extends \Civi\Core\Service\AutoService implements Spe
     if (!$this->applies($e->entity, $apiAction)) {
       return;
     }
-    if (CoreUtil::isContact($e->entity)) {
-      $entityTable = 'civicrm_contact';
-    }
-    else {
-      $entityTable = array_flip($this->getTaggableEntities())[$e->entity] ?? NULL;
-    }
+    // Facades (e.g. Individual) are tagged as their parent entity (e.g. Contact)
+    $entityTable = array_flip($this->getTaggableEntities())[CoreUtil::resolveFacade($e->entity)] ?? NULL;
     if (!$entityTable) {
       return;
     }
@@ -102,10 +98,7 @@ class TagFieldSpecProvider extends \Civi\Core\Service\AutoService implements Spe
     if (!in_array($action, ['get', 'create', 'update'])) {
       return FALSE;
     }
-    if (CoreUtil::isContact($entity)) {
-      return TRUE;
-    }
-    return in_array($entity, $this->getTaggableEntities(), TRUE);
+    return in_array(CoreUtil::resolveFacade($entity), $this->getTaggableEntities(), TRUE);
   }
 
   private function getTaggableEntities(): array {

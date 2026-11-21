@@ -14,6 +14,7 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
+use Civi\Schema\EntityRepository;
 
 /**
  * Base class for all api entities.
@@ -75,7 +76,8 @@ abstract class AbstractEntity implements EntityInterface {
     $permissions = \CRM_Core_Permission::getEntityActionPermissions();
 
     // For legacy reasons the permissions are keyed by lowercase entity name
-    $lcentity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower(static::getEntityName());
+    // Facades share the permissions of their parent entity
+    $lcentity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower(CoreUtil::resolveFacade(static::getEntityName()));
     // Merge permissions for this entity with the defaults
     return ($permissions[$lcentity] ?? []) + $permissions['default'];
   }
@@ -98,6 +100,12 @@ abstract class AbstractEntity implements EntityInterface {
    */
   protected static function getEntityTitle(bool $plural = FALSE): string {
     $name = static::getEntityName();
+    // A facade shares its parent's DAO, so get its title from the facade definition
+    if (EntityRepository::getFacadeParent($name)) {
+      $facadeInfo = EntityRepository::getFacadeInfo($name);
+      $title = $facadeInfo['title'] ?? $name;
+      return $plural ? ($facadeInfo['title_plural'] ?? $title) : $title;
+    }
     $dao = self::getDaoName();
     return $dao ? $dao::getEntityTitle($plural) : ($plural ? \CRM_Utils_String::pluralize($name) : $name);
   }
@@ -131,7 +139,7 @@ abstract class AbstractEntity implements EntityInterface {
    * @return \CRM_Core_DAO|string|null
    */
   protected static function getDaoName(): ?string {
-    return \CRM_Core_DAO_AllCoreTables::getDAONameForEntity(static::getEntityName());
+    return \CRM_Core_DAO_AllCoreTables::getDAONameForEntity(CoreUtil::resolveFacade(static::getEntityName()));
   }
 
   /**
@@ -202,6 +210,14 @@ abstract class AbstractEntity implements EntityInterface {
     }
     if ($dao) {
       $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
+    }
+    $facadeParent = EntityRepository::getFacadeParent($entityName);
+    if ($facadeParent) {
+      $info['type'] = array_merge(CoreUtil::getApiClass($facadeParent)::getInfo()['type'], ['EntityFacade']);
+      $info['facade_of'] = $facadeParent;
+      // Info declared by the facade (e.g. title, icon, label_field) overrides what it inherits from its parent
+      $infoItems = array_flip(array_column(\Civi\Api4\Entity::$entityFields, 'name'));
+      $info = array_intersect_key(EntityRepository::getFacadeInfo($entityName), $infoItems) + $info;
     }
 
     return $info;

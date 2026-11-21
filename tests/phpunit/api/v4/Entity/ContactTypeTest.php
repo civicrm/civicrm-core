@@ -34,8 +34,84 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
 
+  /**
+   * Set by tests which change contact types, so cached metadata is cleared afterwards.
+   *
+   * @var bool
+   */
+  private bool $clearCaches = FALSE;
+
+  public function tearDown(): void {
+    parent::tearDown();
+    if ($this->clearCaches) {
+      \Civi::cache('contactTypes')->clear();
+      \Civi::cache('metadata')->clear();
+    }
+  }
+
   public function testMetadata(): void {
     $this->assertSame('parent_id', CoreUtil::getInfoItem('ContactType', 'parent_field'));
+  }
+
+  public function testEntityFieldsEventDispatchedForIndividual(): void {
+    unset(\Civi::$statics['civi.entity.fields']);
+    $contactListenerCalled = FALSE;
+    $individualListenerCalled = FALSE;
+    $genericListenerEntities = [];
+
+    $dispatcher = \Civi::dispatcher();
+    $contactListener = function($e) use (&$contactListenerCalled) {
+      $contactListenerCalled = TRUE;
+    };
+    $individualListener = function($e) use (&$individualListenerCalled) {
+      $individualListenerCalled = TRUE;
+    };
+    $genericListener = function($e) use (&$genericListenerEntities) {
+      $genericListenerEntities[] = $e->entity;
+    };
+
+    $dispatcher->addListener('civi.entity.fields::Contact', $contactListener);
+    $dispatcher->addListener('civi.entity.fields::Individual', $individualListener);
+    $dispatcher->addListener('civi.entity.fields', $genericListener);
+
+    try {
+      \Civi::entity('Individual')->getFields();
+
+      // Parent listeners are called because Individual loads its parent's fields first
+      $this->assertTrue($contactListenerCalled);
+      $this->assertContains('Contact', $genericListenerEntities);
+
+      // Facade-specific listeners are called too
+      $this->assertTrue($individualListenerCalled);
+      $this->assertContains('Individual', $genericListenerEntities);
+    }
+    finally {
+      $dispatcher->removeListener('civi.entity.fields::Contact', $contactListener);
+      $dispatcher->removeListener('civi.entity.fields::Individual', $individualListener);
+      $dispatcher->removeListener('civi.entity.fields', $genericListener);
+      unset(\Civi::$statics['civi.entity.fields']);
+    }
+  }
+
+  /**
+   * The contact-type facades' title, description and icon follow the editable contact type.
+   */
+  public function testFacadeInfoFollowsContactType(): void {
+    $this->clearCaches = TRUE;
+    ContactType::update(FALSE)
+      ->addWhere('name', '=', 'Individual')
+      ->addValue('label', 'Person')
+      ->addValue('icon', 'fa-child')
+      ->execute();
+    \Civi::cache('metadata')->clear();
+
+    $this->assertSame('Person', CoreUtil::getInfoItem('Individual', 'title'));
+    // There's no plural label, so the plural is still the (translatable) core string
+    $this->assertSame('Individuals', CoreUtil::getInfoItem('Individual', 'title_plural'));
+    $this->assertSame('Contacts of type Person.', CoreUtil::getInfoItem('Individual', 'description'));
+    $this->assertSame('fa-child', CoreUtil::getInfoItem('Individual', 'icon'));
+    // The API name is unchanged
+    $this->assertSame('Individual', CoreUtil::getInfoItem('Individual', 'name'));
   }
 
   public function testMenuItemWillBeCreatedAndDeleted(): void {

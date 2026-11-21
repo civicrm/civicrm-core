@@ -34,10 +34,7 @@ class DAOFieldsCallbackAdapterSpecProvider extends \Civi\Core\Service\AutoServic
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $entityName = $spec->getEntity();
-    if (CoreUtil::isContact($entityName)) {
-      $entityName = 'Contact';
-    }
+    $entityName = CoreUtil::resolveFacade($spec->getEntity());
     $entity = EntityRepository::getEntity($entityName);
     if (empty($entity['class']) || empty($entity['fields_callback'])) {
       return;
