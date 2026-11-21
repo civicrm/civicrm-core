@@ -162,4 +162,14 @@ ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
     return TRUE;
   }
 
+  /**
+   * Add SearchSchedule table
+   * @return bool
+   */
+  public function upgrade_1008(): bool {
+    $this->ctx->log->info('Applying update 1008 - add SearchSchedule table.');
+    E::schema()->createEntityTable('upgrade/schema/1008-SearchSchedule.entityType.php');
+    return TRUE;
+  }
+
 }

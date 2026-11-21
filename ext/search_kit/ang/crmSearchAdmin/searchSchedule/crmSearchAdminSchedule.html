@@ -1,0 +1,127 @@
+<div id="bootstrap-theme">
+  <div ng-if="$ctrl.loading" class="text-center" style="padding: 30px;">
+    <i class="crm-i fa-spinner fa-spin fa-2x" role="img" aria-hidden="true"></i>
+  </div>
+  <form name="searchScheduleForm" ng-if="!$ctrl.loading">
+
+    <div class="clearfix" style="margin-bottom: 15px;" ng-if="$ctrl.schedules.length &gt; 1 || $ctrl.scheduleIndex === 'new'">
+      <div class="form-inline pull-left">
+        <label for="crm-search-schedule-select">{{:: ts('Schedule') }}: </label>
+        <select id="crm-search-schedule-select" class="form-control" ng-model="$ctrl.scheduleIndex" ng-change="$ctrl.selectSchedule($ctrl.scheduleIndex)">
+          <option ng-repeat="s in $ctrl.schedules" ng-value="$index">{{ s.label || ts('Untitled Schedule') }}</option>
+          <option value="new" ng-if="$ctrl.scheduleIndex === 'new'">{{:: ts('+ New Schedule (unsaved)') }}</option>
+        </select>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm pull-right" ng-click="$ctrl.addSchedule()" ng-if="$ctrl.scheduleIndex !== 'new'">
+        <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
+        {{:: ts('Add Another Schedule') }}
+      </button>
+    </div>
+
+    <div class="clearfix" style="margin-bottom: 15px;" ng-if="$ctrl.schedule.id">
+      <div class="btn-group pull-right">
+        <button type="button" class="btn btn-secondary btn-sm" ng-click="$ctrl.sendTest()" ng-disabled="$ctrl.sending || $ctrl.saving" title="{{:: ts('Send an email right now to test this schedule') }}">
+          <i class="crm-i" ng-class="$ctrl.sending ? 'fa-spinner fa-spin' : 'fa-paper-plane'" role="img" aria-hidden="true"></i>
+          {{:: ts('Send Test Now') }}
+        </button>
+        <button type="button" class="btn btn-danger-outline btn-sm" ng-click="$ctrl.deleteSchedule()" ng-disabled="$ctrl.sending || $ctrl.saving" title="{{:: ts('Delete this schedule') }}">
+          <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
+          {{:: ts('Delete') }}
+        </button>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm pull-left" ng-click="$ctrl.addSchedule()" ng-if="$ctrl.schedules.length === 1 && $ctrl.scheduleIndex !== 'new'">
+        <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
+        {{:: ts('Add Another Schedule') }}
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label for="crm-search-schedule-label">{{:: ts('Schedule Title') }} <span class="crm-marker">*</span></label>
+      <div class="input-group">
+        <input id="crm-search-schedule-label" class="form-control" ng-model="$ctrl.schedule.label" required placeholder="{{:: ts('e.g. Weekly Status Report') }}">
+        <span class="input-group-addon">
+          <label style="margin: 0; font-weight: normal; cursor: pointer;">
+            <input type="checkbox" ng-model="$ctrl.schedule.is_active">
+            {{:: ts('Active') }}
+          </label>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="crm-search-schedule-recipients">{{:: ts('Recipients') }} <span class="crm-marker">*</span></label>
+      <input id="crm-search-schedule-recipients" class="form-control" crm-autocomplete="'Contact'" multi="true" ng-model="$ctrl.schedule.recipients" placeholder="{{:: ts('Select contacts...') }}" required>
+      <div class="help-block">{{:: ts('Contacts who will receive this scheduled email.') }}</div>
+    </div>
+
+    <div class="form-group">
+      <label for="crm-search-schedule-subject">{{:: ts('Email Subject') }}</label>
+      <input id="crm-search-schedule-subject" class="form-control" ng-model="$ctrl.schedule.subject" placeholder="{{ $ctrl.schedule.label || $ctrl.display.label }}">
+    </div>
+
+    <div class="form-group">
+      <label for="crm-search-schedule-template">{{:: ts('Message Template') }}</label>
+      <input id="crm-search-schedule-template" class="form-control" crm-autocomplete="'MessageTemplate'" crm-autocomplete-params="$ctrl.msgTemplateParams" ng-model="$ctrl.schedule.msg_template_id" placeholder="{{:: ts('Default message template') }}">
+      <div class="help-block">{{:: ts('Optional template to use for the email body. If omitted, a default message is used.') }}</div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label for="crm-search-schedule-format">{{:: ts('Attachment Format') }} <span class="crm-marker">*</span></label>
+          <select id="crm-search-schedule-format" class="form-control" ng-model="$ctrl.schedule.format" required ng-options="f.id as f.text for f in $ctrl.formats">
+          </select>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label for="crm-search-schedule-frequency-interval">{{:: ts('Frequency') }} <span class="crm-marker">*</span></label>
+          <div class="form-inline">
+            <span>{{:: ts('Every') }}</span>
+            <input type="number" id="crm-search-schedule-frequency-interval" min="1" class="form-control" style="width: 70px;" ng-model="$ctrl.schedule.frequency_interval" required>
+            <select class="form-control" ng-model="$ctrl.schedule.frequency_unit" required ng-options="u.id as u.text for u in $ctrl.frequencyUnits">
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="crm-search-schedule-start-date">{{:: ts('Start Date / Time') }}</label>
+      <input id="crm-search-schedule-start-date" class="form-control" crm-ui-datepicker="{time: true}" ng-model="$ctrl.schedule.start_date" placeholder="{{:: ts('Now') }}">
+      <div class="help-block">{{:: ts('When this schedule should begin sending emails.') }}</div>
+    </div>
+
+    <div class="row well well-sm" ng-if="$ctrl.schedule.id" style="margin-left: 0; margin-right: 0;">
+      <div class="col-sm-6">
+        <strong>{{:: ts('Next Run') }}:</strong>
+        <span ng-if="$ctrl.schedule.is_active && $ctrl.schedule.next_run">{{ $ctrl.formatDate($ctrl.schedule.next_run) }}</span>
+        <span ng-if="!$ctrl.schedule.is_active" class="text-muted"><em>{{:: ts('Inactive') }}</em></span>
+        <span ng-if="$ctrl.schedule.is_active && !$ctrl.schedule.next_run" class="text-muted"><em>{{:: ts('Not scheduled') }}</em></span>
+      </div>
+      <div class="col-sm-6 text-right">
+        <strong>{{:: ts('Last Run') }}:</strong>
+        <span ng-if="$ctrl.schedule.last_run">{{ $ctrl.formatDate($ctrl.schedule.last_run) }}</span>
+        <span ng-if="!$ctrl.schedule.last_run" class="text-muted"><em>{{:: ts('Never') }}</em></span>
+      </div>
+    </div>
+
+    <details class="crm-accordion-bold" style="margin-top: 15px;">
+      <summary>
+        {{:: ts('Additional Filters') }}
+        <span class="badge" ng-if="$ctrl.schedule.filters.length">{{ $ctrl.schedule.filters.length }}</span>
+      </summary>
+      <div class="crm-accordion-body">
+        <div class="help-block">
+          {{:: ts('Optionally apply additional filter criteria when emailing this report.') }}
+        </div>
+        <fieldset class="api4-clause-fieldset">
+          <crm-search-clause clauses="$ctrl.schedule.filters" format="string" op="AND" label="{{:: ts('Filters') }}" fields="$ctrl.fieldsForFilters" saved-search="$ctrl.savedSearch"></crm-search-clause>
+        </fieldset>
+      </div>
+    </details>
+
+    <crm-dialog-button text="ts('Save')" icons="{primary: $ctrl.saving ? 'fa-spinner fa-spin' : 'fa-save'}" on-click="$ctrl.save()" disabled="!searchScheduleForm.$valid || $ctrl.saving" />
+    <crm-dialog-button text="ts('Close')" icons="{primary: 'fa-times'}" on-click="$dialog.cancel()" />
+  </form>
+</div>

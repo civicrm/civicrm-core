@@ -36,6 +36,7 @@
       let initDefaults;
 
       this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
+      this.canSchedule = this.isSuperAdmin || CRM.checkPerm('administer search_kit') || CRM.checkPerm('administer CiviCRM');
       this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
 
       this.preview = this.stale = false;
