@@ -845,6 +845,7 @@ GROUP BY    currency
       }
       $count++;
     }
+    $this->setRowsFound($sql, $count);
 
     // FIXME: calculate % using query
     foreach ($rows as $uid => $row) {
