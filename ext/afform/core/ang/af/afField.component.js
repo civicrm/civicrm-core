@@ -531,7 +531,7 @@
         }
 
         // check and evaluate any conditionals if present
-        return fieldOptions.filter((opt) => {
+        const options = fieldOptions.filter((opt) => {
           if (!opt.if || !opt.if.length) return true;
           try {
             return this.afForm.evaluateExpression(opt.if);
@@ -542,6 +542,15 @@
             return true;
           }
         });
+
+        if (this.defn.show_counts) {
+          // add counts to each option
+          options.forEach((opt) => opt.count = this.getFacetCount(opt.id));
+          // should hiding zero options be configurable?
+          return options.filter((opt) => opt.count);
+        }
+
+        return options;
       };
 
       this.validateValue = () => {
@@ -565,14 +574,18 @@
         $element.find('input[crm-ui-select]').controller('ngModel')?.$render();
       };
 
-      $scope.select2Options = function() {
-        return {
-          // color/icon/description are what crmSelect2's default formatCrmSelect2 renderer
-          // looks for on each result - carrying them through here is what lets e.g. a tags
-          // filter show the same colored swatches as everywhere else tags are picked.
-          results: $scope.getOptions().map((opt) => ({id: opt.id, text: opt.label, color: opt.color, icon: opt.icon, description: opt.description}))
-        };
-      };
+      $scope.select2Options = () => ({
+        // color/icon/description are what crmSelect2's default formatCrmSelect2 renderer
+        // looks for on each result - carrying them through here is what lets e.g. a tags
+        // filter show the same colored swatches as everywhere else tags are picked.
+        results: $scope.getOptions().map((opt) => ({
+          id: opt.id,
+          text: this.defn.show_counts ? `${opt.label} (${opt.count})` : opt.label,
+          color: opt.color,
+          icon: opt.icon,
+          description: opt.description
+        }))
+      });
 
       this.onChangeOperator = function() {
         $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
@@ -674,6 +687,8 @@
         }
         return defaultDate;
       }
+
+      this.getFacetCount = (optionId) => this.afFieldset?.getFacetCount(this.defn.name, optionId);
 
     }
   });

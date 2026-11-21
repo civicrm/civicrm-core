@@ -1,7 +1,7 @@
 <ul class="crm-checkbox-list" ng-class="$ctrl.defn.input_style" id="{{ fieldId }}" ng-if="$ctrl.isMultiple()">
   <li ng-repeat="opt in getOptions() track by opt.id" >
     <input type="checkbox" checklist-model="dataProvider.getFieldData()[$ctrl.fieldName]" ng-required="$ctrl.defn.required && !dataProvider.getFieldData()[$ctrl.fieldName].length" ng-disabled="$ctrl.isDisabled()" id="{{ fieldId + opt.id }}" aria-label="{{$ctrl.defn.label}} {{opt.label}}" checklist-value="opt.id" />
-    <label for="{{ fieldId + opt.id }}">{{:: opt.label }}</label>
+    <label for="{{ fieldId + opt.id }}">{{:: opt.label }}<span ng-if="$ctrl.defn.show_counts" class="crm-afform-filter-count">({{ opt.count }})</span></label>
   </li>
 </ul>
 <label class="crm-af-field-label" ng-class="$ctrl.defn.input_style" ng-if="!$ctrl.isMultiple()" >

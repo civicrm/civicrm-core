@@ -265,6 +265,12 @@
         return this.afFieldset?.getFormName() ?? this.$element?.controller('afForm')?.getFormMeta().name ?? null;
       },
 
+      // A display placed directly in a submission form has no afFieldset, so fall back to the afForm.
+      getAfformFacets() {
+        const facetFields = this.afFieldset?.getFacets();
+        return (facetFields && facetFields.length) ? facetFields : null;
+      },
+
       // Generate params for the SearchDisplay.run api
       getApiParams: function(mode) {
         const apiParams = {
@@ -328,6 +334,18 @@
                 this.rowCount = result.count;
               });
             }
+          }
+          // Add any facet filter counts
+          if (this.getAfformFacets()) {
+            const params = this.getApiParams('facet_counts');
+            crmApi4('SearchDisplay', 'run', params)
+              .then((result) => {
+                if (requestId < this._runCount || !angular.equals(params.filters, this.getFilters())) {
+                  return; // Another request started, or the filters changed, after this one
+                }
+
+                this.afFieldset.setFacetCounts(result);
+              });
           }
           // Run all postRun callbacks on success
           this.onPostRun.forEach(callback => callback.call(this, apiResults, 'success', editedRow));

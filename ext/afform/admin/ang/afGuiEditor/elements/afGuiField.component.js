@@ -93,6 +93,8 @@
         ));
       };
 
+      this.canBeFacet = () => this.isSearch() && !this.isMultiFieldFilter && ['CheckBox', 'Radio', 'Select'].includes($scope.getProp('input_type'));
+
       const defaultStyles = [{value: '', label: ts('Default')}];
       const inputStylesByType = {};
       for (const s of (CRM.afAdmin.field_styles || [])) {
@@ -499,9 +501,14 @@
         return Math.abs(this.defaultDateOffset()) !== 1;
       };
 
-      this.toggleMultiFieldFilter = function() {
+      this.toggleMultiFieldFilter = () => {
         this.isMultiFieldFilter = !this.isMultiFieldFilter;
-        if (!this.isMultiFieldFilter) {
+        if (this.isMultiFieldFilter) {
+          // show counts wont work with multifieldfilters
+          delete this.node.defn.show_counts;
+        }
+        else {
+          // reset name
           this.node.name = this.getFieldName();
         }
       };
