@@ -11,6 +11,7 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Action\Order\Create;
+use Civi\Api4\Action\Order\Validate;
 use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
@@ -42,6 +43,15 @@ class Order extends Generic\AbstractEntity {
     return (new Generic\BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
       return [];
     }))->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Civi\Api4\Action\Order\Validate
+   */
+  public static function validate($checkPermissions = TRUE) {
+    return (new Validate(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }
