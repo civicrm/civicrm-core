@@ -10,6 +10,8 @@
  */
 namespace Civi\Financialacls;
 
+use Civi\Api4\Contribution;
+
 require_once 'BaseTestClass.php';
 
 /**
@@ -125,6 +127,60 @@ class ContributionTest extends BaseTestClass {
       'total_amount' => $params['total_amount'],
       'version' => 3,
     ]);
+  }
+
+  /**
+   * A line item type the user may not edit removes the Edit link, and only that link.
+   */
+  public function testLinksForRestrictedLineItemType(): void {
+    $this->createContributionWithTwoLineItems();
+    $this->addFinancialAclPermissions([
+      ['view', 'Donation'],
+      ['edit', 'Donation'],
+      ['delete', 'Donation'],
+      ['view', 'Event Fee'],
+      ['delete', 'Event Fee'],
+    ]);
+    $contribution = Contribution::get(FALSE)->addSelect('id', 'contact_id')->execute()->single();
+    $links = \CRM_Core_Action::formLink(\CRM_Contribute_Selector_Search::links(), NULL,
+      ['id' => $contribution['id'], 'cid' => $contribution['contact_id'], 'cxt' => ''],
+      'more', FALSE, 'contribution.selector.row', 'Contribution', $contribution['id']);
+    $this->assertStringContainsString("title='View Contribution'", $links);
+    $this->assertStringNotContainsString("title='Edit Contribution'", $links);
+    $this->assertStringContainsString("title='Delete Contribution'", $links);
+  }
+
+  /**
+   * A line item type the user may not edit removes the payment and refund links.
+   */
+  public function testPaymentLinksForRestrictedLineItemType(): void {
+    $this->createContributionWithTwoLineItems();
+    $this->setPaymentLinkPermissions([['view', 'Event Fee']]);
+    $contributionID = Contribution::get(FALSE)->execute()->single()['id'];
+    $this->assertSame([], \CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($contributionID, 'Completed'));
+  }
+
+  /**
+   * Edit permission on every line item type keeps the payment and refund links.
+   */
+  public function testPaymentLinksForEditableLineItemTypes(): void {
+    $this->createContributionWithTwoLineItems();
+    $this->setPaymentLinkPermissions([['view', 'Event Fee'], ['edit', 'Event Fee']]);
+    $contributionID = Contribution::get(FALSE)->execute()->single()['id'];
+    $links = \CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($contributionID, 'Completed');
+    $this->assertSame(['Record Payment', 'Record Refund'], array_column($links, 'title'));
+  }
+
+  /**
+   * Grant the permissions behind the payment links, full access to Donation and the given Event Fee permissions.
+   */
+  private function setPaymentLinkPermissions(array $eventFeePermissions): void {
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'view all contacts', 'edit contributions', 'refund contributions']);
+    $this->addFinancialAclPermissions(array_merge([
+      ['view', 'Donation'],
+      ['edit', 'Donation'],
+      ['delete', 'Donation'],
+    ], $eventFeePermissions));
   }
 
   public function testSuperPermissions(): void {

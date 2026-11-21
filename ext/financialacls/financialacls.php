@@ -510,11 +510,12 @@ function financialacls_civicrm_links(string $op, ?string $objectName, $objectID,
         $links = [];
         return;
       }
+      // Links are indexed sequentially, so match on their action bit.
       if (!CRM_Core_Permission::check('edit contributions of type ' . $financialType)) {
-        unset($links[CRM_Core_Action::UPDATE]);
+        $links = array_filter($links, fn($link) => !(($link['bit'] ?? 0) & CRM_Core_Action::UPDATE));
       }
       if (!CRM_Core_Permission::check('delete contributions of type ' . $financialType)) {
-        unset($links[CRM_Core_Action::DELETE]);
+        $links = array_filter($links, fn($link) => !(($link['bit'] ?? 0) & CRM_Core_Action::DELETE));
       }
     }
     $financialTypeID = $values['financial_type_id'] ?? CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $objectID, 'financial_type_id');
