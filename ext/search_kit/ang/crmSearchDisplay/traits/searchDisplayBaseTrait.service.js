@@ -2,7 +2,7 @@
   "use strict";
 
   // Trait provides base methods and properties common to all search display types
-  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($timeout, $interval, $sce, crmApi4, crmStatus) {
+  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($interval, $sce, crmApi4, crmStatus) {
 
     // Return a base trait shared by all search display controllers
     // Gets mixed in using angular.extend()
@@ -196,16 +196,26 @@
         // - there is a counter (e.g. a contact summary tab)
         // - and the search is hidden or not set to auto-run
         // - or afform filters are present which would interfere with an accurate total
-        // (wait a brief timeout to allow more important things to happen first)
-        $timeout(() => {
-          if (hasCounter && (!(this.loading || this.results) || !angular.equals({}, this.getAfformFilters()))) {
+        // (sent in the background, batched with the counts of other displays on the page)
+        let countRequest;
+        if (hasCounter) {
+          countRequest = CRM.backgroundApi4('SearchDisplay', 'run', () => {
             const params = this.getApiParams('row_count');
             // Exclude afform filters
             params.filters = this.filters;
-            crmApi4('SearchDisplay', 'run', params)
-              .then((result) => setTotalCount(result.count));
-          }
-        }, 900);
+            return params;
+          });
+          countRequest.then(
+            (result) => $scope.$evalAsync(() => setTotalCount(result.count)),
+            () => {}
+          );
+          // Without afform filters, running the search gives the total count so a separate request isn't needed.
+          this.onPreRun.push(() => {
+            if (angular.equals({}, this.getAfformFilters())) {
+              countRequest.cancel();
+            }
+          });
+        }
 
         // Clean up the form handler, visibility poller and pending debounced
         // searches, which are not released by the $scope itself
@@ -218,6 +228,7 @@
           }
           this.getResultsPronto.cancel();
           this.getResultsSoon.cancel();
+          countRequest?.cancel();
         });
       },
 

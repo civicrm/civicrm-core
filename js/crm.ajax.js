@@ -104,6 +104,80 @@
     });
   };
 
+  // Calls waiting to be sent by CRM.backgroundApi4
+  const backgroundQueue = [];
+  let backgroundTimer = null;
+  let backgroundDeadline = Infinity;
+
+  function sendBackgroundQueue() {
+    clearTimeout(backgroundTimer);
+    backgroundTimer = null;
+    backgroundDeadline = Infinity;
+    const batch = backgroundQueue.splice(0).filter((item) => {
+      try {
+        // Params given as a function are evaluated now, so they reflect the state at send time
+        item.call[2] = (typeof item.params === 'function' ? item.params() : item.params) || {};
+        return true;
+      }
+      catch (error) {
+        item.reject(error);
+        return false;
+      }
+    });
+    if (!batch.length) {
+      return;
+    }
+    CRM.api4(batch.map((item) => item.call))
+      .then((results) => batch.forEach((item, index) => {
+        const result = results[index];
+        if (!result || 'error_code' in result) {
+          item.reject(result);
+        }
+        else {
+          item.resolve(result);
+        }
+      }), (error) => batch.forEach((item) => item.reject(error)));
+  }
+
+  /**
+   * Run a low-priority api4 call. Works just like CRM.api4, except:
+   *
+   * - It adds a slight delay.
+   * - Other backgroundApi4 calls made during that delay are bundled in one request.
+   * - Its returned Promise includes a `.cancel()` method.
+   *
+   * @param {string} entity
+   * @param {string} action
+   * @param {Object|Function} [params]
+   *   Api params, or a function returning them (called when the batch is sent, can cancel by throwing)
+   * @param {string|number|Array|Object} [index]
+   * @param {Object} [config]
+   *   - maxWait {number}: ms to wait for other calls to join the batch (default 800)
+   * @return {Promise} with a `cancel()` method (only available on returned promise, can't be chained after .then())
+   */
+  CRM.backgroundApi4 = function(entity, action, params, index, config) {
+    const maxWait = config?.maxWait ?? 800;
+    let item;
+    const request = new Promise((resolve, reject) => {
+      item = {call: [entity, action, null, index], params, resolve, reject};
+    });
+    request.cancel = (reason) => {
+      const position = backgroundQueue.indexOf(item);
+      if (position >= 0) {
+        backgroundQueue.splice(position, 1);
+        item.reject(reason instanceof Error ? reason : new window.DOMException('Cancelled', 'AbortError'));
+      }
+    };
+    backgroundQueue.push(item);
+    const deadline = Date.now() + maxWait;
+    if (deadline < backgroundDeadline) {
+      backgroundDeadline = deadline;
+      clearTimeout(backgroundTimer);
+      backgroundTimer = setTimeout(sendBackgroundQueue, maxWait);
+    }
+    return request;
+  };
+
   /**
    * AJAX api
    * @link https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
