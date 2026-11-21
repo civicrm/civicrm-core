@@ -158,13 +158,13 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 
     // Someone else claims it first.
     $item = $queue->claimItem();
-    $this->assertEquals($id, $item->id);
-    $this->assertEquals(1, $item->run_count);
+    $this->assertSame($id, (int) $item->id);
+    $this->assertSame(1, $item->run_count);
 
     // A racer holding the pre-claim run_count must be rejected.
     $won = $queue->attemptClaim($staleDao, 60);
     $this->assertFalse($won, 'A claim based on stale run_count should be rejected.');
-    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery('SELECT run_count FROM civicrm_queue_item WHERE id = %1', [
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery('SELECT run_count FROM civicrm_queue_item WHERE id = %1', [
       1 => [$id, 'Integer'],
     ]), 'The winning claim should be untouched.');
 
@@ -204,8 +204,8 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 
     $item = $queue->claimItem();
 
-    $this->assertEquals('a', $item->data['test-key']);
-    $this->assertEquals(4, $queue->attemptCount, 'Should retry until it wins: 3 losses + 1 success.');
+    $this->assertSame('a', $item->data['test-key']);
+    $this->assertSame(4, $queue->attemptCount, 'Should retry until it wins: 3 losses + 1 success.');
   }
 
   /**
@@ -215,10 +215,10 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
     $queue = $this->makeQueueThatLosesRaceNTimes(0);
     $queue->createItem(['test-key' => 'a']);
     $queue->createItem(['test-key' => 'b']);
-    $this->assertEquals('a', $queue->claimItem()->data['test-key']);
+    $this->assertSame('a', $queue->claimItem()->data['test-key']);
 
     $this->assertNull($queue->claimItem());
-    $this->assertEquals(1, $queue->attemptCount, 'A leased head should not be claimed again.');
+    $this->assertSame(1, $queue->attemptCount, 'A leased head should not be claimed again.');
   }
 
   /**
@@ -237,8 +237,8 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
     $item = $queue->claimItem();
     $after = $this->countTemporaryTables();
 
-    $this->assertEquals('a', $item->data['test-key']);
-    $this->assertEquals($overhead, $after - $before, 'claimItem() should not create a temporary table');
+    $this->assertSame('a', $item->data['test-key']);
+    $this->assertSame($overhead, $after - $before, 'claimItem() should not create a temporary table');
   }
 
   /**

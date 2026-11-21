@@ -46,7 +46,7 @@ class CRM_Queue_Queue_SqlParallelTest extends CiviUnitTestCase {
 
     $result = $queue->claimItems(3);
 
-    $this->assertEquals([$ids[0], $ids[2]], array_column($result, 'id'), 'The raced item should be excluded; the others should keep their original order.');
+    $this->assertSame([$ids[0], $ids[2]], array_column($result, 'id'), 'The raced item should be excluded; the others should keep their original order.');
   }
 
   /**
@@ -88,8 +88,8 @@ class CRM_Queue_Queue_SqlParallelTest extends CiviUnitTestCase {
     $result = $queue->claimItems(1);
 
     $this->assertCount(1, $result);
-    $this->assertEquals('a', $result[0]->data['test-key']);
-    $this->assertEquals(4, $queue->attemptCount, 'Should retry until it wins: 3 losses + 1 success.');
+    $this->assertSame('a', $result[0]->data['test-key']);
+    $this->assertSame(4, $queue->attemptCount, 'Should retry until it wins: 3 losses + 1 success.');
   }
 
   /**
@@ -133,7 +133,7 @@ class CRM_Queue_Queue_SqlParallelTest extends CiviUnitTestCase {
     }
 
     $this->assertQueueStats(3, 2, 1, $queue);
-    $this->assertDBQuery('0,2,0', 'SELECT GROUP_CONCAT(run_count ORDER BY id) FROM civicrm_queue_item');
+    $this->assertSame('0,2,0', CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(run_count ORDER BY id) FROM civicrm_queue_item'));
   }
 
   /**
