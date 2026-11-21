@@ -16,6 +16,24 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
+      this.orientations = [
+        {id: 'horizontal', label: ts('Horizontal')},
+        {id: 'vertical', label: ts('Vertical')},
+      ];
+
+      // Horizontal is the default, so it's stored as the absence of the attribute.
+      this.getSetOrientation = function(value) {
+        if (arguments.length) {
+          if (value === 'vertical') {
+            ctrl.node.orientation = 'vertical';
+          }
+          else {
+            delete ctrl.node.orientation;
+          }
+        }
+        return ctrl.node.orientation || 'horizontal';
+      };
+
       this.$onInit = function() {
         this.selectedTab = 0;
         this.searchDisplays = [];
@@ -103,6 +121,8 @@
       this.getSetCount = (tabIndex) => (...args) => getSetCount(tabIndex, ...args);
 
       this.isPages = () => this.node['page-nav-buttons'];
+
+      this.isVertical = () => this.node.orientation === 'vertical';
 
     }
   });
