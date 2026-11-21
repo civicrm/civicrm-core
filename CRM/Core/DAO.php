@@ -1961,8 +1961,6 @@ LIKE %1
         break;
       }
 
-      $newObject = new $daoName();
-
       $fields = $object->fields();
       $fieldsToPrefix = [];
       $fieldsToSuffix = [];
@@ -1978,6 +1976,7 @@ LIKE %1
       }
 
       $localizableFields = FALSE;
+      $record = [];
       foreach ($fields as $name => $value) {
         if ($name === 'id' || $value['name'] === 'id') {
           // copy everything but the id!
@@ -1986,33 +1985,42 @@ LIKE %1
 
         $dbName = $value['name'];
         $type = CRM_Utils_Type::typeToString($value['type']);
-        $newObject->$dbName = $object->$dbName;
+        $record[$dbName] = $object->$dbName;
         if (isset($fieldsToPrefix[$dbName])) {
-          $newObject->$dbName = $fieldsToPrefix[$dbName] . $newObject->$dbName;
+          $record[$dbName] = $fieldsToPrefix[$dbName] . $record[$dbName];
         }
         if (isset($fieldsToSuffix[$dbName])) {
-          $newObject->$dbName .= $fieldsToSuffix[$dbName];
+          $record[$dbName] .= $fieldsToSuffix[$dbName];
         }
         if (isset($fieldsToReplace[$dbName])) {
-          $newObject->$dbName = $fieldsToReplace[$dbName];
+          $record[$dbName] = $fieldsToReplace[$dbName];
         }
 
         if ($type === 'Timestamp' || $type === 'Date') {
-          $newObject->$dbName = CRM_Utils_Date::isoToMysql($newObject->$dbName);
+          $record[$dbName] = CRM_Utils_Date::isoToMysql($record[$dbName]);
         }
 
         if (!empty($value['localizable'])) {
           $localizableFields = TRUE;
         }
-
-        if ($newData) {
-          $newObject->copyValues($newData);
-        }
+      }
+      if ($newData) {
+        $record = array_merge($record, $newData);
       }
       if (!empty($fields['name'])) {
+        // `makeNameFromLabel()` isn't static, so we need to create an instance to use it.
+        $newObject = new $daoName();
+        $newObject->copyValues($record);
         $newObject->makeNameFromLabel();
+        $record['name'] = $newObject->name;
       }
-      $newObject->save();
+      if (!$blockCopyofCustomValues) {
+        $customParams = self::buildCustomFieldCopyParams($daoName, $object->id);
+        if ($customParams) {
+          $record['custom'] = CRM_Core_BAO_CustomField::postProcess($customParams, NULL, CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName));
+        }
+      }
+      $newObject = $daoName::writeRecord($record);
 
       // ensure we copy all localized fields as well
       if (CRM_Core_I18n::isMultilingual() && $localizableFields) {
@@ -2032,9 +2040,11 @@ LIKE %1
       }
 
       if (!$blockCopyofCustomValues) {
-        $newObject->copyCustomFields($object->id, $newObject->id);
+        // Custom field values are stored via writeRecord() above. Copy only the
+        // activity file attachments that are tracked outside the custom field tables.
+        $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass($daoName);
+        CRM_Core_BAO_File::copyEntityFile($tableName, $object->id, $tableName, $newObject->id);
       }
-      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName), $newObject->id, $newObject);
     }
 
     return $newObject;
