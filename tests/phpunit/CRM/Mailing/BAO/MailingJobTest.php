@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Mailing;
+use Civi\Api4\MailingJob;
 use Civi\Test\Invasive;
 
 /**
@@ -17,6 +19,11 @@ use Civi\Test\Invasive;
  */
 class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
   use \Civi\Test\Api4TestTrait;
+
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction(TRUE);
+  }
 
   /**
    * Tests CRM_Mailing_BAO_MailingJob::isTemporaryError() method.
@@ -135,6 +142,126 @@ class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
     // Second check: no more unqueued recipients
     $reconciledAgain = Invasive::call(['CRM_Mailing_BAO_MailingJob', 'queueMissingRecipients'], [$mailingID, $parentJobID]);
     $this->assertFalse($reconciledAgain, 'queueMissingRecipients should return false when all recipients are queued');
+  }
+
+  /**
+   * Unscheduling a mailing whose delivery has not started makes it a draft and drops its non-test jobs.
+   */
+  public function testRevertScheduledMailing(): void {
+    $mailingID = $this->createRevertTestMailing('Scheduled', ['status' => 'Scheduled']);
+    CRM_Mailing_BAO_MailingJob::revert($mailingID);
+
+    $mailing = Mailing::get(FALSE)->addWhere('id', '=', $mailingID)->execute()->single();
+    $this->assertSame('Draft', $mailing['status']);
+    $this->assertNull($mailing['scheduled_date']);
+    $this->assertNull($mailing['scheduled_id']);
+    $jobs = MailingJob::get(FALSE)->addWhere('mailing_id', '=', $mailingID)->addWhere('is_test', 'IN', [TRUE, FALSE])->execute();
+    $this->assertCount(1, $jobs, 'Only the test job should remain');
+    $this->assertTrue($jobs->first()['is_test']);
+  }
+
+  /**
+   * Unscheduling is refused, and changes nothing, once delivery has started.
+   *
+   * @dataProvider startedMailingProvider
+   */
+  public function testRevertStartedMailingIsRefused(string $mailingStatus, array $parentJob, bool $withChildJob): void {
+    $mailingID = $this->createRevertTestMailing($mailingStatus, $parentJob, $withChildJob);
+    $mailingBefore = Mailing::get(FALSE)->addWhere('id', '=', $mailingID)->execute()->single();
+    $jobsBefore = (array) MailingJob::get(FALSE)->addWhere('mailing_id', '=', $mailingID)->addWhere('is_test', 'IN', [TRUE, FALSE])->execute();
+
+    try {
+      CRM_Mailing_BAO_MailingJob::revert($mailingID);
+      $this->fail('revert() should refuse a mailing whose delivery has started');
+    }
+    catch (CRM_Core_Exception $e) {
+      // Expected.
+    }
+
+    $this->assertEquals($mailingBefore, Mailing::get(FALSE)->addWhere('id', '=', $mailingID)->execute()->single());
+    $this->assertEquals($jobsBefore, (array) MailingJob::get(FALSE)->addWhere('mailing_id', '=', $mailingID)->addWhere('is_test', 'IN', [TRUE, FALSE])->execute());
+  }
+
+  /**
+   * A parent job created after revert() took its locks makes it refuse.
+   */
+  public function testRevertRefusedWhenParentJobAppears(): void {
+    $mailingID = $this->createRevertTestMailing('Scheduled', ['status' => 'Scheduled']);
+    $inserted = FALSE;
+    \Civi::dispatcher()->addListener('civi.api.prepare', function ($event) use ($mailingID, &$inserted) {
+      if (!$inserted && $event->getEntityName() === 'Mailing' && $event->getActionName() === 'get') {
+        $inserted = TRUE;
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_job (mailing_id, status, is_test) VALUES (%1, 'Scheduled', 0)", [
+          1 => [$mailingID, 'Integer'],
+        ]);
+      }
+    });
+
+    try {
+      CRM_Mailing_BAO_MailingJob::revert($mailingID);
+      $this->fail('revert() should refuse when a parent job appears after it took its locks');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString('being processed right now', $e->getMessage());
+    }
+    $this->assertTrue($inserted);
+    $this->assertSame('Scheduled', Mailing::get(FALSE)->addWhere('id', '=', $mailingID)->execute()->single()['status']);
+    $this->assertCount(2, MailingJob::get(FALSE)->addWhere('mailing_id', '=', $mailingID)->addWhere('is_test', '=', FALSE)->execute());
+  }
+
+  /**
+   * Mailing states in which delivery has started.
+   */
+  public static function startedMailingProvider(): array {
+    $started = ['start_date' => '2026-01-01 10:00:00'];
+    return [
+      'running' => ['Running', ['status' => 'Running'] + $started, TRUE],
+      'paused' => ['Paused', ['status' => 'Paused'] + $started, TRUE],
+      'complete' => ['Complete', ['status' => 'Complete', 'end_date' => '2026-01-01 11:00:00'] + $started, TRUE],
+      // The mailing still reads Scheduled, but cron has started its job.
+      'scheduled but started' => ['Scheduled', ['status' => 'Running'] + $started, FALSE],
+      'scheduled with a start date' => ['Scheduled', ['status' => 'Scheduled'] + $started, FALSE],
+      'scheduled with a child job' => ['Scheduled', ['status' => 'Scheduled'], TRUE],
+    ];
+  }
+
+  /**
+   * Create a mailing with a parent job, optionally a child job, and a test job.
+   */
+  private function createRevertTestMailing(string $mailingStatus, array $parentJob, bool $withChildJob = FALSE): int {
+    $mailingID = $this->createTestEntity('Mailing', [
+      'name' => 'Revert Test Mailing',
+      'subject' => 'Test Subject',
+      'body_text' => 'Test Body',
+      'status' => $mailingStatus,
+    ])['id'];
+    // Set directly: a scheduled_date passed to create() would also create a job.
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing SET scheduled_date = '2026-01-01 09:00:00', scheduled_id = %1 WHERE id = %2", [
+      1 => [$this->createLoggedInUser(), 'Integer'],
+      2 => [$mailingID, 'Integer'],
+    ]);
+    $parentJobID = $this->createTestEntity('MailingJob', $parentJob + [
+      'mailing_id' => $mailingID,
+      'is_test' => 0,
+      'job_type' => NULL,
+    ], 'parent')['id'];
+    if ($withChildJob) {
+      $this->createTestEntity('MailingJob', [
+        'mailing_id' => $mailingID,
+        'parent_id' => $parentJobID,
+        'status' => $parentJob['status'],
+        'is_test' => 0,
+        'job_type' => 'child',
+        'job_offset' => 0,
+        'job_limit' => 10,
+      ], 'child');
+    }
+    $this->createTestEntity('MailingJob', [
+      'mailing_id' => $mailingID,
+      'status' => 'Complete',
+      'is_test' => 1,
+    ], 'test');
+    return $mailingID;
   }
 
 }
