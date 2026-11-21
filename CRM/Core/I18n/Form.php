@@ -49,16 +49,19 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $this->addElement('hidden', 'table', $table);
     $this->addElement('hidden', 'field', $field);
     $this->addElement('hidden', 'id', $id);
-
-    $cols = [];
-    foreach ($this->_locales as $locale) {
-      $cols[] = "{$field}_{$locale} {$locale}";
+    $query = "SELECT `{$field}` FROM `{$table}` WHERE id = %1";
+    $defaultValue = CRM_Core_DAO::singleValueQuery($query, [1 => [$id, 'Integer']], i18nRewrite: FALSE);
+    
+    $query = 'SELECT string, language FROM civicrm_translation WHERE entity_table = %1 AND entity_field = %2 AND entity_id = %3';
+    $dao = CRM_Core_DAO::executeQuery($query, [
+      1 => [$table, 'String'],
+      2 => [$field, 'String'],
+      3 => [$id, 'Integer']
+    ]);
+    $translations = [];
+    while ($dao->fetch()) {
+      $translations[$dao->language] = $dao->string;
     }
-    $query = 'SELECT ' . implode(', ', $cols) . " FROM $table WHERE id = $id";
-
-    $dao = new CRM_Core_DAO();
-    $dao->query($query, FALSE);
-    $dao->fetch();
 
     // get html type and attributes for this field
     $widgets = CRM_Core_I18n_SchemaStructure::widgets();
@@ -90,8 +93,7 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
         $attr['class'] .= ' default-lang';
       }
       $this->add($widget['type'], $name, $languages[$locale], $attr, $required);
-
-      $this->_defaults[$name] = $dao->$locale;
+      $this->_defaults[$name] = $translations[$locale] ?? $defaultValue;
     }
 
     $this->addDefaultButtons(ts('Save'), 'next', NULL);
@@ -125,18 +127,31 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
       CRM_Core_Error::statusBounce("$table.$field is not internationalized.");
     }
 
+    $defaultLocale = \Civi::settings()->get('lcMessages');
+
     $cols = [];
-    $params = [[$values['id'], 'Int']];
-    $i = 1;
+    $params = [
+      1 => [$table, 'String'],
+      2 => [$field, 'String'],
+      3 => [$values['id'], 'Integer'],
+    ];
     foreach ($this->_locales as $locale) {
-      $cols[] = "{$field}_{$locale} = %$i";
-      $params[$i] = [$values["{$field}_{$locale}"], 'String'];
-      $i++;
+      $name = "{$field}_{$locale}";
+      if ($locale == $defaultLocale) {
+        $query = "UPDATE `{$table}` SET `{$field}` = %1 WHERE id = %2";
+        CRM_Core_DAO::executeQuery($query, [
+          1 => [$values[$name], 'String'],
+          2 => [$values['id'], 'Integer'],
+        ]);
+      }
+      else {
+        $query = "REPLACE INTO `civicrm_translation` (entity_table, entity_field, entity_id, language, string) VALUES (%1, %2, %3, %4, %5)";
+        CRM_Core_DAO::executeQuery($query, $params + [
+          4 => [$locale, 'String'],
+          5 => [$values[$name], 'String']
+        ]);
+      }
     }
-    $query = "UPDATE $table SET " . implode(', ', $cols) . " WHERE id = %0";
-    $dao = new CRM_Core_DAO();
-    $query = CRM_Core_DAO::composeQuery($query, $params, TRUE);
-    $dao->query($query, FALSE);
   }
 
 }
