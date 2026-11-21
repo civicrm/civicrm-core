@@ -159,7 +159,7 @@ return [
     'tax_rate' => [
       'title' => ts('Financial Account Tax Rate'),
       'sql_type' => 'decimal(10,8)',
-      'input_type' => NULL,
+      'input_type' => 'Text',
       'description' => ts('The percentage of the total_amount that is due for this tax.'),
       'add' => '4.3',
     ],
