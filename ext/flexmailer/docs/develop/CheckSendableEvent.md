@@ -24,7 +24,7 @@ function _mustache_check_sendable(\Civi\FlexMailer\Event\CheckSendableEvent $e) 
     return;
   }
 
-  if (strpos('{{unsubscribeUrl}}', $e->getMailing()->body_html) === FALSE) {
+  if (!str_contains($e->getMailing()->body_html, '{{unsubscribeUrl}}')) {
     $e->setError('body_html:unsubscribeUrl', E::ts('Please include the token {{unsubscribeUrl}}'));
   }
 }

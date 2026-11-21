@@ -2161,7 +2161,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function getWhereClauseValues(): array {
     $values = [];
     foreach ($this->_apiParams['where'] as $clause) {
-      if (count($clause) > 2 && $clause[1] === '=' && empty($clause[3]) && !str_contains('(', $clause[0])) {
+      if (count($clause) > 2 && $clause[1] === '=' && empty($clause[3]) && !str_contains($clause[0], '(')) {
         $values[$clause[0]] = $clause[2];
       }
     }
