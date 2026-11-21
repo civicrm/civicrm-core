@@ -569,9 +569,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $relStatus = ts('Is equal to Inactive');
     }
     if (!empty($statistics['filters'])) {
+      $relationshipFilters = $this->_columns['civicrm_relationship']['filters'];
       foreach ($statistics['filters'] as $id => $value) {
         // For displaying relationship type filter.
-        if ($value['title'] == 'Relationship') {
+        if ($value['title'] === $relationshipFilters['relationship_type_id']['title']) {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
           $op = ($this->_params['relationship_type_id_op'] ?? NULL) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
           $relationshipTypes = [];
@@ -583,7 +584,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         }
 
         // For displaying relationship status.
-        if ($value['title'] == 'Relationship Status') {
+        if ($value['title'] === $relationshipFilters['is_active']['title']) {
           $isStatusFilter = TRUE;
           $statistics['filters'][$id]['value'] = $relStatus;
         }

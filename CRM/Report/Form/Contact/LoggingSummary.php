@@ -237,9 +237,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       }
 
       if ('Contact' === ($this->_logTables[$row['log_civicrm_entity_log_type']]['log_type'] ?? NULL) &&
-        $row['log_civicrm_entity_log_action'] === ts('Insert')
+        'Insert' === $row['log_civicrm_entity_log_action']
       ) {
-        $row['log_civicrm_entity_log_action'] = ts('Update');
+        $row['log_civicrm_entity_log_action'] = 'Update';
       }
 
       // For certain tables, we may want to look at an alternate column to
