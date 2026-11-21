@@ -24,6 +24,8 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     if ($dbLocale) {
       $this->disableMultilingual();
     }
+    Civi::settings()->revert('civimail_workflow');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
     parent::tearDown();
   }
 
@@ -674,6 +676,85 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       $this->assertSame(1, $mailingRecipients['count'], 'Check recipient count');
       $this->assertSame('ghi@test.com', $mailingRecipients['values'][$mailingRecipients['id']]['api.Email.getvalue'], 'Check if recipient email belong to deceased contact');
     }
+  }
+
+  /**
+   * Test that rescheduling a rejected mailing resets stale approval fields.
+   */
+  public function testReschedulingRejectedMailingResetsApproval(): void {
+    Civi::settings()->set('civimail_workflow', TRUE);
+
+    $rejectStatusId = (int) CRM_Core_PseudoConstant::getKey('CRM_Mailing_BAO_Mailing', 'approval_status_id', 'Rejected');
+    $approveStatusId = (int) CRM_Core_PseudoConstant::getKey('CRM_Mailing_BAO_Mailing', 'approval_status_id', 'Approved');
+    $approver = $this->createTestEntity('Contact', ['first_name' => 'Approver', 'last_name' => 'User']);
+
+    $mailing = $this->createTestEntity('Mailing', [
+      'name' => 'Rejected Mailing',
+      'subject' => 'Workflow Test',
+      'body_html' => '<p>Initial content</p>',
+      'approval_status_id' => $rejectStatusId,
+      'approval_note' => 'Please fix typos',
+      'approver_id' => $approver['id'],
+      'approval_date' => '2026-11-01 10:00:00',
+    ]);
+
+    $this->assertSame($rejectStatusId, $mailing['approval_status_id']);
+    $this->assertSame('Please fix typos', $mailing['approval_note']);
+    $this->assertSame($approver['id'], $mailing['approver_id']);
+    $this->assertSame('2026-11-01 10:00:00', $mailing['approval_date']);
+
+    // 1. Updating subject without rescheduling should not touch approval fields.
+    CRM_Mailing_BAO_Mailing::create([
+      'id' => $mailing['id'],
+      'subject' => 'Updated Subject',
+    ]);
+    $updated = Mailing::get(FALSE)->addWhere('id', '=', $mailing['id'])->execute()->first();
+    $this->assertSame('Updated Subject', $updated['subject']);
+    $this->assertSame($rejectStatusId, $updated['approval_status_id']);
+    $this->assertSame('Please fix typos', $updated['approval_note']);
+
+    // 2. Rescheduling the rejected mailing by a user with schedule (but not approve) permission.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['create mailings', 'schedule mailings'];
+
+    CRM_Mailing_BAO_Mailing::create([
+      'id' => $mailing['id'],
+      'scheduled_date' => '2026-11-15 10:00:00',
+      'check_permissions' => 1,
+    ]);
+
+    $rescheduled = Mailing::get(FALSE)
+      ->addWhere('id', '=', $mailing['id'])
+      ->execute()
+      ->first();
+
+    $this->assertSame('2026-11-15 10:00:00', $rescheduled['scheduled_date']);
+    $this->assertNull($rescheduled['approval_status_id']);
+    $this->assertNull($rescheduled['approval_note']);
+    $this->assertNull($rescheduled['approver_id']);
+    $this->assertNull($rescheduled['approval_date']);
+
+    // 3. User with approve permission scheduling and approving in one step.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['create mailings', 'schedule mailings', 'approve mailings'];
+
+    CRM_Mailing_BAO_Mailing::create([
+      'id' => $mailing['id'],
+      'scheduled_date' => '2026-11-16 10:00:00',
+      'approval_status_id' => $approveStatusId,
+      'approval_note' => 'Looks good',
+      'approver_id' => $approver['id'],
+      'approval_date' => '2026-11-15 11:00:00',
+      'check_permissions' => 1,
+    ]);
+
+    $approved = Mailing::get(FALSE)
+      ->addWhere('id', '=', $mailing['id'])
+      ->execute()
+      ->first();
+
+    $this->assertSame($approveStatusId, $approved['approval_status_id']);
+    $this->assertSame('Looks good', $approved['approval_note']);
+    $this->assertSame($approver['id'], $approved['approver_id']);
+    $this->assertSame('2026-11-15 11:00:00', $approved['approval_date']);
   }
 
 }
