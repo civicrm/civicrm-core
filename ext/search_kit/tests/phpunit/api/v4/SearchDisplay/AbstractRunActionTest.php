@@ -27,6 +27,24 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
     parent::tearDown();
   }
 
+  /**
+   * Where-clause values should ignore expressions containing functions.
+   */
+  public function testGetWhereClauseValuesSkipsExpressions(): void {
+    $run = new \Civi\Api4\Action\SearchDisplay\Run('SearchDisplay', 'run');
+    $apiParams = new \ReflectionProperty(\Civi\Api4\Action\SearchDisplay\AbstractRunAction::class, '_apiParams');
+    $apiParams->setValue($run, [
+      'where' => [
+        ['contact_type:name', '=', 'Individual'],
+        ['GROUP_CONCAT(contact_a.id)', '=', '1,2,3'],
+      ],
+    ]);
+
+    $method = new \ReflectionMethod($run, 'getWhereClauseValues');
+
+    $this->assertSame(['contact_type:name' => 'Individual'], $method->invoke($run));
+  }
+
   public function testReplaceTokens() {
     CustomGroup::create(FALSE)
       ->addValue('title', 'Foods')

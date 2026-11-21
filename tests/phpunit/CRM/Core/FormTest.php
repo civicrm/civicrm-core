@@ -114,6 +114,22 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
   }
 
   /**
+   * Purified defaults should not decode entities that were already encoded.
+   */
+  public function testSetPurifiedDefaultsPreservesEncodedEntities(): void {
+    $encoded = '<span title="Tom &amp; Jerry &quot;Show&quot;">x</span>';
+    $plain = '<span title="Tom & Jerry Show">x</span>';
+    $form = new CRM_Core_Form();
+    $form->setPurifiedDefaults([
+      'encoded' => $encoded,
+      'plain' => $plain,
+    ]);
+
+    $this->assertSame($encoded, $form->_defaultValues['encoded']);
+    $this->assertSame($plain, $form->_defaultValues['plain']);
+  }
+
+  /**
    * Test the getAuthenticatedUser function.
    *
    * It should return a checksum validated user, falling back to the logged in user.
