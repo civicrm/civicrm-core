@@ -8,6 +8,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Individual;
 use Civi\Api4\Organization;
 use Civi\Test\HeadlessInterface;
+use Civi\Test\Invasive;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\Mailing;
 
@@ -32,17 +33,14 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
    */
   public function testGetWhereClauseValuesSkipsExpressions(): void {
     $run = new \Civi\Api4\Action\SearchDisplay\Run('SearchDisplay', 'run');
-    $apiParams = new \ReflectionProperty(\Civi\Api4\Action\SearchDisplay\AbstractRunAction::class, '_apiParams');
-    $apiParams->setValue($run, [
+    Invasive::set([$run, '_apiParams'], [
       'where' => [
         ['contact_type:name', '=', 'Individual'],
         ['GROUP_CONCAT(contact_a.id)', '=', '1,2,3'],
       ],
     ]);
 
-    $method = new \ReflectionMethod($run, 'getWhereClauseValues');
-
-    $this->assertSame(['contact_type:name' => 'Individual'], $method->invoke($run));
+    $this->assertSame(['contact_type:name' => 'Individual'], Invasive::call([$run, 'getWhereClauseValues']));
   }
 
   public function testReplaceTokens() {

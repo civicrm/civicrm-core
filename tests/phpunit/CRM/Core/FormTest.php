@@ -117,16 +117,12 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    * Purified defaults should not decode entities that were already encoded.
    */
   public function testSetPurifiedDefaultsPreservesEncodedEntities(): void {
-    $encoded = '<span title="Tom &amp; Jerry &quot;Show&quot;">x</span>';
-    $plain = '<span title="Tom & Jerry Show">x</span>';
-    $form = new CRM_Core_Form();
-    $form->setPurifiedDefaults([
-      'encoded' => $encoded,
-      'plain' => $plain,
-    ]);
+    $form = $this->getTestForm(CRM_Core_Form_TestDefaultValues::class, [])
+      ->processForm(\Civi\Test\FormWrapper::BUILT);
+    $defaults = $form->getDefaultValues();
 
-    $this->assertSame($encoded, $form->_defaultValues['encoded']);
-    $this->assertSame($plain, $form->_defaultValues['plain']);
+    $this->assertSame(CRM_Core_Form_TestDefaultValues::ENCODED, $defaults['encoded']);
+    $this->assertSame(CRM_Core_Form_TestDefaultValues::PLAIN, $defaults['plain']);
   }
 
   /**
@@ -149,6 +145,21 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Core_Form');
     $this->createLoggedInUser();
     $this->assertEquals($this->ids['Contact']['logged_in'], $form->getAuthenticatedContactID());
+  }
+
+}
+
+class CRM_Core_Form_TestDefaultValues extends CRM_Core_Form {
+
+  public const ENCODED = '<span title="Tom &amp; Jerry &quot;Show&quot;">x</span>';
+
+  public const PLAIN = '<span title="Tom & Jerry Show">x</span>';
+
+  public function setDefaultValues() {
+    return [
+      'encoded' => self::ENCODED,
+      'plain' => self::PLAIN,
+    ];
   }
 
 }
