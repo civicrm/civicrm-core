@@ -30,15 +30,6 @@ class AddressMetadata extends SqlEntityMetadata {
         $originalReindexed[$opt['id']] = $opt;
       }
 
-      // At the moment it's unsorted. The pre-entity output used the db for
-      // sorting. We don't know what all the local mysql settings are set to,
-      // but the strings right now are still all en_US, and it will get
-      // re-sorted in a minute according to locale if the civi locale is
-      // different anyway, so use en_US.
-      // If we just use regular asort() here, then e.g. Åland Islands is wrong.
-      $collator = new \Collator('en_US.utf8');
-      $collator->asort($map);
-
       // Do all the things
       $map = \CRM_Core_BAO_Country::_defaultContactCountries($map);
 
