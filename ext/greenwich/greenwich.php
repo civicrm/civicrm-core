@@ -40,4 +40,9 @@ function greenwich_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
       ]);
       break;
   }
+  // Add an additional css file for claro overrides if we are on drupal9+ sites
+  $config = CRM_Core_Config::singleton();
+  if ($theme === 'greenwich' && $bundle->name === 'coreResources' && $config->userFramework === 'Drupal8') {
+    $bundle->addStyleFile('greenwich', 'css/drupal8.css');
+  }
 }
