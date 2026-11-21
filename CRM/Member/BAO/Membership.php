@@ -2014,7 +2014,7 @@ WHERE {$whereClause}";
 
     $membershipQuery = Membership::get(FALSE)
       ->addWhere('contact_id', '=', $contactID)
-      ->addWhere('status_id:name', '<>', 'Pending')
+      ->addWhere('status_id.is_current_member', '=', TRUE)
       ->addWhere('is_test', '=', $isTest)
       //CRM-4297
       ->addOrderBy('end_date', 'DESC');
