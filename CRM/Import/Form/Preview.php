@@ -66,9 +66,21 @@ abstract class CRM_Import_Form_Preview extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   protected function assignPreviewVariables(): void {
+    $jobMetadata = $this->getUserJob()['metadata'];
+    $validationSkipped = $jobMetadata['validation_skipped'] ?? FALSE;
+
     $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
-    $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
-    $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
+    $this->assign('validationSkipped', $validationSkipped);
+    if ($validationSkipped) {
+      $largeFile = CRM_Utils_Constant::value('CIVICRM_IMPORT_LARGE_FILE', 10000);
+      $this->assign('largeFileSize', CRM_Utils_Number::formatLocaleNumeric($largeFile));
+      $this->assign('invalidRowCount', FALSE);
+      $this->assign('validRowCount', FALSE);
+    } else{
+      $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
+      $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID));
+    }
+
     $this->assign('totalRowCount', $this->getRowCount([]));
     $this->assign('mapper', $this->getMappedFieldLabels());
     $this->assign('dataValues', $this->getDataRows([], 2));
