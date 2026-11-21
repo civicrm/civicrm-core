@@ -29,4 +29,22 @@ class MessageTemplate extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\MessageTemplate\GetTokenSchema
+   */
+  public static function getTokenSchema($checkPermissions = TRUE) {
+    return (new Action\MessageTemplate\GetTokenSchema(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\MessageTemplate\GetTokens
+   */
+  public static function getTokens($checkPermissions = TRUE) {
+    return (new Action\MessageTemplate\GetTokens(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }
