@@ -1,0 +1,65 @@
+<div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
+
+<div class="crm-search-admin-display-email-report">
+
+  <legend>
+    {{:: ts('Email Settings') }}
+  </legend>
+
+  <div class="form-inline">
+    <label>{{:: ts('Search Display') }}</label>
+    <select class="form-control" ng-model="$ctrl.display.settings.searchDisplay">
+      <option ng-repeat="display in $ctrl.searchDisplays" value="{{:: display.name }}">{{:: display.label }}</option>
+  </select>
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('To Contacts') }}</label>
+    <input placeholder="{{:: ts('To Contacts') }}" class="form-control" crm-autocomplete="'Contact'" crm-autocomplete-params="{key: 'sortName', formName: 'searchAdmin', fieldName: 'toContactIds'}" multi="true" auto-open="true" ng-model="$ctrl.display.settings.contactIds">
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('Message Template') }}</label>
+    <input placeholder="{{:: ts('Message Template') }}" class="form-control" crm-autocomplete="'MessageTemplate'" crm-autocomplete-params="{key: 'title', formName: 'searchAdmin', fieldName: 'messageTemplateId'}" multi="true" auto-open="true" ng-model="$ctrl.display.settings.messageTemplateId">
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('Report Frequency') }}</label>
+    <select class="form-control" ng-model="$ctrl.display.settings.frequency">
+      <option ng-repeat="(key, label) in $ctrl.email_report_frequencies" value="{{:: key}}">{{:: label}}</option>
+    </select>
+  </div>
+  <div class="form-inline" ng-if="$ctrl.display.settings.frequency == 'custom'">
+    <label>{{:: ts('Custom Report Frequency') }}</label>
+    <input type="text"
+           class="form-control"
+           ng-model="$ctrl.display.settings.frequency_custom"
+           ng-change="$ctrl.cronError = $ctrl.validateCron($ctrl.display.settings.frequency_custom)"
+           placeholder="0 6 * * 1">
+  </div>
+  <div class="alert alert-danger" ng-if="$ctrl.display.settings.frequency == 'custom' && $ctrl.cronError">
+    <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+    {{ $ctrl.cronError }}
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('Start Date') }}</label>
+    <input class="form-control" crm-ui-datepicker="{time: true}" ng-model="$ctrl.display.settings.startDate">
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('Email Subject') }}</label>
+    <input type="text" class="form-control" ng-model="$ctrl.display.settings.subject">
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('Report Name') }}</label>
+    <input type="text" class="form-control" ng-model="$ctrl.display.settings.reportName">
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('File Name') }}</label>
+    <input type="text" class="form-control" ng-model="$ctrl.display.settings.fileName">
+  </div>
+  <fieldset class="api4-clause-fieldset crm-search-filters">
+    <table class="table table-condensed" ng-if="$ctrl.searchDisplays.length">
+      <tbody>
+          <crm-search-clause clauses="$ctrl.display.settings.filters" format="string" op="AND" label="{{:: ts('Filters') }}" fields="fieldsForFilter" allow-functions="$ctrl.paramExists('groupBy')" ></crm-search-clause>
+      </tbody>
+    </table>
+  </fieldset>
+
+</div>
