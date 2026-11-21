@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Action\Contact;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Generic\Result;
 
 /**
@@ -21,6 +22,8 @@ use Civi\Api4\Generic\Result;
  * @method int getContactId() Get contact ID param
  * @method $this setChecksum(string $checksum) Set checksum param (required)
  * @method string getChecksum() Get checksum param
+ * @method $this setAsOf(?int $asOf) Set asOf param
+ * @method int|null getAsOf() Get asOf param
  */
 class ValidateChecksum extends \Civi\Api4\Generic\AbstractAction {
 
@@ -41,11 +44,23 @@ class ValidateChecksum extends \Civi\Api4\Generic\AbstractAction {
   protected $checksum;
 
   /**
+   * Unix timestamp to check expiry against, e.g. when a queued request was made. Defaults to now.
+   *
+   * Only for internal calls and administrators because an earlier time accepts checksums that may have since expired.
+   *
+   * @var int
+   */
+  protected $asOf = NULL;
+
+  /**
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
+    if ($this->asOf !== NULL && $this->getCheckPermissions() && !\CRM_Core_Permission::check('administer CiviCRM')) {
+      throw new UnauthorizedException('Checking a checksum as of another time requires administer CiviCRM permission.');
+    }
     $result[] = [
-      'valid' => \CRM_Contact_BAO_Contact_Utils::validChecksum($this->contactId, $this->checksum),
+      'valid' => \CRM_Contact_BAO_Contact_Utils::validChecksum($this->contactId, $this->checksum, asOf: $this->asOf),
     ];
   }
 
