@@ -309,7 +309,7 @@ class CRM_Core_SelectValues {
           'String' => ['serialize' => 'optional', 'option_group' => TRUE],
           'Int' => ['serialize' => 'optional', 'option_group' => TRUE],
           'ContactReference' => ['serialize' => 'optional', 'option_group' => FALSE],
-          'EntityReference' => ['serialize' => 'never', 'option_group' => FALSE],
+          'EntityReference' => ['serialize' => 'optional', 'option_group' => FALSE],
         ],
       ],
       [
