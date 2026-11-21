@@ -341,12 +341,12 @@ class CRM_Core_Menu {
    * @internal
    */
   public static function clear() {
-    // Take the rebuild lock: TRUNCATE is a writer too, and clearing the table out from under an
-    // in-flight self::rebuild() would leave it holding only the rows that store() inserts after the
-    // truncate. Callers include extensions (e.g. Afform) that clear on save.
+    // Take the rebuild lock: emptying the table is a write too, and clearing it out from under an
+    // in-flight self::rebuild() would leave it holding only the rows that store() inserts after it
+    // was emptied. Callers include extensions (e.g. Afform) that clear on save.
     $lock = Civi::lockManager()->acquire(self::REBUILD_LOCK, self::REBUILD_LOCK_TIMEOUT);
     if (!$lock->isAcquired()) {
-      Civi::log()->warning('CRM_Core_Menu::clear() is truncating civicrm_menu without the ' . self::REBUILD_LOCK . ' lock after waiting ' . self::REBUILD_LOCK_TIMEOUT . 's; a concurrent rebuild may be in progress.');
+      Civi::log()->warning('CRM_Core_Menu::clear() is emptying civicrm_menu without the ' . self::REBUILD_LOCK . ' lock after waiting ' . self::REBUILD_LOCK_TIMEOUT . 's; a concurrent rebuild may be in progress.');
     }
     try {
       self::truncate();
@@ -357,12 +357,15 @@ class CRM_Core_Menu {
   }
 
   /**
-   * TRUNCATE civicrm_menu and drop the derived route cache.
+   * Empty civicrm_menu and drop the derived route cache.
    *
    * Unlocked; callers hold REBUILD_LOCK (see self::clear() and self::rebuild()).
    */
   private static function truncate() {
-    CRM_Core_DAO::executeQuery('TRUNCATE civicrm_menu');
+    // DELETE rather than TRUNCATE, for the same reason as in
+    // CRM_Core_Config::clearDBCache(): a transaction that reads civicrm_menu
+    // meanwhile would fail with MySQL error 1412.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_menu');
     Civi::cache('long')->delete('PublicRouteIndex');
     Civi::cache('long')->delete('AdminSiteMapLinks');
   }

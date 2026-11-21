@@ -31,6 +31,30 @@ class CRM_Upgrade_Incremental_php_SixTwentyTwo extends CRM_Upgrade_Incremental_B
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Set "group_multiple_parents" setting if used', 'setMultipleGroupParents');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_mailing_recipients.index_mailing_id_contact_id']), 'addIndex', 'civicrm_mailing_recipients', [['mailing_id', 'contact_id']], 'index');
+    // The cache clear no longer TRUNCATEs civicrm_prevnext_cache, so its AUTO_INCREMENT is no longer
+    // reset and an int id could run out on busy sites. Empty the cache first so the ALTER is instant.
+    $this->addTask('Empty civicrm_prevnext_cache', 'emptyPrevNextCache');
+    $this->addTask('Change PrevNextCache.id to bigint', 'alterSchemaField', 'PrevNextCache', 'id', [
+      'title' => ts('Prev Next Cache ID'),
+      'sql_type' => 'bigint unsigned',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'add' => '3.4',
+      'primary_key' => TRUE,
+      'auto_increment' => TRUE,
+    ]);
+  }
+
+  /**
+   * Empty the prev/next cache, so changing its id column does not copy rows.
+   *
+   * It only holds cached search results, which are rebuilt on the next search.
+   *
+   * @return bool
+   */
+  public static function emptyPrevNextCache(): bool {
+    CRM_Core_DAO::executeQuery('TRUNCATE TABLE civicrm_prevnext_cache');
+    return TRUE;
   }
 
   /**
