@@ -283,6 +283,27 @@ class CRM_Core_I18n {
         : CRM_Utils_Array::subset(CRM_Core_I18n::languages(), $codes);
   }
 
+  public static function getActiveLocalesOptions(): array {
+    $options = [];
+    $locales = self::uiLanguages();
+    if (count($locales) > 1) {
+      if (\Civi::settings()->get('force_translation_source_locale') ?? TRUE) {
+        $defaultLocale = \Civi::settings()->get('lcMessages');
+        $langLabel = $locales[$defaultLocale];
+        $locales = [];
+        $locales[$defaultLocale] = $langLabel;
+      }
+
+      foreach ($locales as $langCode => $langLabel) {
+        $options[] = [
+          'id' => $langCode,
+          'text' => $langLabel,
+        ];
+      }
+    }
+    return $options;
+  }
+
   /**
    * Replace arguments in a string with their values. Arguments are represented by % followed by their number.
    *
