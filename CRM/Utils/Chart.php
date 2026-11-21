@@ -34,6 +34,22 @@ class CRM_Utils_Chart {
     if (empty($output)) {
       return NULL;
     }
+
+    // based on number of bar count adjust angle for xLabelAngle
+    // if xLabelAngle is not set
+    if (empty($params['xLabelAngle'])) {
+      $count = count($params['values']);
+      $output['xLabelAngle'] = match (TRUE) {
+        $count > 20 => 70,
+        $count > 16 => 45,
+        $count > 12 => 20,
+        default => 0,
+      };
+    }
+    else {
+      $output['xLabelAngle'] = $params['xLabelAngle'];
+    }
+
     $output['type'] = 'barchart';
     // Default title
     $output += ['title' => ts('Bar Chart')];
