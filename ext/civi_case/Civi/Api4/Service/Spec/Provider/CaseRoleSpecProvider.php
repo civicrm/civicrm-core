@@ -93,19 +93,16 @@ class CaseRoleSpecProvider extends \Civi\Core\Service\AutoService implements Gen
   }
 
   /**
-   * Reuses CaseManagerSpecProvider::renderCaseManagerSql() (the per-case-type
+   * Reuses CaseManagerSpecProvider::getCaseManagerSubquery() (the per-case-type
    * manager-role lookup) rather than duplicating it, wrapping its subquery
-   * in an equality check against the logged-in user. $field/$query are
-   * passed straight through: CaseManagerSpecProvider's alias derivation
-   * only depends on $field['sql_name'], which resolves identically here
-   * (both fields share `columnName('id')` on the same base Case row).
+   * in an equality check against the logged-in user.
    */
   public static function renderIsMyManagedCaseSql(array $field, Api4SelectQuery $query): string {
     $userID = (int) (\CRM_Core_Session::getLoggedInContactID() ?? 0);
     if (!$userID) {
       return '0';
     }
-    $managerSql = CaseManagerSpecProvider::renderCaseManagerSql($field, $query);
+    $managerSql = CaseManagerSpecProvider::getCaseManagerSubquery(self::getAlias($field));
     return "($managerSql = $userID)";
   }
 
