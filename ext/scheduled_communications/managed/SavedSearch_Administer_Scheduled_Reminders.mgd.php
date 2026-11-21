@@ -1,12 +1,13 @@
 <?php
-use CRM_CivicrmAdminUi_ExtensionUtil as E;
+use CRM_ScheduledCommunications_ExtensionUtil as E;
 
 return [
   [
     'name' => 'SavedSearch_Administer_Scheduled_Reminders',
     'entity' => 'SavedSearch',
-    'cleanup' => 'always',
+    'cleanup' => 'unused',
     'update' => 'unmodified',
+    'replaces' => ['module' => 'civicrm_admin_ui'],
     'params' => [
       'version' => 4,
       'values' => [
@@ -48,8 +49,9 @@ return [
   [
     'name' => 'SavedSearch_Administer_Scheduled_Reminders_SearchDisplay_Administer_Scheduled_Reminders_Table',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'always',
+    'cleanup' => 'unused',
     'update' => 'unmodified',
+    'replaces' => ['module' => 'civicrm_admin_ui'],
     'params' => [
       'version' => 4,
       'values' => [

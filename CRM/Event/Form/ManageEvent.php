@@ -440,11 +440,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $tabs['fee'] = ['title' => ts('Fees'), 'icon' => 'crm-i fa-money'] + $default;
     }
     $tabs['registration'] = ['title' => ts('Online Registration'), 'icon' => 'crm-i fa-check'] + $default;
-    // @fixme I don't understand the event permissions check here - can we just get rid of it?
-    $permissions = CRM_Event_BAO_Event::getAllPermissions();
-    if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
-      $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage', 'icon' => 'crm-i fa-envelope'] + $default;
-    }
 
     $tabs['pcp'] = ['title' => ts('Personal Campaigns'), 'icon' => 'crm-i fa-user'] + $default;
     $tabs['repeat'] = ['title' => ts('Repeat'), 'icon' => 'crm-i fa-repeat'] + $default;
@@ -458,10 +453,9 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if ($eventID) {
       // disable tabs based on their configuration status
       $sql = "
-SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, pcp.is_active as is_pcp, sch.id as is_reminder, re.id as is_repeating_event
+SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, pcp.is_active as is_pcp, re.id as is_repeating_event
 FROM       civicrm_event e
 LEFT JOIN  civicrm_pcp_block pcp   ON ( pcp.entity_table = 'civicrm_event' AND pcp.entity_id = e.id )
-LEFT JOIN  civicrm_action_schedule sch ON ( sch.mapping_id = %2 AND sch.entity_value = %1 )
 LEFT JOIN  civicrm_recurring_entity re ON ( e.id = re.entity_id AND re.entity_table = 'civicrm_event' )
 WHERE      e.id = %1
 ";
@@ -469,7 +463,6 @@ WHERE      e.id = %1
       CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
       $params = [
         1 => [$eventID, 'Integer'],
-        2 => [CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID, 'Integer'],
       ];
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if (!$dao->fetch()) {
@@ -486,9 +479,6 @@ WHERE      e.id = %1
       }
       if (!$dao->is_pcp) {
         $tabs['pcp']['valid'] = FALSE;
-      }
-      if (!$dao->is_reminder) {
-        $tabs['reminder']['valid'] = FALSE;
       }
       if (!$dao->is_repeating_event) {
         $tabs['repeat']['valid'] = FALSE;
