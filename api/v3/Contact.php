@@ -728,7 +728,7 @@ function _civicrm_api3_greeting_format_params($params) {
  */
 function _civicrm_api3_quicksearch_get_order_by($name, $isPrependWildcard, $field_name) {
   $skipExactMatch = ($name === '%');
-  if ($field_name === 'email' && !strpos('@', $name)) {
+  if ($field_name === 'email' && !str_contains($name, '@')) {
     $skipExactMatch = TRUE;
   }
 

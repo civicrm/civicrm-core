@@ -588,6 +588,27 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   }
 
   /**
+   * Location return properties should skip identifier fields.
+   */
+  public function testMakePropertiesExcludesLocationIdFields(): void {
+    $returnProperties = [
+      'location' => [
+        'Home' => [
+          'location_type' => 1,
+          'city' => 1,
+          'state_province_id' => 1,
+          'email' => 1,
+          'email_id' => 1,
+        ],
+      ],
+    ];
+    $selector = new CRM_Contact_Selector('CRM_Contact_Selector');
+    $properties = $selector->makeProperties($returnProperties);
+
+    $this->assertSame(['Home-city', 'Home-email'], $properties);
+  }
+
+  /**
    * Test the Search Builder using Non ASCII location type for email filter
    */
   public function testSelectorQueryOnNonASCILocationType(): void {

@@ -3396,6 +3396,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Email quicksearch should only skip exact-first ordering when there is no @.
+   */
+  public function testQuicksearchOrderByForEmail(): void {
+    require_once 'api/v3/Contact.php';
+    $this->callAPISuccess('Setting', 'create', ['includeOrderByClause' => TRUE]);
+
+    $this->assertSame('ORDER BY exactFirst, sort_name', _civicrm_api3_quicksearch_get_order_by('bob@example.com', TRUE, 'email'));
+    $this->assertSame('ORDER BY sort_name', _civicrm_api3_quicksearch_get_order_by('bob', TRUE, 'email'));
+  }
+
+  /**
    * Full results returned.
    *
    * @implements CRM_Utils_Hook::aclWhereClause
