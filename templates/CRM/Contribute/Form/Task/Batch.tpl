@@ -12,8 +12,8 @@
 <div class="help">
     {ts}Update field values for each contribution as needed. Click <strong>Update Contributions</strong> below to save all your changes. To set a field to the same value for ALL rows, enter that value for the first contribution and then click the <strong>Copy icon</strong> (next to the column title).{/ts}
 </div>
-    <table class="crm-copy-fields">
-    <thead class="sticky">
+    <table class="crm-copy-fields crm-sticky-header">
+    <thead>
             <tr class="columnheader">
              {foreach from=$readOnlyFields item=fTitle key=fName}
               <th>{$fTitle}</th>

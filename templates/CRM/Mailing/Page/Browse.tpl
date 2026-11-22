@@ -29,8 +29,8 @@
 {if $rows}
     {include file="CRM/common/pager.tpl" location="top"}
     {strip}
-    <table class="selector row-highlight">
-      <thead class="sticky">
+    <table class="selector row-highlight crm-sticky-header">
+      <thead>
       {foreach from=$columnHeaders item=header}
         <th>
           {if !empty($header.sort)}

@@ -12,8 +12,8 @@
 {/if}
 
 {strip}
-<table class="selector row-highlight">
-<thead class="sticky">
+<table class="selector row-highlight crm-sticky-header">
+<thead>
 {if ! $single and $context eq 'Search'}
   <th scope="col" title="{ts escape='htmlattribute'}Select rows{/ts}">{$form.toggleSelect.html}</th>
 {/if}

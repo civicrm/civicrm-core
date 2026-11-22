@@ -14,8 +14,8 @@
   <div class="form-item">
     {strip}
     {include file="CRM/common/enableDisableApi.tpl"}
-      <table cellpadding="0" cellspacing="0" border="0" class="selector row-highlight">
-        <thead class="sticky">
+      <table cellpadding="0" cellspacing="0" border="0" class="selector row-highlight crm-sticky-header">
+        <thead>
             <th>{ts}Name{/ts}</th>
             <th>{ts}Server{/ts}</th>
             <th>{ts}Username{/ts}</th>

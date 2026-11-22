@@ -15,7 +15,7 @@
             {include file="CRM/common/pager.tpl" location="top"}
         </div>
     {/if}
-    <table class="report-layout display">
+    <table class="report-layout display crm-sticky-header">
         {capture assign="tableHeader"}
             {foreach from=$columnHeaders item=header key=field}
                 {assign var=class value=""}
@@ -42,7 +42,7 @@
         {/capture}
 
         {if !$sections} {* section headers and sticky headers aren't playing nice yet *}
-            <thead class="sticky">
+            <thead>
             <tr>
               {$tableHeader nofilter}
             </tr>

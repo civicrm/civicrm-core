@@ -14,8 +14,8 @@
          <div class="crm-submit-buttons">
             {if $fields}{$form._qf_Batch_refresh.html}{/if} &nbsp;{include file="CRM/common/formButtons.tpl" location="top"}
          </div>
-         <table class="crm-copy-fields">
-         <thead class="sticky">
+         <table class="crm-copy-fields crm-sticky-header">
+         <thead>
             <tr class="columnheader">
              {foreach from=$readOnlyFields item=fTitle key=fName}
               <th>{$fTitle}</th>

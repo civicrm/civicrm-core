@@ -20,11 +20,11 @@
   {*Statistics at the Top of the page*}
   {include file="CRM/Report/Form/Statistics.tpl" top=true bottom=false}
 
-<table class="report-layout display">
+<table class="report-layout display crm-sticky-header">
    {foreach from=$rows item=row}
      <thead><th colspan=16><font color="black" size="3">{$row.label}</font></th></thead>
 
-     <thead class="sticky">
+     <thead>
      <tr>
        {foreach from=$columnHeaders item=label key=header}
          <th>{$label.title}</th>

@@ -43,8 +43,8 @@
         {include file="CRM/common/pagerAToZ.tpl"}
 
         {strip}
-        <table class="selector row-highlight" summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
-            <thead class="sticky">
+        <table class="selector row-highlight crm-sticky-header" summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
+            <thead>
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
                 {foreach from=$columnHeaders item=header}
                     <th scope="col">

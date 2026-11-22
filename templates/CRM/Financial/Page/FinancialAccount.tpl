@@ -32,8 +32,8 @@
       {strip}
       {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-      <table id="crm-financial_accounts" class="display">
-        <thead class="sticky">
+      <table id="crm-financial_accounts" class="display crm-sticky-header">
+        <thead>
           <th>{ts}Name{/ts}</th>
           <th>{ts}Description{/ts}</th>
           <th>{ts}Acctg Code{/ts}</th>

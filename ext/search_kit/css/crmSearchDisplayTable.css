@@ -28,12 +28,6 @@
   font-weight: bold;
 }
 
-table.crm-sticky-header > thead > tr {
-  position: sticky !important;
-  top: var(--crm-menubar-bottom, 0);
-  z-index: 2;
-}
-
 /* Nested styling for hierarchical rows */
 #bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-row {
   position: relative;
