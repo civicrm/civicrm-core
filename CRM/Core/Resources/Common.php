@@ -203,7 +203,6 @@ class CRM_Core_Resources_Common {
 
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
-      $items[] = "packages/jquery/plugins/jquery.tableHeader.js";
       $items[] = "packages/jquery/plugins/jquery.notify.min.js";
     }
 
