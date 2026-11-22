@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Api4\Generic\Result;
 use Civi\Core\Event\GenericHookEvent;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -13,6 +14,69 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
 
   use \Civi\Api4\Utils\AfformFormatTrait;
 
+  private const SUBMISSION_FIELDS = ['submission_count', 'submission_date', 'user_submission_count', 'submit_currently_open'];
+  private const LAYOUT_FIELDS = ['layout', 'search_displays'];
+
+  /**
+   * Override _run method to do expensive loading/formatting after $result has been filtered
+   */
+  public function _run(Result $result) {
+    $this->expandSelectClauseWildcards();
+    $needSubmissionInQuery = $this->_whereContains(self::SUBMISSION_FIELDS) || array_intersect(self::SUBMISSION_FIELDS, array_keys($this->orderBy));
+    $needSubmissionInResult = !$needSubmissionInQuery && array_intersect(self::SUBMISSION_FIELDS, $this->select);
+    $needLayoutInQuery = $this->_whereContains(self::LAYOUT_FIELDS) || array_intersect(self::LAYOUT_FIELDS, array_keys($this->orderBy));
+    $needLayoutInResult = !$needLayoutInQuery && array_intersect(self::LAYOUT_FIELDS, $this->select);
+
+    if ($needSubmissionInResult || $needLayoutInResult) {
+      $originalSelect = $this->select;
+      $extraSelect = $needSubmissionInResult ? ['name', 'submit_enabled', 'submit_limit', 'submit_limit_per_user'] : ['name'];
+      $this->select = array_unique(array_merge($this->select, $extraSelect));
+    }
+
+    parent::_run($result);
+
+    if (isset($originalSelect)) {
+      $this->select = $originalSelect;
+    }
+
+    $records = $result->getArrayCopy();
+
+    // Load layout & search_displays only for the final filtered/limited result set
+    if ($needLayoutInResult && $records) {
+      $this->addLayoutFields($records);
+    }
+
+    foreach ($records as &$record) {
+      // Format layouts
+      if (isset($record['layout'])) {
+        $this->convertLegacyContactTypes($record['layout']);
+        if ($this->layoutFormat !== 'html') {
+          $record['layout'] = $this->convertHtmlToOutput($record['layout']);
+        }
+      }
+      // Purify markup in confirmation_message
+      if (isset($record['confirmation_message']) && str_contains($record['confirmation_message'], '<')) {
+        $record['confirmation_message'] = \CRM_Utils_String::purifyHTML($record['confirmation_message']);
+      }
+    }
+    unset($record);
+
+    // Fetch submission aggregates in bulk
+    if ($needSubmissionInResult) {
+      $this->addSubmissionFields($records);
+    }
+
+    if (isset($originalSelect)) {
+      $keys = array_flip($originalSelect);
+      foreach ($records as &$record) {
+        $record = array_intersect_key($record, $keys);
+      }
+      unset($record);
+    }
+
+    $result->exchangeArray($records);
+  }
+
   public function getRecords() {
     $afforms = [];
 
@@ -21,8 +85,8 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
 
     // Optimization: only fetch extra data if requested
     $getComputed = $this->_isFieldSelected('has_local', 'has_base', 'base_module');
-    $getSearchDisplays = $this->_isFieldSelected('search_displays');
-    $getLayout = $getSearchDisplays || $this->_isFieldSelected('layout');
+    $getLayout = $this->_whereContains(self::LAYOUT_FIELDS) || array_intersect(self::LAYOUT_FIELDS, array_keys($this->orderBy));
+    $getSearchDisplays = $getLayout && $this->_isFieldSelected('search_displays');
     // To optimize lookups by file/module/directive name
     $getNames = array_filter([
       'name' => $this->_itemsToGet('name'),
@@ -55,22 +119,22 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'directive_name' => _afform_angular_module_name($name, 'dash'),
       ];
       // Skip if afform does not match requested name
-      foreach ($getNames as $key => $names) {
-        if (!in_array($info[$key], $names)) {
+      foreach ($getNames as $key => $allowedNames) {
+        if (!in_array($info[$key], $allowedNames)) {
           unset($afforms[$name]);
           continue 2;
         }
       }
       $record = $scanner->getMeta($name, $getLayout);
       // Skip if afform does not exist or is not of requested type(s)
-      if (
-        (!$record && !isset($afforms[$name])) ||
-        ($getTypes && isset($record['type']) && !in_array($record['type'], $getTypes, TRUE))
-      ) {
-        unset($afforms[$name]);
+      if (!$record && !isset($afforms[$name])) {
         continue;
       }
       $afforms[$name] = array_merge($afforms[$name] ?? [], $record ?? [], $info);
+      if ($getTypes && !in_array($afforms[$name]['type'] ?? 'form', $getTypes, TRUE)) {
+        unset($afforms[$name]);
+        continue;
+      }
       if (isset($afforms[$name]['permission']) && is_string($afforms[$name]['permission'])) {
         $afforms[$name]['permission'] = explode(',', $afforms[$name]['permission']);
       }
@@ -91,63 +155,110 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       if (!isset($afforms[$name]['placement']) && $this->_isFieldSelected('placement')) {
         self::convertLegacyPlacement($afforms[$name]);
       }
-      if (!isset($afforms[$name]['placement_filters'])) {
+      if (!isset($afforms[$name]['placement_filters']) && $this->_isFieldSelected('placement_filters', 'placement_weight')) {
         self::convertLegacyPlacementOptions($afforms[$name]);
       }
     }
 
-    // Format layouts
-    if ($getLayout) {
-      foreach ($afforms as $name => $record) {
-        if (isset($record['layout'])) {
-          $this->convertLegacyContactTypes($afforms[$name]['layout']);
-          if ($this->layoutFormat !== 'html') {
-            $afforms[$name]['layout'] = $this->convertHtmlToOutput($afforms[$name]['layout']);
-          }
-        }
-      }
-    }
-
-    // Purify markup in confirmation_message
-    if ($this->_isFieldSelected('confirmation_message')) {
-      foreach ($afforms as $name => $record) {
-        if (isset($record['confirmation_message']) && str_contains($afforms[$name]['confirmation_message'], '<')) {
-          $afforms[$name]['confirmation_message'] = \CRM_Utils_String::purifyHTML($afforms[$name]['confirmation_message']);
-        }
-      }
-    }
-
-    // Fetch submission aggregates in bulk
-    if ($afforms && $this->_isFieldSelected('submission_count', 'submission_date', 'user_submission_count', 'submit_currently_open')) {
-      $userContactId = \CRM_Core_Session::getLoggedInContactID();
-      $afformSubmissions = \Civi\Api4\AfformSubmission::get(FALSE)
-        ->addSelect('afform_name', 'COUNT(id) AS count', 'MAX(submission_date) AS date')
-        ->addWhere('afform_name', 'IN', array_keys($afforms))
-        ->addWhere('status_id:name', '!=', 'Draft')
-        ->addGroupBy('afform_name')
-        ->execute()->indexBy('afform_name');
-      foreach ($afforms as $name => $record) {
-        $afforms[$name]['submission_count'] = $afformSubmissions[$name]['count'] ?? 0;
-        $afforms[$name]['submission_date'] = $afformSubmissions[$name]['date'] ?? NULL;
-        $afforms[$name]['submit_currently_open'] = ($record['submit_enabled'] ?? TRUE) && (empty($record['submit_limit']) || $record['submit_limit'] > $afforms[$name]['submission_count']);
-
-        // Check per-user submission limit
-        if ($userContactId && ($this->_isFieldSelected('user_submission_count') || (!empty($afforms[$name]['submit_limit_per_user']) && $afforms[$name]['submit_currently_open']))) {
-          $userSubmissions = \Civi\Api4\AfformSubmission::get(FALSE)
-            ->addWhere('afform_name', '=', $name)
-            ->addWhere('contact_id', '=', $userContactId)
-            ->addWhere('status_id:name', '!=', 'Draft')
-            ->selectRowCount()
-            ->execute();
-          $afforms[$name]['user_submission_count'] = $userSubmissions->countMatched();
-          if (!empty($afforms[$name]['submit_limit_per_user']) && $afforms[$name]['submit_currently_open']) {
-            $afforms[$name]['submit_currently_open'] = $userSubmissions->countMatched() < $afforms[$name]['submit_limit_per_user'];
-          }
-        }
-      }
+    // Fetch submission aggregates if needed for WHERE or ORDER BY
+    if ($this->_whereContains(self::SUBMISSION_FIELDS) || array_intersect(self::SUBMISSION_FIELDS, array_keys($this->orderBy))) {
+      $this->addSubmissionFields($afforms);
     }
 
     return $afforms;
+  }
+
+  /**
+   * Populate layout and search_displays for the final filtered records.
+   *
+   * @param array $records
+   */
+  private function addLayoutFields(array &$records): void {
+    /** @var \CRM_Afform_AfformScanner $scanner */
+    $scanner = \Civi::service('afform_scanner');
+    $names = array_column($records, 'name');
+    $hookForms = [];
+    $hookParams = [
+      'afforms' => &$hookForms,
+      'getNames' => ['name' => $names],
+      'getTypes' => $this->_itemsToGet('type'),
+      'getLayout' => TRUE,
+    ];
+    \Civi::dispatcher()->dispatch('civi.afform.get', GenericHookEvent::create($hookParams));
+    $hookLayouts = array_column($hookForms, 'layout', 'name');
+    $needSearchDisplays = in_array('search_displays', $this->select);
+
+    foreach ($records as &$record) {
+      $name = $record['name'];
+      $htmlFile = $scanner->findFilePath($name, \CRM_Afform_AfformScanner::LAYOUT_FILE);
+      if ($htmlFile !== NULL) {
+        $record['layout'] = file_get_contents($htmlFile);
+      }
+      elseif (isset($hookLayouts[$name])) {
+        $record['layout'] = $hookLayouts[$name];
+      }
+      if ($needSearchDisplays && !empty($record['layout'])) {
+        $record['search_displays'] = $this->getSearchDisplays($record['layout']);
+      }
+    }
+    unset($record);
+  }
+
+  /**
+   * Populate submission aggregate fields on a list of afform records.
+   *
+   * @param array $afforms
+   *   Afform records (may be 0-indexed or keyed by name).
+   */
+  private function addSubmissionFields(array &$afforms): void {
+    if (!$afforms) {
+      return;
+    }
+    $names = array_column($afforms, 'name');
+    $userContactId = \CRM_Core_Session::getLoggedInContactID();
+    $needUserSubmissionCount = $this->_isFieldSelected('user_submission_count');
+    $afformSubmissions = \Civi\Api4\AfformSubmission::get(FALSE)
+      ->addSelect('afform_name', 'COUNT(id) AS count', 'MAX(submission_date) AS date')
+      ->addWhere('afform_name', 'IN', $names)
+      ->addWhere('status_id:name', '!=', 'Draft')
+      ->addGroupBy('afform_name')
+      ->execute()->indexBy('afform_name');
+
+    $userCountNames = [];
+    foreach ($afforms as &$record) {
+      $name = $record['name'];
+      $record['submission_count'] = $afformSubmissions[$name]['count'] ?? 0;
+      $record['submission_date'] = $afformSubmissions[$name]['date'] ?? NULL;
+      $record['submit_currently_open'] = ($record['submit_enabled'] ?? TRUE) && (empty($record['submit_limit']) || $record['submit_limit'] > $record['submission_count']);
+
+      if ($userContactId && ($needUserSubmissionCount || (!empty($record['submit_limit_per_user']) && $record['submit_currently_open']))) {
+        $userCountNames[] = $name;
+      }
+    }
+    unset($record);
+
+    // Fetch per-user submission counts in bulk
+    if ($userCountNames) {
+      $userSubmissions = \Civi\Api4\AfformSubmission::get(FALSE)
+        ->addSelect('afform_name', 'COUNT(id) AS count')
+        ->addWhere('afform_name', 'IN', $userCountNames)
+        ->addWhere('contact_id', '=', $userContactId)
+        ->addWhere('status_id:name', '!=', 'Draft')
+        ->addGroupBy('afform_name')
+        ->execute()->indexBy('afform_name');
+      $userCountLookup = array_flip($userCountNames);
+      foreach ($afforms as &$record) {
+        $name = $record['name'];
+        if (isset($userCountLookup[$name])) {
+          $userCount = $userSubmissions[$name]['count'] ?? 0;
+          $record['user_submission_count'] = $userCount;
+          if (!empty($record['submit_limit_per_user']) && $record['submit_currently_open']) {
+            $record['submit_currently_open'] = $userCount < $record['submit_limit_per_user'];
+          }
+        }
+      }
+      unset($record);
+    }
   }
 
   /**
