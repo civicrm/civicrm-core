@@ -75,7 +75,7 @@ class OpensslCipherSuite implements CipherSuiteInterface {
   protected function encryptOnly(string $plainText, string $suite, string $key): string {
     $method = $this->getCipherMethod($suite);
     $this->assertLen(self::KEY_BYTES, $key);
-    $iv = random_bytes(openssl_cipher_iv_length($method));
+    $iv = random_bytes($this->getIvLength($method));
     $this->clearOpenSslErrors();
     $encrypted = openssl_encrypt($plainText, $method, $key, OPENSSL_RAW_DATA, $iv);
     if ($encrypted === FALSE) {
@@ -87,7 +87,7 @@ class OpensslCipherSuite implements CipherSuiteInterface {
   protected function decryptOnly(string $cipherText, string $suite, string $key): string {
     $method = $this->getCipherMethod($suite);
     $this->assertLen(self::KEY_BYTES, $key);
-    $blockBytes = openssl_cipher_iv_length($method);
+    $blockBytes = $this->getIvLength($method);
     $iv = substr($cipherText, 0, $blockBytes);
     $this->clearOpenSslErrors();
     $decrypted = openssl_decrypt(substr($cipherText, $blockBytes), $method, $key, OPENSSL_RAW_DATA, $iv);
@@ -149,6 +149,20 @@ class OpensslCipherSuite implements CipherSuiteInterface {
       throw new CryptoException('Failed to decrypt token. Invalid digest.');
     }
     return $this->decryptOnly(substr($cipherText, 0, -1 * $digestBytes), $suite, $encKey);
+  }
+
+  /**
+   * Determine the IV length for an OpenSSL cipher method.
+   *
+   * openssl_cipher_iv_length() returns FALSE if the cipher is unavailable,
+   * and some modes (e.g. ECB) report a zero-byte IV.
+   */
+  private function getIvLength(string $method): int {
+    $length = openssl_cipher_iv_length($method);
+    if ($length === FALSE || $length <= 0) {
+      throw new CryptoException('Invalid IV length for cipher ' . $method);
+    }
+    return $length;
   }
 
   private function getCipherMethod(string $suite): string {
