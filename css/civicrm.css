@@ -3226,9 +3226,6 @@ span.crm-select-item-color {
 }
 
 /* jQuery UI styles */
-.crm-container .ui-progressbar-value {
-  background-image: url("../packages/jquery/css/images/pbar-ani.gif");
-}
 
 .crm-container .crm-dialog,
 .crm-container.ui-dialog {
