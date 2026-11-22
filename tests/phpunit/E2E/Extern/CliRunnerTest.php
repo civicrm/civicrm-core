@@ -114,7 +114,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
     $exs = [];
     foreach (static::getRunners() as $runner) {
       $exs[] = array_merge($runner, ['[civicrm.root]/css/civicrm.css']);
-      $exs[] = array_merge($runner, ['[civicrm.packages]/jquery/css/images/arrow.png']);
+      $exs[] = array_merge($runner, ['[civicrm.packages]/jquery/plugins/jquery.blockUI.min.js']);
     }
     return $exs;
   }
