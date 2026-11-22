@@ -20,7 +20,7 @@
       fieldName: '@name',
       defn: '='
     },
-    controller: function($scope, $element, crmApi4, $timeout) {
+    controller: function($scope, $element, $timeout) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform');
       const ctrl = this;
       // Prefix used for SearchKit explicit joins
@@ -195,7 +195,7 @@
                 joinEntity: ctrl.afJoin ? ctrl.afJoin.entity : null,
                 values: $scope.dataProvider.getFieldData()
               };
-              crmApi4('Afform', 'getOptions', params)
+              CRM.backgroundApi4('Afform', 'getOptions', params, {maxWait: 100})
                 .then((data) => {
                   $('input[crm-ui-select]', $element)
                     .removeClass('loading')
