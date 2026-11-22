@@ -196,6 +196,85 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::basicTypePairs(FALSE, 'id');
     $this->assertEquals([$this->getContactTypeID('Individual'), $this->getContactTypeID('Organization')], array_keys($result));
     $this->assertEquals(['Individual', 'Organization'], array_values($result));
+
+    $this->assertSame(['Individual', 'Organization'], CRM_Contact_BAO_ContactType::basicTypes());
+    $this->assertSame(['Individual', 'Household', 'Organization'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
+    $this->assertSame(['Individual', 'Organization'], array_keys(CRM_Contact_BAO_ContactType::basicTypeInfo()));
+    $this->assertSame(['Individual', 'Household', 'Organization'], array_keys(CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE)));
+  }
+
+  /**
+   * Test subtype, pair, label, and type-checking helper methods.
+   */
+  public function testHelperMethods(): void {
+    $this->createTestEntity('ContactType', [
+      'is_active' => 0,
+      'name' => 'inactive_sub',
+      'label' => 'Inactive Sub',
+      'parent_id:name' => 'Individual',
+    ]);
+
+    // contactTypes() active vs all
+    $activeTypes = CRM_Contact_BAO_ContactType::contactTypes(FALSE);
+    $allTypes = CRM_Contact_BAO_ContactType::contactTypes(TRUE);
+    $this->assertNotContains('inactive_sub', $activeTypes);
+    $this->assertContains('inactive_sub', $allTypes);
+
+    // subTypes() with $all and $columnName = 'label'
+    $this->assertNotContains('inactive_sub', CRM_Contact_BAO_ContactType::subTypes('Individual', FALSE));
+    $this->assertContains('inactive_sub', CRM_Contact_BAO_ContactType::subTypes('Individual', TRUE));
+    $subTypeLabels = CRM_Contact_BAO_ContactType::subTypes('Individual', FALSE, 'label');
+    $this->assertContains('Sub1 Individual', $subTypeLabels);
+    $this->assertNotContains('Inactive Sub', $subTypeLabels);
+    $this->assertContains('Inactive Sub', CRM_Contact_BAO_ContactType::subTypes('Individual', TRUE, 'label'));
+
+    // subTypePairs()
+    $pairs = CRM_Contact_BAO_ContactType::subTypePairs('Individual');
+    $this->assertSame('- Sub1 Individual', $pairs['sub1_individual']);
+    $this->assertArrayNotHasKey('inactive_sub', $pairs);
+    $this->assertArrayNotHasKey('sub_organization', $pairs);
+
+    $allPairs = CRM_Contact_BAO_ContactType::subTypePairs('Individual', TRUE, '* ');
+    $this->assertSame('* Inactive Sub', $allPairs['inactive_sub']);
+
+    // contactTypePairs()
+    $allContactPairs = CRM_Contact_BAO_ContactType::contactTypePairs(FALSE);
+    $this->assertSame('Individual', $allContactPairs['Individual']);
+    $this->assertSame('Sub1 Individual', $allContactPairs['sub1_individual']);
+    $this->assertArrayNotHasKey('inactive_sub', $allContactPairs);
+
+    $filteredPairs = CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, ['Individual', 'sub1_individual', 'inactive_sub', 'nonexistent']);
+    $this->assertSame(['Individual' => 'Individual', 'sub1_individual' => 'Sub1 Individual'], $filteredPairs);
+
+    $delimited = CRM_Contact_BAO_ContactType::contactTypePairs(TRUE, CRM_Core_DAO::VALUE_SEPARATOR . 'Individual' . CRM_Core_DAO::VALUE_SEPARATOR . 'inactive_sub' . CRM_Core_DAO::VALUE_SEPARATOR, ', ');
+    $this->assertSame('Individual, Inactive Sub', $delimited);
+
+    // isaSubType()
+    $this->assertTrue(CRM_Contact_BAO_ContactType::isaSubType('sub1_individual'));
+    $this->assertTrue(CRM_Contact_BAO_ContactType::isaSubType('inactive_sub'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isaSubType('Individual'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isaSubType('invalid'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isaSubType(NULL));
+
+    // suppressSubTypes()
+    $types = [0 => 'Individual', 2 => 'sub1_individual', 5 => 'Organization', 7 => 'sub_household'];
+    $suppressed = CRM_Contact_BAO_ContactType::suppressSubTypes($types);
+    $this->assertSame([0 => 'Individual', 5 => 'Organization'], $suppressed);
+    $this->assertSame([0 => 'Individual', 5 => 'Organization'], $types);
+
+    // isExtendsContactType()
+    $this->assertTrue(CRM_Contact_BAO_ContactType::isExtendsContactType('sub1_individual', 'Individual'));
+    $this->assertTrue(CRM_Contact_BAO_ContactType::isExtendsContactType(CRM_Core_DAO::VALUE_SEPARATOR . 'sub1_individual' . CRM_Core_DAO::VALUE_SEPARATOR . 'sub2_individual' . CRM_Core_DAO::VALUE_SEPARATOR, 'Individual'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isExtendsContactType('sub1_individual', 'Organization'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isExtendsContactType('Individual', 'Individual'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isExtendsContactType('invalid', 'Individual'));
+    $this->assertTrue(CRM_Contact_BAO_ContactType::isExtendsContactType('Sub1 Individual', 'Individual', FALSE, 'label'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isExtendsContactType('Sub1 Individual', 'Organization', FALSE, 'label'));
+
+    // getLabel()
+    $this->assertSame('Individual', CRM_Contact_BAO_ContactType::getLabel('Individual'));
+    $this->assertSame('Sub1 Individual', CRM_Contact_BAO_ContactType::getLabel('sub1_individual'));
+    $this->assertSame('nonexistent', CRM_Contact_BAO_ContactType::getLabel('nonexistent'));
   }
 
   /**

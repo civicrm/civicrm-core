@@ -42,7 +42,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    */
   public static function basicTypeInfo($includeInactive = FALSE): array {
     return array_filter(self::getAllContactTypes(), function($type) use ($includeInactive) {
-      return empty($type['parent']) && ($includeInactive || $type['is_active']);
+      return !isset($type['parent']) && ($includeInactive || $type['is_active']);
     });
   }
 
@@ -68,7 +68,13 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @throws \CRM_Core_Exception
    */
   public static function basicTypePairs($all = FALSE, $key = 'name') {
-    return array_column(self::basicTypeInfo($all), 'label', $key);
+    $pairs = [];
+    foreach (self::getAllContactTypes() as $type) {
+      if (!$type['parent'] && ($all || $type['is_active'])) {
+        $pairs[$type[$key]] = $type['label'];
+      }
+    }
+    return $pairs;
   }
 
   /**
@@ -85,7 +91,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   public static function subTypeInfo($contactType = NULL, $all = FALSE) {
     $contactTypes = self::getAllContactTypes();
     foreach ($contactTypes as $index => $type) {
-      if (empty($type['parent']) ||
+      if (!$type['parent'] ||
         (!$all && !$type['is_active'])
         || ($contactType && $type['parent'] !== $contactType)
       ) {
@@ -102,40 +108,40 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param string|null $contactType
    * @param bool $all
    * @param string $columnName
-   * @param bool $ignoreCache
    *
    * @return array
    *   all subtypes OR list of subtypes associated to
    *   a given basic contact type
    * @throws \CRM_Core_Exception
    */
-  public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
+  public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name') {
     if ($columnName === 'name') {
       return array_keys(self::subTypeInfo($contactType, $all));
     }
     else {
-      return array_values(self::subTypePairs($contactType, FALSE, NULL, $ignoreCache));
+      return array_values(self::subTypePairs($contactType, $all, NULL));
     }
   }
 
   /**
-   *
-   * retrieve subtype pairs with name as 'subtype-name' and 'label' as value
+   * Retrieve subtype pairs with name as 'subtype-name' and 'label' as value
    *
    * @param array $contactType
    * @param bool $all
    * @param string|null $labelPrefix
-   * @param bool $ignoreCache
    *
    * @return array
    *   list of subtypes with name as 'subtype-name' and 'label' as value
    */
-  public static function subTypePairs($contactType = NULL, $all = FALSE, $labelPrefix = '- ', $ignoreCache = FALSE) {
-    $subtypes = self::subTypeInfo($contactType, $all);
-
+  public static function subTypePairs($contactType = NULL, $all = FALSE, $labelPrefix = '- ') {
     $pairs = [];
-    foreach ($subtypes as $name => $info) {
-      $pairs[$name] = $labelPrefix . $info['label'];
+    foreach (self::getAllContactTypes() as $name => $type) {
+      if ($type['parent'] &&
+        ($all || $type['is_active']) &&
+        (!$contactType || $type['parent'] === $contactType)
+      ) {
+        $pairs[$name] = $labelPrefix . $type['label'];
+      }
     }
     return $pairs;
   }
@@ -188,7 +194,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @throws \CRM_Core_Exception
    */
   public static function contactTypePairs($all = FALSE, $typeName = NULL, $delimiter = NULL) {
-    $types = self::contactTypeInfo($all);
+    $types = self::getAllContactTypes();
 
     if ($typeName && !is_array($typeName)) {
       $typeName = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($typeName, CRM_Core_DAO::VALUE_SEPARATOR));
@@ -197,14 +203,16 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
     $pairs = [];
     if ($typeName) {
       foreach ($typeName as $type) {
-        if (array_key_exists($type, $types)) {
+        if (isset($types[$type]) && ($all || $types[$type]['is_active'])) {
           $pairs[$type] = $types[$type]['label'];
         }
       }
     }
     else {
       foreach ($types as $name => $info) {
-        $pairs[$name] = $info['label'];
+        if ($all || $info['is_active']) {
+          $pairs[$name] = $info['label'];
+        }
       }
     }
 
@@ -231,6 +239,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
     $separator = '__'
   ): array {
     $contactTypes = self::getAllContactTypes();
+    $values = [];
     foreach ($contactTypes as $contactType) {
       $parent = $contactType['parent'] ? $contactTypes[$contactType['parent']] : NULL;
       if (!$all && (!$contactType['is_active'] || ($parent && !$parent['is_active']))) {
@@ -247,17 +256,12 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
         $pName = $contactType['name'];
       }
 
-      if (!isset($values[$pName])) {
-        $values[$pName] = [];
-      }
-      $values[$pName][] = ['key' => $key, 'label' => $label];
+      $values[$pName][$key] = $label;
     }
 
     $selectElements = [];
     foreach ($values as $elements) {
-      foreach ($elements as $element) {
-        $selectElements[$element['key']] = $element['label'];
-      }
+      $selectElements += $elements;
     }
     return $selectElements;
   }
@@ -267,13 +271,16 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    *
    * @param string $subType
    *   Contact subType.
-   * @param bool $ignoreCache
    *
    * @return bool
    *   true if subType, false otherwise.
    */
-  public static function isaSubType($subType, $ignoreCache = FALSE) {
-    return in_array($subType, self::subTypes(NULL, TRUE, 'name', $ignoreCache));
+  public static function isaSubType($subType) {
+    if (!is_string($subType)) {
+      return FALSE;
+    }
+    $contactTypes = self::getAllContactTypes();
+    return !empty($contactTypes[$subType]['parent']);
   }
 
   /**
@@ -284,11 +291,10 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    *   Return value will be a string if input is a string, otherwise an array
    */
   public static function getBasicType($subType) {
-    $allSubTypes = array_column(self::subTypeInfo(NULL, TRUE), 'parent', 'name');
     if (is_array($subType)) {
-      return array_intersect_key($allSubTypes, array_flip($subType));
+      return array_filter(array_map([self::class, 'getBasicType'], array_combine($subType, $subType)));
     }
-    return $allSubTypes[$subType] ?? NULL;
+    return self::getAllContactTypes()[$subType]['parent'] ?? NULL;
   }
 
   /**
@@ -296,13 +302,12 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    *
    * @param array $subTypes
    *   Contact subTypes.
-   * @param bool $ignoreCache
    *
    * @return array
    *   Array of suppressed subTypes.
    */
-  public static function suppressSubTypes(&$subTypes, $ignoreCache = FALSE) {
-    $subTypes = array_diff($subTypes, self::subTypes(NULL, TRUE, 'name', $ignoreCache));
+  public static function suppressSubTypes(&$subTypes) {
+    $subTypes = array_diff($subTypes, self::subTypes(NULL, TRUE));
     return $subTypes;
   }
 
@@ -314,6 +319,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param string $contactType
    *   Contact Type.
    * @param bool $ignoreCache
+   *   Unused param.
    * @param string $columnName
    *
    * @return bool
@@ -321,7 +327,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    */
   public static function isExtendsContactType($subType, $contactType, $ignoreCache = FALSE, $columnName = 'name') {
     $subType = (array) CRM_Utils_Array::explodePadded($subType);
-    $subtypeList = self::subTypes($contactType, TRUE, $columnName, $ignoreCache);
+    $subtypeList = self::subTypes($contactType, TRUE, $columnName);
     $intersection = array_intersect($subType, $subtypeList);
     return $subType == $intersection;
   }
@@ -458,12 +464,7 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
    * @throws \CRM_Core_Exception
    */
   public static function getLabel($typeName) {
-    $types = self::contactTypeInfo(TRUE);
-
-    if (array_key_exists($typeName, $types)) {
-      return $types[$typeName]['label'];
-    }
-    return $typeName;
+    return self::getAllContactTypes()[$typeName]['label'] ?? $typeName;
   }
 
   /**
