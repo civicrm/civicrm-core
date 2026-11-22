@@ -200,13 +200,6 @@
     <access_arguments>*always allow*</access_arguments>
   </item>
   <item>
-    <path>civicrm/profile-editor/schema</path>
-    <page_callback>CRM_UF_Page_ProfileEditor::getSchemaJSON</page_callback>
-    <title>ProfileEditor</title>
-    <access_arguments>access CiviCRM</access_arguments>
-    <is_ajax>true</is_ajax>
-  </item>
-  <item>
     <path>civicrm/a</path>
     <page_callback>\Civi\Angular\Page\Main</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
