@@ -35,8 +35,10 @@
             ctrl.tally = null;
             if (status === 'success' && tallyParams) {
               tallyParams.return = 'tally';
-              crmApi4('SearchDisplay', 'run', tallyParams).then(function (result) {
-                ctrl.tally = result[0];
+              CRM.backgroundApi4('SearchDisplay', 'run', tallyParams, {maxWait: 100}).then((result) => {
+                $scope.$evalAsync(() => {
+                  ctrl.tally = result[0];
+                });
               });
             }
           });

@@ -20,6 +20,7 @@
       // Called by the controller's $onInit function
       initializeDisplay: function($scope, $element) {
         const ctrl = this;
+        this.$scope = $scope;
         this.$element = $element;
         this.limit = this.settings.limit;
         this.sort = Array.isArray(this.settings.sort) ? structuredClone(this.settings.sort) : [];
@@ -331,12 +332,14 @@
             }
             else if (this.settings.pager || this.settings.headerCount) {
               const params = this.getApiParams('row_count');
-              crmApi4('SearchDisplay', 'run', params).then((result) => {
+              CRM.backgroundApi4('SearchDisplay', 'run', params, {maxWait: 100}).then((result) => {
                 if (requestId < this._runCount || !angular.equals(params.filters, this.getFilters())) {
                   return; // Another request started, or the filters changed, after this one
                 }
 
-                this.rowCount = result.count;
+                this.$scope.$evalAsync(() => {
+                  this.rowCount = result.count;
+                });
               });
             }
           }
