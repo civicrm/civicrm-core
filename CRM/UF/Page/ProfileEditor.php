@@ -54,7 +54,6 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           'profilePreviewKey' => CRM_Core_Key::get('CRM_UF_Form_Inline_Preview', TRUE),
         ];
       })
-      ->addScriptFile('civicrm.packages', 'backbone/json2.js', 100, 'html-header', FALSE)
       ->addScriptFile('civicrm.packages', 'backbone/backbone.js', 120, 'html-header')
       ->addScriptFile('civicrm.packages', 'backbone/backbone.marionette.js', 125, 'html-header', FALSE)
       ->addScriptFile('civicrm.packages', 'backbone/backbone.collectionsubset.js', 125, 'html-header', FALSE)
