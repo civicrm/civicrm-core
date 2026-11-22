@@ -106,37 +106,75 @@
 
   // Calls waiting to be sent by CRM.backgroundApi4
   const backgroundQueue = [];
+  // In-flight cacheable calls keyed by serialized [entity, action, params]
+  const inFlightCache = new Map();
   let backgroundTimer = null;
   let backgroundDeadline = Infinity;
+
+  function isGetAction(entity, action, params) {
+    const isReadOnly = action === 'autocomplete' ||
+      (entity === 'SearchDisplay' && action === 'run') ||
+      /^get([A-Z]|$)/.test(action);
+    if (!isReadOnly) {
+      return false;
+    }
+    if (params?.chain && typeof params.chain === 'object') {
+      return Object.values(params.chain).every((chained) =>
+        Array.isArray(chained) && isGetAction(chained[0], chained[1], chained[2])
+      );
+    }
+    return true;
+  }
 
   function sendBackgroundQueue() {
     clearTimeout(backgroundTimer);
     backgroundTimer = null;
     backgroundDeadline = Infinity;
-    const batch = backgroundQueue.splice(0).filter((item) => {
+    const toSend = [];
+
+    backgroundQueue.splice(0).forEach((item) => {
       try {
         // Params given as a function are evaluated now, so they reflect the state at send time
         item.call[2] = (typeof item.params === 'function' ? item.params() : item.params) || {};
-        return true;
       }
       catch (error) {
         item.reject(error);
-        return false;
+        return;
       }
+
+      if (item.cache ?? isGetAction(item.call[0], item.call[1], item.call[2])) {
+        const key = JSON.stringify(item.call);
+        const existing = inFlightCache.get(key);
+        if (existing) {
+          // Deduplicate against an already in-flight or earlier queued call
+          existing.subscribers.push(item);
+          return;
+        }
+        item.cacheKey = key;
+        inFlightCache.set(key, item);
+      }
+      item.subscribers = [item];
+      toSend.push(item);
     });
-    if (!batch.length) {
+
+    if (!toSend.length) {
       return;
     }
-    CRM.api4(batch.map((item) => item.call))
-      .then((results) => batch.forEach((item, index) => {
+
+    CRM.api4(toSend.map((item) => item.call))
+      .then((results) => toSend.forEach((item, index) => {
+        if (item.cacheKey) {
+          inFlightCache.delete(item.cacheKey);
+        }
         const result = results[index];
-        if (!result || 'error_code' in result) {
-          item.reject(result);
+        const method = (!result || 'error_code' in result) ? 'reject' : 'resolve';
+        item.subscribers.forEach((sub) => sub[method](result));
+      }), (error) => toSend.forEach((item) => {
+        if (item.cacheKey) {
+          inFlightCache.delete(item.cacheKey);
         }
-        else {
-          item.resolve(result);
-        }
-      }), (error) => batch.forEach((item) => item.reject(error)));
+        item.subscribers.forEach((sub) => sub.reject(error));
+      }));
   }
 
   /**
@@ -144,6 +182,7 @@
    *
    * - It adds a slight delay.
    * - Other backgroundApi4 calls made during that delay are bundled in one request.
+   * - Identical queued/in-flight calls can be deduplicated via `config.cache`.
    * - Its returned Promise includes a `.cancel()` method.
    *
    * @param {string} entity
@@ -152,13 +191,14 @@
    *   Api params, or a function returning them (called when the batch is sent, can cancel by throwing)
    * @param {Object} [config]
    *   - maxWait {number}: ms to wait for other calls to join the batch (default 800)
+   *   - cache {boolean}: share queued/in-flight result with identical calls (defaults to true for get-like requests)
    * @return {Promise} with a `cancel()` method (only available on returned promise, can't be chained after .then())
    */
   CRM.backgroundApi4 = function(entity, action, params, config) {
     const maxWait = config?.maxWait ?? 800;
     let item;
     const request = new Promise((resolve, reject) => {
-      item = {call: [entity, action, null], params, resolve, reject};
+      item = {call: [entity, action, null], params, cache: config?.cache, resolve, reject};
     });
     request.cancel = (reason) => {
       const position = backgroundQueue.indexOf(item);
