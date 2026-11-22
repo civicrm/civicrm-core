@@ -137,24 +137,17 @@ input.crm-form-checkbox + label {
 }
 /* Styles for Sticky Header */
 .crm-sticky thead > tr > th,
-.crm-container table thead.sticky {
+.crm-container table thead.sticky > tr > th {
   background-color: #fff;
-}
-
-.crm-container thead div.sticky-header {
-  height: 15px;
 }
 
 .crm-sticky thead,
-.crm-container thead div.sticky-header {
+.crm-container table thead.sticky {
   border-bottom: 2px solid #cfcec3;
   background-color: #fff;
   z-index: 10;
-}
-
-.crm-sticky thead {
   position: sticky;
-  top: var(--crm-menubar-bottom);
+  top: var(--crm-menubar-bottom, 0);
   box-shadow: 0 2px 2px -1px #cfcec3;
 }
 
