@@ -58,6 +58,8 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
+    // A table lock left by a failed claim would make the cleanup below wait.
+    CRM_Core_DAO::executeQuery('UNLOCK TABLES');
     CRM_Utils_Time::resetTime();
 
     $tablesToTruncate = ['civicrm_queue_item'];
@@ -219,6 +221,37 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 
     $this->assertNull($queue->claimItem());
     $this->assertSame(1, $queue->attemptCount, 'A leased head should not be claimed again.');
+  }
+
+  /**
+   * A claim that fails must not leave a table lock on the connection: later
+   * queries on other tables would fail, and other connections would wait.
+   */
+  public function testFailedClaimLeavesNoTableLock() {
+    $queue = new CRM_Queue_Queue_Sql(['type' => 'Sql', 'name' => 'test-queue']);
+    $queue->createItem(['test-key' => 'a']);
+    // 'a' cannot be unserialized, so the claim fails.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_queue_item SET data = %1 WHERE queue_name = %2', [
+      1 => ['O:7:"Closure":0:{}', 'String'],
+      2 => ['test-queue', 'String'],
+    ]);
+
+    try {
+      $queue->claimItem();
+      $this->fail('claimItem() should pass on the error');
+    }
+    catch (Exception $e) {
+      $this->assertStringContainsString('Closure', $e->getMessage());
+    }
+
+    $error = NULL;
+    try {
+      CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_contact WHERE id = 0');
+    }
+    catch (Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertNull($error, 'The failed claim left a table lock on the connection.');
   }
 
   /**
