@@ -173,7 +173,6 @@ class CRM_Core_Resources_Common {
       "bower_components/jquery-ui/jquery-ui.min.js",
       "bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css",
       "bower_components/lodash-compat/lodash.min.js",
-      "packages/jquery/plugins/jquery.mousewheel.min.js",
       "bower_components/select2/select2.min.js",
       "bower_components/select2/select2.min.css",
       "bower_components/font-awesome/css/all.min.css",
