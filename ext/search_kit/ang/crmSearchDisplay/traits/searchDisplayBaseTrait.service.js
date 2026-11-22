@@ -112,9 +112,11 @@
         }
 
         // When filters are changed, trigger callbacks and refresh search (if there's no search button)
-        function onChangeFilters() {
+        function onChangeFilters(newVal, oldVal) {
           ctrl.page = 1;
-          ctrl.rowCount = null;
+          if (newVal !== oldVal) {
+            ctrl.rowCount = null;
+          }
           ctrl.onChangeFilters.forEach(callback => callback.call(ctrl));
           if (!ctrl.settings.button) {
             ctrl.getResultsSoon();
@@ -207,7 +209,12 @@
             return params;
           });
           countRequest.then(
-            (result) => $scope.$evalAsync(() => setTotalCount(result.count)),
+            (result) => $scope.$evalAsync(() => {
+              if (angular.equals({}, this.getAfformFilters())) {
+                this.rowCount = result.count;
+              }
+              setTotalCount(result.count);
+            }),
             () => {}
           );
           // Without afform filters, running the search gives the total count so a separate request isn't needed.
@@ -325,7 +332,7 @@
           this.loading = false;
           this.serverError = null;
           // Update rowCount if running for the first time or during an update op
-          if (!this.rowCount || editedRow) {
+          if (typeof this.rowCount !== 'number' || editedRow) {
             // No need to fetch count if on page 1 and result count is under the limit
             if (!this.limit || (this.results.length < this.limit && this.page === 1)) {
               this.rowCount = this.results.length;

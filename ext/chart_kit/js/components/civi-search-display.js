@@ -226,7 +226,12 @@
           return params;
         });
         this._countRequest.then(
-          (result) => setTotalCount(result.count),
+          (result) => {
+            if (!this.hasAfformFilters()) {
+              this.rowCount = result.count;
+            }
+            setTotalCount(result.count);
+          },
           () => {}
         );
         // Without afform filters, running the search gives the total count so a separate request isn't needed.
@@ -315,7 +320,7 @@
         ctrl.results = apiResults.run;
         ctrl.loading = false;
         // Update rowCount if running for the first time or during an update op
-        if (!ctrl.rowCount || editedRow) {
+        if (typeof ctrl.rowCount !== 'number' || editedRow) {
           // No need to fetch count if on page 1 and result count is under the limit
           if (!ctrl.limit || (ctrl.results.length < ctrl.limit && ctrl.page === 1)) {
             ctrl.rowCount = ctrl.results.length;
