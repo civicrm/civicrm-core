@@ -23,7 +23,9 @@ describe('civi-search-display', function() {
     };
     spyOn(CRM, 'url').and.returnValue('/civicrm/ajax/api4');
     spyOn(CRM.$, 'post').and.callFake(function(url, data) {
-      var response = data.calls ? {run: {values: [{}, {}], count: 2}} : {values: [], count: 7};
+      var calls = data.calls && JSON.parse(data.calls);
+      var response = Array.isArray(calls) ? calls.map(() => ({values: [], count: 7})) :
+        calls ? {run: {values: [{}, {}], count: 2}} : {values: [], count: 7};
       return CRM.$.Deferred().resolve(response).promise();
     });
     container = document.createElement('div');
@@ -82,7 +84,7 @@ describe('civi-search-display', function() {
     element.results = [];
     spyOn(element, 'getAfformFilters').and.returnValue({status_id: 1});
     await tickPastCountFetch();
-    expect(JSON.parse(CRM.$.post.calls.mostRecent().args[1].params).filters).toEqual({contact_id: 3});
+    expect(JSON.parse(CRM.$.post.calls.mostRecent().args[1].calls)[0][2].filters).toEqual({contact_id: 3});
     expect(CRM.tabHeader.updateCount).toHaveBeenCalledWith('#tab_chart', 7);
   });
 

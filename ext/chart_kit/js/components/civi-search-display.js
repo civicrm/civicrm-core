@@ -35,6 +35,7 @@
       if (this.afFieldset) {
         this.afFieldset.removeEventListener('crmFormChangeFilters', this._onChangeFiltersListener, true);
       }
+      this._countRequest?.cancel();
     }
 
     get formContainer() {
@@ -213,17 +214,28 @@
       // - there is a counter (e.g. a contact summary tab)
       // - and the search is hidden or not set to auto-run
       // - or afform filters are present which would interfere with an accurate total
-      // (wait a brief timeout to allow more important things to happen first)
-      setTimeout(() => {
-        if (hasCounter() && (!(this.loading || this.results) || this.hasAfformFilters())) {
+      // (sent in the background, batched with the counts of other displays on the page)
+      if (hasCounter()) {
+        this._countRequest = CRM.backgroundApi4('SearchDisplay', 'run', () => {
+          if ((this.loading || this.results) && !this.hasAfformFilters()) {
+            throw new window.DOMException('Cancelled', 'AbortError');
+          }
           const params = this.getApiParams('row_count');
           // Exclude afform filters
           params.filters = this.filters;
-          api4('SearchDisplay', 'run', params).then(function(result) {
-            setTotalCount(result.count);
-          });
-        }
-      }, 900);
+          return params;
+        });
+        this._countRequest.then(
+          (result) => setTotalCount(result.count),
+          () => {}
+        );
+        // Without afform filters, running the search gives the total count so a separate request isn't needed.
+        this.onPreRun.push(() => {
+          if (!this.hasAfformFilters()) {
+            this._countRequest.cancel();
+          }
+        });
+      }
     }
 
     _onChangeFilters() {
