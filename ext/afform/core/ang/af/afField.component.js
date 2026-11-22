@@ -476,11 +476,11 @@
             ctrl._entityLabels[ids.join()] = null;
             const params = ctrl.getAutocompleteParams();
             params.ids = ids;
-            crmApi4(ctrl.fkEntity, 'autocomplete', params)
-              .then((result) => {
+            CRM.backgroundApi4(ctrl.fkEntity, 'autocomplete', params, {maxWait: 100})
+              .then((result) => $scope.$evalAsync(() => {
                 // Join all labels
                 ctrl._entityLabels[ids.join()] = result.map((item) => item.label).join(', ');
-              });
+              }));
           }
           return ctrl._entityLabels[ids.join()] || ts('Loading...');
         }
