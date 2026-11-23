@@ -33,7 +33,7 @@ use Civi\Api4\Utils\CoreUtil;
  * @method $this setReload(?array $reload) Optionally reload $ENTITIES after saving with an extra SELECT.
  * @method bool getReload()
  * @method $this setMatch(array $match) Specify fields to match for update.
- * @method bool getMatch()
+ * @method array getMatch()
  *
  * @package Civi\Api4\Generic
  */

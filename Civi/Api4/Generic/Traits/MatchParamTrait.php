@@ -16,7 +16,7 @@ use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @method $this setMatch(array $match) Specify fields to match for update.
- * @method bool getMatch()
+ * @method array getMatch()
  * @package Civi\Api4\Generic
  */
 trait MatchParamTrait {
