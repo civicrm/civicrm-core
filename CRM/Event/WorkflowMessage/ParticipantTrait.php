@@ -145,7 +145,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    */
   public function setParticipantID(int $participantID) {
     $this->participantID = $participantID;
-    if (!$this->getContributionID() && $this->isCiviContributeEnabled()) {
+    if (!$this->getContributionID() && !isset($this->contribution) && $this->isCiviContributeEnabled()) {
       $lineItem = LineItem::get(FALSE)
         ->addWhere('entity_table', '=', 'civicrm_participant')
         ->addWhere('entity_id', '=', $participantID)
