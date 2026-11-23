@@ -813,7 +813,7 @@ if (!CRM.vars) CRM.vars = {};
             $el.trigger('initSelectionComplete');
           } else {
             var params = $.extend({quickEdit: !!select2Options.quickEdit}, getApiParams(), {ids: idsNeeded});
-            CRM.api4(entityName, 'autocomplete', params).then(function (result) {
+            CRM.api4(entityName, 'autocomplete', params, {delay: 100}).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
               $el.trigger('initSelectionComplete');
             });

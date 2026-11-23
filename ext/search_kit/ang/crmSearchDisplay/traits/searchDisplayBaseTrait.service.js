@@ -2,7 +2,7 @@
   "use strict";
 
   // Trait provides base methods and properties common to all search display types
-  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($timeout, $interval, $sce, crmApi4, crmStatus) {
+  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($interval, $sce, crmApi4, crmStatus) {
 
     // Return a base trait shared by all search display controllers
     // Gets mixed in using angular.extend()
@@ -111,9 +111,11 @@
         }
 
         // When filters are changed, trigger callbacks and refresh search (if there's no search button)
-        function onChangeFilters() {
+        function onChangeFilters(newVal, oldVal) {
           ctrl.page = 1;
-          ctrl.rowCount = null;
+          if (newVal !== oldVal) {
+            ctrl.rowCount = null;
+          }
           ctrl.onChangeFilters.forEach(callback => callback.call(ctrl));
           if (!ctrl.settings.button) {
             ctrl.getResultsSoon();
@@ -196,16 +198,31 @@
         // - there is a counter (e.g. a contact summary tab)
         // - and the search is hidden or not set to auto-run
         // - or afform filters are present which would interfere with an accurate total
-        // (wait a brief timeout to allow more important things to happen first)
-        $timeout(() => {
-          if (hasCounter && (!(this.loading || this.results) || !angular.equals({}, this.getAfformFilters()))) {
+        // (sent after a short delay, batched with the counts of other displays on the page)
+        let countAbortController;
+        if (hasCounter) {
+          countAbortController = new window.AbortController();
+          crmApi4('SearchDisplay', 'run', () => {
             const params = this.getApiParams('row_count');
             // Exclude afform filters
             params.filters = this.filters;
-            crmApi4('SearchDisplay', 'run', params)
-              .then((result) => setTotalCount(result.count));
-          }
-        }, 900);
+            return params;
+          }, {delay: true, signal: countAbortController.signal}).then(
+            (result) => {
+              if (angular.equals({}, this.getAfformFilters())) {
+                this.rowCount = result.count;
+              }
+              setTotalCount(result.count);
+            },
+            () => {}
+          );
+          // Without afform filters, running the search gives the total count so a separate request isn't needed.
+          this.onPreRun.push(() => {
+            if (angular.equals({}, this.getAfformFilters())) {
+              countAbortController.abort();
+            }
+          });
+        }
 
         // Clean up the form handler, visibility poller and pending debounced
         // searches, which are not released by the $scope itself
@@ -218,6 +235,7 @@
           }
           this.getResultsPronto.cancel();
           this.getResultsSoon.cancel();
+          countAbortController?.abort();
         });
       },
 
@@ -313,14 +331,14 @@
           this.loading = false;
           this.serverError = null;
           // Update rowCount if running for the first time or during an update op
-          if (!this.rowCount || editedRow) {
+          if (typeof this.rowCount !== 'number' || editedRow) {
             // No need to fetch count if on page 1 and result count is under the limit
             if (!this.limit || (this.results.length < this.limit && this.page === 1)) {
               this.rowCount = this.results.length;
             }
             else if (this.settings.pager || this.settings.headerCount) {
               const params = this.getApiParams('row_count');
-              crmApi4('SearchDisplay', 'run', params).then((result) => {
+              crmApi4('SearchDisplay', 'run', params, {delay: 100}).then((result) => {
                 if (requestId < this._runCount || !angular.equals(params.filters, this.getFilters())) {
                   return; // Another request started, or the filters changed, after this one
                 }

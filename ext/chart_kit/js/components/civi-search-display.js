@@ -35,6 +35,7 @@
       if (this.afFieldset) {
         this.afFieldset.removeEventListener('crmFormChangeFilters', this._onChangeFiltersListener, true);
       }
+      this._countAbortController?.abort();
     }
 
     get formContainer() {
@@ -213,17 +214,33 @@
       // - there is a counter (e.g. a contact summary tab)
       // - and the search is hidden or not set to auto-run
       // - or afform filters are present which would interfere with an accurate total
-      // (wait a brief timeout to allow more important things to happen first)
-      setTimeout(() => {
-        if (hasCounter() && (!(this.loading || this.results) || this.hasAfformFilters())) {
+      // (sent after a short delay, batched with the counts of other displays on the page)
+      if (hasCounter()) {
+        this._countAbortController = new window.AbortController();
+        api4('SearchDisplay', 'run', () => {
+          if ((this.loading || this.results) && !this.hasAfformFilters()) {
+            throw new window.DOMException('Cancelled', 'AbortError');
+          }
           const params = this.getApiParams('row_count');
           // Exclude afform filters
           params.filters = this.filters;
-          api4('SearchDisplay', 'run', params).then(function(result) {
+          return params;
+        }, {delay: true, signal: this._countAbortController.signal}).then(
+          (result) => {
+            if (!this.hasAfformFilters()) {
+              this.rowCount = result.count;
+            }
             setTotalCount(result.count);
-          });
-        }
-      }, 900);
+          },
+          () => {}
+        );
+        // Without afform filters, running the search gives the total count so a separate request isn't needed.
+        this.onPreRun.push(() => {
+          if (!this.hasAfformFilters()) {
+            this._countAbortController.abort();
+          }
+        });
+      }
     }
 
     _onChangeFilters() {
@@ -303,7 +320,7 @@
         ctrl.results = apiResults.run;
         ctrl.loading = false;
         // Update rowCount if running for the first time or during an update op
-        if (!ctrl.rowCount || editedRow) {
+        if (typeof ctrl.rowCount !== 'number' || editedRow) {
           // No need to fetch count if on page 1 and result count is under the limit
           if (!ctrl.limit || (ctrl.results.length < ctrl.limit && ctrl.page === 1)) {
             ctrl.rowCount = ctrl.results.length;
