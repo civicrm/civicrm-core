@@ -742,17 +742,20 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * Since this is used from the batched script caching helps.
    *
-   * Caching is by domain - if that hits any issues we should add a new function getDomainMembershipTypes
-   * or similar rather than 'just add another param'! but this is closer to earlier behaviour so 'should' be OK.
+   * All domains are cached together and filtered by $domain on retrieval.
+   *
+   * @param int|bool $domain
+   *   Domain ID to filter by, TRUE for current domain, or FALSE for all domains.
    *
    * @return array
    *   List of membershipType details keyed by membershipTypeID
    * @throws \CRM_Core_Exception
    */
-  public static function getAllMembershipTypes(): array {
-    $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
-    if (!Civi::cache('metadata')->has($cacheString)) {
-      $types = (array) MembershipType::get(FALSE)->addOrderBy('weight')->addWhere('domain_id', '=', 'current_domain')->execute()->indexBy('id');
+  public static function getAllMembershipTypes(int|bool $domain = TRUE): array {
+    $cacheString = __CLASS__ . __FUNCTION__ . '_' . CRM_Core_I18n::getLocale();
+    $types = Civi::cache('metadata')->get($cacheString);
+    if (!isset($types)) {
+      $types = (array) MembershipType::get(FALSE)->addOrderBy('weight')->execute()->indexBy('id');
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       foreach ($types as $id => $type) {
         $types[$id]['tax_rate'] = (float) ($taxRates[$type['financial_type_id']] ?? 0.0);
@@ -764,7 +767,13 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
       Civi::cache('metadata')->set($cacheString, $types);
     }
-    return Civi::cache('metadata')->get($cacheString);
+    if ($domain) {
+      $domain = $domain === TRUE ? CRM_Core_BAO_Domain::getDomainID() : $domain;
+      return array_filter($types, function ($value) use ($domain) {
+        return $value['domain_id'] === $domain;
+      });
+    }
+    return $types;
   }
 
   /**
@@ -776,7 +785,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @throws \CRM_Core_Exception
    */
   public static function getMembershipType($id) {
-    return self::getAllMembershipTypes()[$id];
+    return self::getAllMembershipTypes(FALSE)[$id];
   }
 
 }
