@@ -188,7 +188,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Campaign', NULL, NULL, NULL, '12');
     $this->assertSame('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -420,8 +419,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertDBCompareValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name', 'id',
       $tableName, 'Database check for custom group table name.'
     );
-
-    $this->customGroupDelete($customGroup->id);
   }
 
   /**
@@ -541,7 +538,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $isEmptyGroup = CRM_Core_BAO_CustomGroup::isGroupEmpty($customGroupId);
 
     $this->assertTrue($isEmptyGroup, 'Check that custom Group is Empty.');
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -567,7 +563,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
     // Clean up via API — deleteRecord() uses DROP TABLE IF EXISTS so it
     // handles the missing backing table gracefully.
-    $this->customGroupDelete($groupId);
   }
 
   /**
@@ -599,7 +594,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
     // Clean up via API — deleteRecord() uses DROP TABLE IF EXISTS so it
     // handles the missing backing table gracefully.
-    $this->customGroupDelete($groupId);
   }
 
   /**

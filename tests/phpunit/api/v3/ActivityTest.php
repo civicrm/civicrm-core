@@ -461,9 +461,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'id' => $result['id'],
     ]);
     $this->assertSame("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**
@@ -485,9 +482,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'id' => $result['id'],
     ]);
     $this->assertSame("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**
@@ -522,8 +516,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['custom_' . $customField['id'] . '_id']);
     $this->assertSame('Anderson, Anthony II', $result['values'][$result['id']]['custom_' . $customField['id'] . '_1']);
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['custom_' . $customField['id'] . '_1_id']);
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**
@@ -890,8 +882,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('activity', 'get', $params);
     $this->assertSame('custom string', $result['values'][0]['custom_' . $ids['custom_field_id']]);
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**

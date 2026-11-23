@@ -167,9 +167,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->assertSame('Check', $contributions[$result['id']]['payment_instrument']);
     // CRM-20359: assert that contribution custom field token is rightfully replaced by its value
     $this->assertEquals($params[$customFieldKey], $contributions[$result['id']][$customFieldKey]);
-
-    $this->customFieldDelete($customField['id']);
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**

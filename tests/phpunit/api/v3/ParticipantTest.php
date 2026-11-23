@@ -144,9 +144,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
     $check = $this->callAPISuccess($this->_entity, 'get', ['id' => $result['id']]);
     $this->assertSame('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**

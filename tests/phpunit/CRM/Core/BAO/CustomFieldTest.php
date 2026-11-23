@@ -57,8 +57,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     $this->assertSame('testFld', CRM_Core_BAO_CustomField::getField($customFieldID)['name']);
     $this->assertEquals($customFieldID, CRM_Core_BAO_CustomField::getFieldByName('new_custom_group.testFld')['id']);
-
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -131,8 +129,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $dbColumnName = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldID, 'column_name', 'id', 'Database check for edited CustomField.');
     $this->assertEquals($fields['column_name'], $dbColumnName,
       "Column name set as specified");
-
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -154,8 +150,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $dbFieldName = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldID, 'name', 'id', 'Database check for edited CustomField.');
     $this->assertEquals($fields['name'], $dbFieldName,
       "Column name set as specified");
-
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -185,8 +179,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customGroup['id'], 'id', 'custom_group_id',
       'Database check for created CustomField.'
     );
-
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -287,8 +279,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         $this->assertSame($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
       }
     }
-
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -314,7 +304,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     $this->contactDelete($contact2);
     $this->contactDelete($contact1);
-    $this->customGroupDelete($customGroup['id']);
   }
 
   public function testDeleteCustomField(): void {
@@ -334,7 +323,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertDBNull('CRM_Core_DAO_CustomField', $customGroup['id'], 'id',
       'custom_group_id', 'Database check for deleted Custom Field.'
     );
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -465,9 +453,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         4 => [$countriesByName['Cambodia'], 'Integer'],
       ]
     );
-
-    $this->customGroupDelete($groups['A']['id']);
-    $this->customGroupDelete($groupB['id']);
   }
 
   /**
