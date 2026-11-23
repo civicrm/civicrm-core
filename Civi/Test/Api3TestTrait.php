@@ -30,12 +30,6 @@ trait Api3TestTrait {
   }
 
   /**
-   * Api version - easier to override than just a define
-   * @var int
-   */
-  protected $_apiversion = 3;
-
-  /**
    * Get the value the current api version returns for a typed value.
    *
    * For tests that run under both APIv3 and APIv4: APIv4 returns typed values,
