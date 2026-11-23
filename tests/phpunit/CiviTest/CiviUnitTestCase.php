@@ -1669,6 +1669,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * Delete custom group.
    *
+   * @deprecated
+   *   Use \Civi\Api4\CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroupID)->execute().
+   *   Cleanup at the end of a test is not needed if tearDown() calls
+   *   quickCleanup($tables, TRUE) or the test uses useTransaction().
+   *
    * @param int $customGroupID
    *
    * @return array|int
@@ -1709,6 +1714,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   /**
    * Delete custom field.
+   *
+   * @deprecated
+   *   Use \Civi\Api4\CustomField::delete(FALSE)->addWhere('id', '=', $customFieldID)->execute().
+   *   Cleanup at the end of a test is not needed if tearDown() calls
+   *   quickCleanup($tables, TRUE) or the test uses useTransaction().
    *
    * @param int $customFieldID
    *

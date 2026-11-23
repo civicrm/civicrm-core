@@ -434,10 +434,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Contribution', 'getfields');
     $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $result['values']);
     $this->assertArrayNotHasKey('custom_' . $idsContact['custom_field_id'], $result['values']);
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
-    $this->customFieldDelete($idsContact['custom_field_id']);
-    $this->customGroupDelete($idsContact['custom_group_id']);
   }
 
   /**
@@ -465,8 +461,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $this->assertSame('second', $this->callAPISuccessGetValue('Contribution', ['id' => $second['id'], 'return' => $customKey]));
     $this->assertSame('first', $this->callAPISuccessGetValue('Contribution', ['id' => $first['id'], 'return' => $customKey]));
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**

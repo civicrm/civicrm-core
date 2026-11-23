@@ -946,9 +946,6 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertSame('1.234,03|8,5|1.234,03|<a href="https://example.org/camp" target="_blank">https://example.org/camp</a>', $p->getRow(0)->render('html'));
     // A zero is a value, an unset field is not.
     $this->assertSame('0,00||1.234,03|', $p->getRow(1)->render('plain'));
-
-    $this->customGroupDelete($participantGroup['id']);
-    $this->customGroupDelete($contactGroup['id']);
   }
 
 }

@@ -707,9 +707,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'id' => $result['id'],
     ]);
     $this->assertSame('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**
@@ -722,8 +719,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = NULL;
     $this->callAPISuccess('contact', 'create', $params);
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**
@@ -764,9 +759,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccessGetSingle('Contact', ['id' => $contact_id, 'return' => ['custom_' . $custom_field_id]]);
     $this->assertSame('', $result['custom_' . $custom_field_id]);
-
-    $this->customFieldDelete($custom_field_id);
-    $this->customGroupDelete($custom_group_id);
   }
 
   /**
@@ -1324,8 +1316,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertSame('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
     $fields = ($this->callAPISuccess('contact', 'getfields', $params));
     $this->assertIsArray($fields['values']['custom_' . $ids['custom_field_id']]);
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   public function testGetOptions(): void {
@@ -1381,8 +1371,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $check = $this->callAPISuccess($this->_entity, 'get', $params);
 
     $this->assertSame('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**
@@ -2704,7 +2692,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
-    $moreIDs = $this->CustomGroupMultipleCreateWithFields();
+    $this->CustomGroupMultipleCreateWithFields();
     $params = [
       'sequential' => 1,
       'first_name' => 'abc3',
@@ -2725,8 +2713,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // delete the contact and custom groups
     $this->callAPISuccess('contact', 'delete', ['id' => $result['id']]);
-    $this->customGroupDelete($ids['custom_group_id']);
-    $this->customGroupDelete($moreIDs['custom_group_id']);
 
     $this->assertEquals($result['id'], $result['values'][0]['id']);
     $this->assertArrayKeyExists('api.website.create', $result['values'][0]);
@@ -2741,7 +2727,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
-    $moreIDs = $this->CustomGroupMultipleCreateWithFields();
+    $this->CustomGroupMultipleCreateWithFields();
     $params = [
       'first_name' => 'abc3',
       'last_name' => 'xyz3',
@@ -2793,8 +2779,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Contact', 'Get', $params);
     // delete the contact
     $this->callAPISuccess('contact', 'delete', $result);
-    $this->customGroupDelete($ids['custom_group_id']);
-    $this->customGroupDelete($moreIDs['custom_group_id']);
     $this->assertSame(0, $result['values'][$result['id']]['api.website.get']['is_error']);
     $this->assertSame('https://civicrm.org', $result['values'][$result['id']]['api.website.get']['values'][0]['url']);
   }
@@ -2855,7 +2839,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
-    $moreIDs = $this->CustomGroupMultipleCreateWithFields();
+    $this->CustomGroupMultipleCreateWithFields();
     $params = [
       'first_name' => 'abc3',
       'last_name' => 'xyz3',
@@ -2907,8 +2891,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertSame('https://civicrm.org', $result['values'][$result['id']]['api.website.getValue']);
 
     $this->callAPISuccess('contact', 'delete', $result);
-    $this->customGroupDelete($ids['custom_group_id']);
-    $this->customGroupDelete($moreIDs['custom_group_id']);
   }
 
   /**
@@ -2986,9 +2968,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Contact', 'Get', $params);
 
-    $this->customGroupDelete($ids['custom_group_id']);
-    $this->customGroupDelete($moreIDs['custom_group_id']);
-    $this->customGroupDelete($andMoreIDs['custom_group_id']);
     $this->assertSame(0, $result['values'][$result['id']]['api.CustomValue.get']['is_error']);
     $this->assertSame('https://civicrm.org', $result['values'][$result['id']]['api.website.getValue']);
   }
@@ -4514,8 +4493,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     //Cleanup
     $this->callAPISuccess('OptionValue', 'create', ['id' => $postalOption['id'], 'name' => 'Dear {contact.first_name}']);
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**

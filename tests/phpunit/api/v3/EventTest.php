@@ -393,8 +393,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ]);
     $this->assertSame("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
   }
 
@@ -417,9 +415,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ]);
 
     $this->assertSame(0, $check['count']);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**
@@ -441,9 +436,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ]);
 
     $this->assertGreaterThan(0, $check['count']);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**
@@ -497,8 +489,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
     // Not sure whether I should test for custom_X_1 and custom_X_1_id as well.
     // (1 being the id of the record in the custom value table)
 
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
     $this->callAPISuccess('contact', 'delete', [
       'id' => $contact_id,
       'skip_undelete' => TRUE,
@@ -572,8 +562,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
     $this->assertSame(1, $result['count']);
 
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
     $this->callAPISuccess('event', 'delete', [
       'id' => $result['id'],
       'skip_undelete' => TRUE,

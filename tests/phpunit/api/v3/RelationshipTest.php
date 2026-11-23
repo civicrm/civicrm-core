@@ -382,9 +382,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $getParams = ['id' => $result['id']];
     $check = $this->callAPISuccess($this->entity, 'get', $getParams);
     $this->assertSame("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**

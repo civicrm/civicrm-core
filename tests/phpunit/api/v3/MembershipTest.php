@@ -1009,9 +1009,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', [
       'id' => $check['id'],
     ]);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   /**

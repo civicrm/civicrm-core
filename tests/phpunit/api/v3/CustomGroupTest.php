@@ -362,9 +362,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     // Old group weight should be incremented
     $oldGroup = $this->callAPISuccess('CustomGroup', 'get', ['id' => $customGroupId])['values'][$customGroupId];
     $this->assertEquals($oldGroup['weight'], $customGroup['weight'] + 1);
-
-    $this->customGroupDelete($customGroupId);
-    $this->customGroupDelete($newGroup['id']);
   }
 
   /**
@@ -376,7 +373,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $result = array_shift($customGroup['values']);
     $this->assertSame('3', $result['extends_entity_column_id']);
     $this->assertSame('Participant', $result['extends']);
-    $this->customGroupDelete($result['id']);
   }
 
   /**
@@ -392,7 +388,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $this->assertTrue(empty($result['extends_entity_column_id']));
     $this->assertTrue(empty($result['extends_entity_column_value']));
     $this->assertSame('Individual', $result['extends']);
-    $this->customGroupDelete($result['id']);
   }
 
 }
