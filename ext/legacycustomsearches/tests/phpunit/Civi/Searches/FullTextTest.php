@@ -29,7 +29,6 @@ use PHPUnit\Framework\TestCase;
 class FullTextTest extends TestCase implements HeadlessInterface, HookInterface {
 
   use Test\ContactTestTrait;
-  use Test\Api3TestTrait;
 
   /**
    * Civi\Test has many helpers, like install(), uninstall(), sql(), and
