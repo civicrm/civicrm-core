@@ -1,9 +1,19 @@
 <?php
 
+use Civi\Api4\Campaign;
+
 class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
+
+  protected $_apiversion = 4;
+
+  public function setUp(): void {
+    parent::setUp();
+    $this->enableCiviCampaign();
+  }
 
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_campaign', 'civicrm_campaign_group', 'civicrm_group']);
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCampaign');
     parent::tearDown();
   }
 
@@ -40,8 +50,11 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
     $form->_action = CRM_Core_Action::ADD;
     $values = $this->getCorrectFormFields($thousandSeparator);
     $result = CRM_Campaign_Form_Campaign::Submit($values, $form);
-    $campaign = $this->callAPISuccess('campaign', 'get', ['id' => $result['id']]);
-    $this->assertSame('10000.00', $campaign['values'][$campaign['id']]['goal_revenue']);
+    $goalRevenue = Campaign::get(FALSE)
+      ->addSelect('goal_revenue')
+      ->addWhere('id', '=', $result['id'])
+      ->execute()->single()['goal_revenue'];
+    $this->assertSame(10000.0, $goalRevenue);
   }
 
   /**

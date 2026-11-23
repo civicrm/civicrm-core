@@ -17,6 +17,8 @@ use Civi\Api4\Survey;
  */
 class CRM_Campaign_BAO_SurveyTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   public function setUp(): void {
     parent::setUp();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
