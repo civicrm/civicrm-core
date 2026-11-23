@@ -79,7 +79,10 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return string
    */
   public function getCustomGroupTable(string $identifier = 'Custom Group'): string {
-    return $this->callAPISuccessGetValue('CustomGroup', ['id' => $this->ids['CustomGroup'][$identifier], 'return' => 'table_name']);
+    return CustomGroup::get(FALSE)
+      ->addSelect('table_name')
+      ->addWhere('id', '=', $this->ids['CustomGroup'][$identifier])
+      ->execute()->single()['table_name'];
   }
 
   /**
@@ -91,7 +94,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return string
    */
   protected function getCustomFieldColumnName(string $key): string {
-    return $this->callAPISuccessGetValue('CustomField', ['id' => $this->getCustomFieldID($key), 'return' => 'column_name']);
+    return $this->getCustomFieldValue($key, 'column_name');
   }
 
   /**
@@ -251,10 +254,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return string
    */
   protected function getCustomFieldOptionGroupID(string $key): string {
-    return (string) $this->callAPISuccessGetValue('CustomField', [
-      'id' => $this->getCustomFieldID($key),
-      'return' => 'option_group_id',
-    ]);
+    return (string) $this->getCustomFieldValue($key, 'option_group_id');
   }
 
   /**
@@ -265,10 +265,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return string
    */
   protected function getOptionGroupName(string $key): string {
-    return (string) $this->callAPISuccessGetValue('CustomField', [
-      'id' => $this->getCustomFieldID($key),
-      'return' => 'option_group_id.name',
-    ]);
+    return (string) $this->getCustomFieldValue($key, 'option_group_id.name');
   }
 
   /**
@@ -281,7 +278,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createIntCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Int'), $params);
-    return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -294,7 +291,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createBooleanCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Boolean'), $params);
-    return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -307,7 +304,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createContactReferenceCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('ContactReference'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -320,7 +317,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createTextCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('String'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -333,7 +330,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createLinkCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Link'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -346,7 +343,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createCountryCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Country'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -359,7 +356,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createMultiCountryCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Country'), ['serialize' => 1, 'label' => 'Country-multi'], $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -372,7 +369,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createStateCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('StateProvince'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -385,7 +382,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createMultiStateCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('StateProvince'), ['serialize' => 1, 'label' => 'State-multi'], $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -398,7 +395,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createFileCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('File'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -411,8 +408,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createSelectCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('String', 'Select'), $params);
-    $params['version'] = 3;
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -425,7 +421,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createAutoCompleteCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('String', 'Autocomplete-Select'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -437,7 +433,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createDateCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Date'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -449,8 +445,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createStringCheckboxCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('String', 'CheckBox'), $params);
-    $params['version'] = 3;
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -462,8 +457,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createIntegerRadioCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Int', 'Radio'), $params);
-    $params['version'] = 3;
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -475,8 +469,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createFloatSelectCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Float', 'Select'), $params);
-    $params['version'] = 3;
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
   }
 
   /**
@@ -488,7 +481,35 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createMoneyTextCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Money'), $params);
-    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+    return $this->createCustomFieldRecord($params);
+  }
+
+  /**
+   * Create a custom field.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  private function createCustomFieldRecord(array $params): array {
+    return CustomField::create(FALSE)
+      ->setValues($params)
+      ->execute()->first();
+  }
+
+  /**
+   * Get a value from the identified custom field.
+   *
+   * @param string $key
+   * @param string $fieldName
+   *
+   * @return mixed
+   */
+  private function getCustomFieldValue(string $key, string $fieldName) {
+    return CustomField::get(FALSE)
+      ->addSelect($fieldName)
+      ->addWhere('id', '=', $this->getCustomFieldID($key))
+      ->execute()->single()[$fieldName];
   }
 
   /**
@@ -503,7 +524,6 @@ trait CRMTraits_Custom_CustomDataTrait {
     $values = $this->getAvailableFieldCombinations()[$dataType];
     return array_merge([
       'is_searchable' => 1,
-      'sequential' => 1,
       'default_value' => '',
       'is_required' => 0,
     ], array_merge($values['default'], $values[$htmlType])
@@ -539,19 +559,19 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => 'Red',
-              'value' => 'R',
+              'id' => 'R',
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => 'Yellow',
-              'value' => 'Y',
+              'id' => 'Y',
               'weight' => 2,
               'is_active' => 1,
             ],
             [
               'label' => 'Green',
-              'value' => 'G',
+              'id' => 'G',
               'weight' => 3,
               'is_active' => 1,
             ],
@@ -566,19 +586,19 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => 'Red',
-              'value' => 'R',
+              'id' => 'R',
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => 'Yellow',
-              'value' => 'Y',
+              'id' => 'Y',
               'weight' => 2,
               'is_active' => 1,
             ],
             [
               'label' => 'Green',
-              'value' => 'G',
+              'id' => 'G',
               'weight' => 3,
               'is_active' => 1,
             ],
@@ -593,25 +613,25 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => 'Lilac',
-              'value' => 'L',
+              'id' => 'L',
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => 'Purple',
-              'value' => 'P',
+              'id' => 'P',
               'weight' => 2,
               'is_active' => 1,
             ],
             [
               'label' => 'Mauve',
-              'value' => 'M',
+              'id' => 'M',
               'weight' => 3,
               'is_active' => 1,
             ],
             [
               'label' => 'Violet',
-              'value' => 'V',
+              'id' => 'V',
               'weight' => 4,
               'is_active' => 1,
             ],
@@ -627,19 +647,19 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => 'Red',
-              'value' => 'R',
+              'id' => 'R',
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => 'Yellow',
-              'value' => 'Y',
+              'id' => 'Y',
               'weight' => 2,
               'is_active' => 1,
             ],
             [
               'label' => 'Green',
-              'value' => 'G',
+              'id' => 'G',
               'weight' => 3,
               'is_active' => 1,
             ],
@@ -654,19 +674,19 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => 'Red',
-              'value' => 'R',
+              'id' => 'R',
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => 'Yellow',
-              'value' => 'Y',
+              'id' => 'Y',
               'weight' => 2,
               'is_active' => 1,
             ],
             [
               'label' => 'Green',
-              'value' => 'G',
+              'id' => 'G',
               'weight' => 3,
               'is_active' => 1,
             ],
@@ -687,13 +707,13 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => '50',
-              'value' => 3,
+              'id' => 3,
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => '100',
-              'value' => 4,
+              'id' => 4,
               'weight' => 2,
               'is_active' => 1,
             ],
@@ -705,19 +725,19 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => '50',
-              'value' => 3,
+              'id' => 3,
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => '100',
-              'value' => 4,
+              'id' => 4,
               'weight' => 2,
               'is_active' => 1,
             ],
             [
               'label' => 'Red Testing',
-              'value' => 5,
+              'id' => 5,
               'weight' => 3,
               'is_active' => 1,
             ],
@@ -748,13 +768,13 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => '50',
-              'value' => 3,
+              'id' => 3,
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => '100',
-              'value' => 4,
+              'id' => 4,
               'weight' => 2,
               'is_active' => 1,
             ],
@@ -766,13 +786,13 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => '50',
-              'value' => 3,
+              'id' => 3,
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => '100',
-              'value' => 4,
+              'id' => 4,
               'weight' => 2,
               'is_active' => 1,
             ],
@@ -791,13 +811,13 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => '50',
-              'value' => 3,
+              'id' => 3,
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => '100',
-              'value' => 4,
+              'id' => 4,
               'weight' => 2,
               'is_active' => 1,
             ],
@@ -809,13 +829,13 @@ trait CRMTraits_Custom_CustomDataTrait {
           'option_values' => [
             [
               'label' => '50',
-              'value' => 3,
+              'id' => 3,
               'weight' => 1,
               'is_active' => 1,
             ],
             [
               'label' => '100',
-              'value' => 4,
+              'id' => 4,
               'weight' => 2,
               'is_active' => 1,
             ],
@@ -846,7 +866,6 @@ trait CRMTraits_Custom_CustomDataTrait {
           'data_type' => 'StateProvince',
           'html_type' => 'Select',
           'label' => 'State',
-          'option_type' => 0,
         ],
       ],
       'Country' => [
@@ -854,7 +873,6 @@ trait CRMTraits_Custom_CustomDataTrait {
           'data_type' => 'Country',
           'html_type' => 'Select',
           'label' => 'Country',
-          'option_type' => 0,
         ],
       ],
       'File' => [
