@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('World Regions'),
     'description' => ts('List of World Regions'),
     'add' => '1.8',
+    'label_field' => 'name',
   ],
   'getFields' => fn() => [
     'id' => [

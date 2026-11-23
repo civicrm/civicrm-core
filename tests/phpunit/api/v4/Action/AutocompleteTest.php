@@ -792,6 +792,12 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertSame($pcps[0]['id'], $allResults[0]['id']);
   }
 
+  public function testWorldRegionAutocompleteByName(): void {
+    $result = $this->runAutocomplete('WorldRegion', ['input' => 'Europe']);
+    $this->assertCount(1, $result);
+    $this->assertSame('Europe and Central Asia', $result[0]['label']);
+  }
+
 }
 
 class AutocompleteTestForm extends \CRM_Core_Form {
