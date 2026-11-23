@@ -22,6 +22,10 @@ use Civi\Api4\Setting;
  */
 class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
+  protected $_apiversion = 4;
+
   /**
    * Tears down the fixture, for example, closes a network connection.
    *
@@ -335,14 +339,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Ensure that when hidden smart group is created, wildcard string value is not ignored
    */
   public function testHiddenSmartGroup(): void {
-    $customGroup = $this->customGroupCreate();
-    $fields = [
-      'label' => 'testFld',
-      'data_type' => 'String',
-      'html_type' => 'Text',
-      'custom_group_id' => $customGroup['id'],
-    ];
-    $customFieldID = CRM_Core_BAO_CustomField::create($fields)->id;
+    $this->createCustomGroupWithFieldOfType([], 'text');
+    $customFieldID = $this->getCustomFieldID('text');
 
     $contactID = $this->individualCreate(['custom_' . $customFieldID => 'abc']);
 
