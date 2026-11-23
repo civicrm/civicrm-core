@@ -2,6 +2,7 @@
 
 namespace Civi\Contribute;
 
+use Civi\Api4\Contribution;
 use Civi\Checkout\AfformCheckoutOptionInterface;
 use Civi\Checkout\CheckoutOption;
 use Civi\Checkout\CheckoutSession;
@@ -15,6 +16,12 @@ class TestCheckoutOption extends CheckoutOption implements AfformCheckoutOptionI
   public function startCheckout(CheckoutSession $session): void {
     $session->setPendingUrl("https://now.go.to/{$session->getContributionId()}");
     $session->setResponseItem('test_session_token', $session->tokenise());
+    // Report the schedule a payment processor would see when starting checkout.
+    $session->setResponseItem('test_recur', Contribution::get(FALSE)
+      ->addSelect('contribution_recur_id', 'contribution_recur_id.frequency_unit', 'contribution_recur_id.frequency_interval')
+      ->addWhere('id', '=', $session->getContributionId())
+      ->execute()
+      ->single());
   }
 
   public function validate($e): void {
