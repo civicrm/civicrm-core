@@ -2,6 +2,8 @@
 
 namespace Civi\Financialacls;
 
+use Civi\Api4\FinancialType;
+use Civi\Api4\Order;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -20,13 +22,11 @@ class FinancialTypeTest extends BaseTestClass {
    * financial type.
    */
   public function testChangeFinancialTypeName(): void {
-    $type = $this->callAPISuccess('FinancialType', 'create', [
-      'name' => 'my test',
-    ]);
-    $this->callAPISuccess('FinancialType', 'create', [
-      'name' => 'your test',
-      'id' => $type['id'],
-    ]);
+    $type = $this->createTestEntity('FinancialType', ['name' => 'my test']);
+    FinancialType::update(FALSE)
+      ->addWhere('id', '=', $type['id'])
+      ->addValue('name', 'your test')
+      ->execute();
     $statusMessages = CRM_Core_Session::singleton()->getStatus(TRUE);
     $financialTypeMessages = array_filter($statusMessages, function ($msg) {
         return str_starts_with($msg['text'], 'Changing the name of a Financial Type');
@@ -115,32 +115,24 @@ class FinancialTypeTest extends BaseTestClass {
       'financial_type_id:name' => 'Donation',
       'weight' => 1,
     ])->execute()->first()['id'];
-    $contributionParams = [
-      'total_amount' => 300,
-      'currency' => 'USD',
-      'contact_id' => $this->individualCreate(),
-      'financial_type_id' => 'Donation',
-      'line_items' => [
-        [
-          'line_item' => [
-            [
-              'price_field_id' => $priceFieldID,
-              'price_field_value_id' => $priceFieldValueID,
-              'qty' => 3,
-            ],
-          ],
-        ],
-      ],
-    ];
-
-    $contribution = $this->callAPISuccess('Order', 'create', $contributionParams);
+    $contributionID = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem([
+        'price_field_id' => $priceFieldID,
+        'price_field_value_id' => $priceFieldValueID,
+        'qty' => 3,
+      ])
+      ->execute()->first()['id'];
 
     $this->setPermissions([
       'view contributions of type Member Dues',
     ]);
 
     try {
-      _civicrm_financial_acls_check_permissioned_line_items($contribution['id'], 'view');
+      _civicrm_financial_acls_check_permissioned_line_items($contributionID, 'view');
       $this->fail('Missed expected exception');
     }
     catch (\CRM_Core_Exception $e) {
@@ -151,7 +143,7 @@ class FinancialTypeTest extends BaseTestClass {
       'view contributions of type Donation',
     ]);
     try {
-      _civicrm_financial_acls_check_permissioned_line_items($contribution['id'], 'view');
+      _civicrm_financial_acls_check_permissioned_line_items($contributionID, 'view');
     }
     catch (\CRM_Core_Exception $e) {
       $this->fail('permissions should be established');
