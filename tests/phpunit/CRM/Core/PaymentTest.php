@@ -17,6 +17,8 @@ use Civi\Test\Invasive;
  */
 class CRM_Core_PaymentTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   /**
    * Test the payment method is adequately logged - we don't expect the processing to succeed
    */
@@ -28,8 +30,9 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     catch (Exception $e) {
 
     }
-    $log = $this->callAPISuccess('SystemLog', 'get', []);
-    $this->assertSame('payment_notification processor_name=Paypal', $log['values'][$log['id']]['message']);
+    $this->assertSame('payment_notification processor_name=Paypal', CRM_Core_DAO::singleValueQuery(
+      'SELECT message FROM civicrm_system_log ORDER BY id DESC LIMIT 1'
+    ));
   }
 
   /**

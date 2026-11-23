@@ -1,10 +1,14 @@
 <?php
 
+use Civi\Api4\System;
+
 /**
  * Class CRM_Core_BAO_EmailTest
  * @group headless
  */
 class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
+
+  protected $_apiversion = 4;
 
   /**
    * Set up for class.
@@ -188,13 +192,13 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $emails = array_values($fromEmails);
     $this->assertStringContainsString("(preferred)", $emails[0]);
     Civi::settings()->set("allow_mail_from_logged_in_contact", 0);
-    $this->callAPISuccess('system', 'flush', []);
+    System::flush(FALSE)->execute();
     $fromEmails = CRM_Core_BAO_Email::getFromEmail();
     $emails = array_values($fromEmails);
     $this->assertStringNotContainsString("(preferred)", $emails[0]);
     $this->assertStringContainsString("info@EXAMPLE.ORG", $emails[0]);
     Civi::settings()->set("allow_mail_from_logged_in_contact", 1);
-    $this->callAPISuccess('system', 'flush', []);
+    System::flush(FALSE)->execute();
   }
 
 }
