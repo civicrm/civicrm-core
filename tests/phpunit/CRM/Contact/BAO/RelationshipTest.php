@@ -37,6 +37,25 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that permissioned contacts are found through any of several relationship types.
+   */
+  public function testGetPermissionedContactsWithSeveralRelationshipTypes(): void {
+    $firstTypeID = $this->relationshipTypeCreate(['name_a_b' => 'First type of', 'name_b_a' => 'First type for']);
+    $secondTypeID = $this->relationshipTypeCreate(['name_a_b' => 'Second type of', 'name_b_a' => 'Second type for']);
+    $individualID = $this->individualCreate();
+    $organizationID = $this->organizationCreate();
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $organizationID,
+      'relationship_type_id' => $secondTypeID,
+      'is_permission_a_b' => 1,
+    ]);
+
+    $contacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($individualID, "$firstTypeID,$secondTypeID");
+    $this->assertSame([$organizationID], array_keys($contacts));
+  }
+
+  /**
    * Test Relationship Type Options Will Return Specified Type
    *
    * @throws \CRM_Core_Exception
