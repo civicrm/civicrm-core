@@ -979,4 +979,64 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertSame("{$cids[1]},{$newEmailId}", $created[0]['key']);
   }
 
+  public function testDraggableWithCompositeRowKey(): void {
+    $name = __FUNCTION__;
+    $optionGroup = $this->createTestRecord('OptionGroup', [
+      'title' => $name,
+    ]);
+    $optionIds = $this->saveTestRecords('OptionValue', [
+      'defaults' => ['option_group_id' => $optionGroup['id']],
+      'records' => [
+        ['value' => 'A', 'weight' => 1],
+        ['value' => 'B', 'weight' => 2],
+        ['value' => 'C', 'weight' => 3],
+      ],
+    ])->column('id');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'OptionValue',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['value', 'weight', 'option_group_id'],
+          'where' => [['option_group_id', '=', $optionGroup['id']]],
+          'orderBy' => ['weight' => 'ASC'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => $name,
+        'settings' => [
+          'draggable' => 'weight',
+          'actions' => TRUE,
+          'actions_entities' => ['', 'option_group_id'],
+          'columns' => [
+            ['key' => 'value', 'label' => 'Value', 'type' => 'field'],
+            ['key' => 'weight', 'label' => 'Weight', 'type' => 'field'],
+          ],
+        ],
+      ],
+    ];
+
+    $page = civicrm_api4('SearchDisplay', 'run', $params + ['return' => 'page:1']);
+    $this->assertSame([
+      "{$optionIds[0]},{$optionGroup['id']}",
+      "{$optionIds[1]},{$optionGroup['id']}",
+      "{$optionIds[2]},{$optionGroup['id']}",
+    ], $page->column('key'));
+
+    // Drag C (composite key) to weight 1
+    $weights = SearchDisplay::inlineEdit(FALSE)
+      ->setSavedSearch($params['savedSearch'])
+      ->setDisplay($params['display'])
+      ->setReturn('draggableWeight')
+      ->setRowKey("{$optionIds[2]},{$optionGroup['id']}")
+      ->setValues(['weight' => 1])
+      ->execute();
+    $this->assertSame(1, $weights[$optionIds[2]]);
+    $this->assertSame(2, $weights[$optionIds[0]]);
+    $this->assertSame(3, $weights[$optionIds[1]]);
+  }
+
 }

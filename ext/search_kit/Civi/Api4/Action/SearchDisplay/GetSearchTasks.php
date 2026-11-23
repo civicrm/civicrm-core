@@ -54,12 +54,14 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'keyIndex' => $keyIndices[$alias] ?? NULL,
       ];
     }
+    $linkTaskKeys = [];
     // Include any actionable entity referenced by an in-row task link
     foreach ($this->display['settings']['columns'] ?? [] as $column) {
       $links = !empty($column['links']) ? $column['links'] : (!empty($column['link']) ? [$column['link']] : []);
       foreach ($links as $link) {
         if (!empty($link['task']) && empty($link['path'])) {
           $alias = $link['join'] ?? '';
+          $linkTaskKeys[($alias !== '' ? "$alias:" : '') . $link['task']] = TRUE;
           if (isset($actionableEntities[$alias]) && !isset($targetEntities[$alias])) {
             $targetEntities[$alias] = $actionableEntities[$alias] + [
               'inMenu' => FALSE,
@@ -76,8 +78,9 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ->addSelect('name', 'title', 'title_plural', 'primary_key')
       ->execute()
       ->indexBy('name');
-    // Used by searchDisplayTasksTrait
-    $result->editable['entityInfo'] = (array) $entityInfoMap;
+    // Used by searchDisplayTasksTrait (keep entityInfo as main entity for backwards compatibility)
+    $result->editable['entityInfo'] = $entityInfoMap[$mainEntityName] ?? [];
+    $result->editable['entityInfoMap'] = (array) $entityInfoMap;
 
     $tasks = [];
     $builtEntities = [];
@@ -88,6 +91,15 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         $this->buildEntityTasks($entityInfoMap[$entityName], $tasks);
       }
     }
+    // Seed global "Download Spreadsheet" task on the main entity before the hook so listeners can modify or unset it
+    $tasks[$mainEntityName]['download'] = [
+      'module' => 'crmSearchTasks',
+      'title' => E::ts('Download Spreadsheet'),
+      'icon' => 'fa-download',
+      'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
+      // Does not require any rows to be selected
+      'number' => '>= 0',
+    ];
 
     // Call `hook_civicrm_searchKitTasks` which serves 3 purposes:
     // 1. For extensions to augment this list of tasks
@@ -121,15 +133,18 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           continue;
         }
         $namespacedName = $prefix . $name;
+        $isFiltered = !empty($task['_filteredBySubscriber']);
+        unset($task['_filteredBySubscriber']);
         $inMenu = $task['inMenu'] ?? $targetInfo['inMenu'];
-        if ($targetInfo['inMenu'] && is_array($enabledActions) && !empty($task['_filteredBySubscriber'])) {
-          $inMenu = in_array($namespacedName, $enabledActions, TRUE)
-            || ($menuEntityCount === 1 && in_array($name, $enabledActions, TRUE));
+        if ($targetInfo['inMenu'] && is_array($enabledActions) && $isFiltered) {
+          $inMenu = in_array($namespacedName, $enabledActions, TRUE);
+          if (!$inMenu && empty($linkTaskKeys[$namespacedName])) {
+            continue;
+          }
         }
         elseif (!$targetInfo['inMenu']) {
           $inMenu = FALSE;
         }
-        unset($task['_filteredBySubscriber']);
 
         $task['name'] = $namespacedName;
         $task['entity'] = $entityName;
@@ -158,28 +173,35 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       $outputTasks = array_merge($outputTasks, $aliasTasks);
     }
 
-    // Add the global "Download Spreadsheet" task once when actions menu is enabled
-    if (!empty($enabledActions) && (!is_array($enabledActions) || in_array('download', $enabledActions, TRUE))) {
-      $firstTarget = reset($enabledEntities) ?: reset($targetEntities);
-      $outputTasks[] = [
-        'name' => 'download',
-        'module' => 'crmSearchTasks',
-        'title' => E::ts('Download Spreadsheet'),
-        'icon' => 'fa-download',
-        'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
-        // Does not require any rows to be selected
-        'number' => '>= 0',
-        'entity' => $firstTarget['entity'] ?? $mainEntityName,
-        'join' => $menuEntityCount > 1 ? NULL : ($firstTarget['alias'] ?? ''),
-        'entityLabel' => $menuEntityCount > 1 ? '' : ($firstTarget['label'] ?? ($entityInfoMap[$mainEntityName]['title_plural'] ?? '')),
-        'idField' => $firstTarget['idField'] ?? NULL,
-        'keyIndex' => NULL,
-        'inMenu' => TRUE,
-      ];
-      if ($menuEntityCount <= 1) {
-        usort($outputTasks, function($a, $b) {
-          return strnatcasecmp($a['title'], $b['title']);
-        });
+    // Add the global "Download Spreadsheet" task once when actions menu is enabled and not removed by hook/subscriber
+    if (!empty($enabledActions)) {
+      $downloadTask = $tasks[$mainEntityName]['download'] ?? NULL;
+      if ($downloadTask && CoreUtil::isContact($mainEntityName) && !empty($tasks['Contact']['download'])) {
+        $downloadTask = array_merge($downloadTask, $tasks['Contact']['download']);
+      }
+      if ($downloadTask) {
+        unset($downloadTask['_filteredBySubscriber']);
+        $firstTarget = reset($enabledEntities) ?: reset($targetEntities);
+        $outputTasks[] = $downloadTask + [
+          'name' => 'download',
+          'module' => 'crmSearchTasks',
+          'title' => E::ts('Download Spreadsheet'),
+          'icon' => 'fa-download',
+          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
+          // Does not require any rows to be selected
+          'number' => '>= 0',
+          'entity' => $firstTarget['entity'] ?? $mainEntityName,
+          'join' => $menuEntityCount > 1 ? NULL : ($firstTarget['alias'] ?? ''),
+          'entityLabel' => $menuEntityCount > 1 ? '' : ($firstTarget['label'] ?? ($entityInfoMap[$mainEntityName]['title_plural'] ?? '')),
+          'idField' => $firstTarget['idField'] ?? NULL,
+          'keyIndex' => NULL,
+          'inMenu' => TRUE,
+        ];
+        if ($menuEntityCount <= 1) {
+          usort($outputTasks, function($a, $b) {
+            return strnatcasecmp($a['title'], $b['title']);
+          });
+        }
       }
     }
 

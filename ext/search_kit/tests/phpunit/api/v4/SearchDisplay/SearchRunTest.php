@@ -4532,6 +4532,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     ]);
     $this->assertCount(2, $multiDownload);
     $this->assertSame('fred2@example.com', $multiDownload[1][1]);
+
+    // 3. Task link on an aggregated join must NOT fall back to the main entity's task
+    $aggLinkParams = $multiParams;
+    $aggLinkParams['savedSearch']['api_params']['select'] = ['id', 'first_name', 'GROUP_CONCAT(Contact_Email_contact_id_01.email) AS emails'];
+    $aggLinkParams['savedSearch']['api_params']['groupBy'] = ['id'];
+    $aggLinkParams['display']['settings']['actions_entities'] = [''];
+    $aggLinkParams['display']['settings']['columns'][1]['key'] = 'emails';
+    $aggLinkParams['display']['settings']['sort'] = [['id', 'ASC']];
+    $aggLinkPage = civicrm_api4('SearchDisplay', 'run', $aggLinkParams + ['return' => 'page:1']);
+    $this->assertEmpty($aggLinkPage[0]['columns'][2]['links']);
   }
 
 }

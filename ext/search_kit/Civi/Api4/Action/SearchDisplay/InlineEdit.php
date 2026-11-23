@@ -261,12 +261,17 @@ class InlineEdit extends Run {
     // For hierarchical entities, also allow parent_field to be updated.
     $parentField = CoreUtil::getInfoItem($entityName, 'parent_field');
     if ($parentField && array_key_exists($parentField, $this->values)) {
-      $values[$parentField] = $this->values[$parentField];
+      $parentValue = $this->values[$parentField];
+      if (is_string($parentValue) && str_contains($parentValue, ',')) {
+        $parentValue = explode(',', $parentValue)[0];
+      }
+      $values[$parentField] = $parentValue;
     }
+    $rowId = str_contains((string) $this->rowKey, ',') ? explode(',', (string) $this->rowKey)[0] : $this->rowKey;
     civicrm_api4($entityName, 'update', [
       'checkPermissions' => empty($this->display['acl_bypass']),
       'where' => [
-        [$keyName, '=', $this->rowKey],
+        [$keyName, '=', $rowId],
       ],
       'values' => $values,
     ]);

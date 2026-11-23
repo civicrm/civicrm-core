@@ -54,6 +54,21 @@ trait SavedSearchInspectorTrait {
    */
   private $_joinMap;
 
+  /**
+   * @var array|null
+   */
+  private $_actionableEntities;
+
+  /**
+   * @var array|null
+   */
+  private $_rowKeyFields;
+
+  /**
+   * @var bool|null
+   */
+  private $_hasAggregateSelect;
+
   private $_savedSearchParam;
 
   private $_displayParam;
@@ -85,6 +100,7 @@ trait SavedSearchInspectorTrait {
     }
     // Reset internal cached metadata
     $this->_selectQuery = $this->_selectClause = $this->_searchEntityFields = $this->_joinMap = NULL;
+    $this->_actionableEntities = $this->_rowKeyFields = $this->_hasAggregateSelect = NULL;
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
   }
 
@@ -122,6 +138,7 @@ trait SavedSearchInspectorTrait {
         'name' => NULL,
       ];
     }
+    $this->_rowKeyFields = NULL;
   }
 
   /**
@@ -246,13 +263,17 @@ trait SavedSearchInspectorTrait {
     }
     // If the query has no groupBy, fields can only aggregate if the select clause contains an aggregate function
     if (empty($apiParams['groupBy'])) {
-      foreach ($apiParams['select'] ?? [] as $selectExpr) {
-        $expr = SqlExpression::convert($selectExpr, TRUE);
-        if ($expr instanceof SqlFunction && $expr->getCategory() === SqlFunction::CATEGORY_AGGREGATE) {
-          return TRUE;
+      if (!isset($this->_hasAggregateSelect)) {
+        $this->_hasAggregateSelect = FALSE;
+        foreach ($apiParams['select'] ?? [] as $selectExpr) {
+          $expr = SqlExpression::convert($selectExpr, TRUE);
+          if ($expr instanceof SqlFunction && $expr->getCategory() === SqlFunction::CATEGORY_AGGREGATE) {
+            $this->_hasAggregateSelect = TRUE;
+            break;
+          }
         }
       }
-      return FALSE;
+      return $this->_hasAggregateSelect;
     }
     // If the column is used for a groupBy, no
     if (in_array($fieldPath, $apiParams['groupBy'])) {
@@ -295,10 +316,13 @@ trait SavedSearchInspectorTrait {
    * @return array<string, array{alias: string, entity: string, label: string, idField: string, isJoin: bool}>
    */
   protected function getActionableEntities(): array {
+    if (isset($this->_actionableEntities)) {
+      return $this->_actionableEntities;
+    }
     $entities = [];
     $mainEntity = $this->savedSearch['api_entity'] ?? NULL;
     if (!$mainEntity || !CoreUtil::entityExists($mainEntity)) {
-      return $entities;
+      return $this->_actionableEntities = $entities;
     }
     // Hack to support relationships
     $resolvedMain = ($mainEntity === 'RelationshipCache') ? 'Relationship' : $mainEntity;
@@ -407,7 +431,7 @@ trait SavedSearchInspectorTrait {
       ];
     }
 
-    return $entities;
+    return $this->_actionableEntities = $entities;
   }
 
   /**
@@ -445,9 +469,12 @@ trait SavedSearchInspectorTrait {
    * @return array<string, string>
    */
   protected function getRowKeyFields(): array {
+    if (isset($this->_rowKeyFields)) {
+      return $this->_rowKeyFields;
+    }
     $actionable = $this->getActionableEntities();
     if (!$actionable) {
-      return [];
+      return $this->_rowKeyFields = [];
     }
     $keys = [];
     // Primary row key: '' if actionable, else first actionable entity (e.g. groupBy joined/FK PK)
@@ -476,7 +503,7 @@ trait SavedSearchInspectorTrait {
         }
       }
     }
-    return $keys;
+    return $this->_rowKeyFields = $keys;
   }
 
   /**

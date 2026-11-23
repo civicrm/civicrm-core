@@ -1082,8 +1082,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       // Process task links
       elseif (!$link['path'] && !empty($link['task'])) {
-        $taskKey = !empty($link['join']) ? $link['join'] . ':' . $link['task'] : $link['task'];
-        $task = $this->getTask($taskKey) ?? $this->getTask($link['task']);
+        $taskKey = !empty($link['join']) && !str_starts_with($link['task'], $link['join'] . ':') ? $link['join'] . ':' . $link['task'] : $link['task'];
+        $task = $this->getTask($taskKey);
         $link['conditions'] = array_merge($link['conditions'], $task['conditions'] ?? []);
         // Convert legacy tasks (which have a url)
         if (!empty($task['crmPopup'])) {

@@ -392,6 +392,28 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertSame(0, $tasks['contact_id:delete']['keyIndex']);
     $this->assertTrue($tasks['contact_id:delete']['inMenu']);
 
+    // Legacy unprefixed actions array on a grouped display whose main entity is not actionable
+    // must NOT silently enable the joined entity's tasks (e.g. Delete Contacts)
+    $legacyTasks = SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch([
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['contact_id.id', 'COUNT(id) AS COUNT_id'],
+          'groupBy' => ['contact_id.id'],
+        ],
+      ])
+      ->setDisplay([
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => ['delete'],
+        ],
+      ])
+      ->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('contact_id:delete', (array) $legacyTasks);
+    $this->assertArrayNotHasKey('delete', (array) $legacyTasks);
+
     // Grouping by non-PK field should only allow Download Spreadsheet
     $nonPkTasks = SearchDisplay::getSearchTasks(FALSE)
       ->setSavedSearch([
@@ -458,8 +480,9 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->execute();
     $tasks = $result->indexBy('name');
 
-    $this->assertArrayHasKey('Contact', $result->editable['entityInfo']);
-    $this->assertArrayHasKey('Email', $result->editable['entityInfo']);
+    $this->assertSame('Contact', $result->editable['entityInfo']['name']);
+    $this->assertArrayHasKey('Contact', $result->editable['entityInfoMap']);
+    $this->assertArrayHasKey('Email', $result->editable['entityInfoMap']);
 
     $this->assertArrayHasKey('delete', (array) $tasks);
     $this->assertSame('Contact', $tasks['delete']['entity']);
@@ -530,6 +553,58 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertSame('Contact', $fkTasks['contact_id:delete']['entity']);
     $this->assertSame('contact_id', $fkTasks['contact_id:delete']['idField']);
     $this->assertSame(1, $fkTasks['contact_id:delete']['keyIndex']);
+  }
+
+  public function testGetSearchTasksDownloadHook(): void {
+    $savedSearch = [
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id', 'display_name'],
+      ],
+    ];
+    $display = [
+      'type' => 'table',
+      'label' => __FUNCTION__,
+      'settings' => [
+        'actions' => TRUE,
+      ],
+    ];
+
+    // Hook modifying download task (e.g. logreader restricting unfiltered export)
+    $modifyListener = function(\Civi\Core\Event\GenericHookEvent $event) {
+      if (isset($event->tasks['Contact']['download'])) {
+        $event->tasks['Contact']['download']['number'] = '> 0';
+      }
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_searchKitTasks', $modifyListener);
+    try {
+      $tasks = SearchDisplay::getSearchTasks(FALSE)
+        ->setSavedSearch($savedSearch)
+        ->setDisplay($display)
+        ->execute()->indexBy('name');
+      $this->assertArrayHasKey('download', (array) $tasks);
+      $this->assertSame('> 0', $tasks['download']['number']);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_searchKitTasks', $modifyListener);
+    }
+
+    // Hook unsetting download task must remove it from output
+    $unsetListener = function(\Civi\Core\Event\GenericHookEvent $event) {
+      unset($event->tasks['Contact']['download']);
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_searchKitTasks', $unsetListener);
+    try {
+      $tasks = SearchDisplay::getSearchTasks(FALSE)
+        ->setSavedSearch($savedSearch)
+        ->setDisplay($display)
+        ->execute()->indexBy('name');
+      $this->assertArrayNotHasKey('download', (array) $tasks);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_searchKitTasks', $unsetListener);
+    }
   }
 
 }

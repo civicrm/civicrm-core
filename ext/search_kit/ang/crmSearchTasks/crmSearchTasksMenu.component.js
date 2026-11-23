@@ -38,7 +38,7 @@
       }
 
       this.$onInit = function() {
-        $scope.$watch('$ctrl.taskManager.tasks', updateTaskGroups);
+        $scope.$watchCollection('$ctrl.taskManager.tasks', updateTaskGroups);
         if (ctrl.displayMode === 'buttons') {
           ctrl.taskManager.getMetadata();
         }

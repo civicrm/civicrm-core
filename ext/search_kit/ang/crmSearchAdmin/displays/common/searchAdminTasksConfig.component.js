@@ -11,7 +11,7 @@
       crmSearchAdmin: '^crmSearchAdmin'
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminTasksConfig.html',
-    controller: function($scope, $timeout, searchMeta) {
+    controller: function($scope, $timeout, $q, searchMeta) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
@@ -34,57 +34,55 @@
         const enabledJoins = getEnabledEntityJoins();
         const enabledEntities = ctrl.actionableEntities.filter((e) => enabledJoins.includes(e.join));
         ctrl.enabledEntityCount = enabledEntities.length;
-        Promise.all(enabledEntities.map((entityInfo) =>
+        $q.all(enabledEntities.map((entityInfo) =>
           searchMeta.getSearchTasks(entityInfo.entity).then((tasks) => ({entityInfo, tasks}))
         )).then((results) => {
-          $scope.$applyAsync(() => {
-            const allTasks = [];
-            const taskGroups = [];
-            let downloadTask = null;
-            results.forEach(({entityInfo, tasks}) => {
-              const prefix = entityInfo.join ? entityInfo.join + ':' : '';
-              const groupTasks = [];
-              tasks.forEach((task) => {
-                if (task.name === 'download') {
-                  if (!downloadTask) {
-                    downloadTask = structuredClone(task);
-                  }
-                  return;
+          const allTasks = [];
+          const taskGroups = [];
+          let downloadTask = null;
+          results.forEach(({entityInfo, tasks}) => {
+            const prefix = entityInfo.join ? entityInfo.join + ':' : '';
+            const groupTasks = [];
+            tasks.forEach((task) => {
+              if (task.name === 'download') {
+                if (!downloadTask) {
+                  downloadTask = structuredClone(task);
                 }
-                const namespacedTask = Object.assign({}, task, {
-                  name: prefix + task.name,
-                  unprefixedName: task.name,
-                  join: entityInfo.join,
-                  entityLabel: entityInfo.label
-                });
-                groupTasks.push(namespacedTask);
-                allTasks.push(namespacedTask);
+                return;
+              }
+              const namespacedTask = Object.assign({}, task, {
+                name: prefix + task.name,
+                unprefixedName: task.name,
+                join: entityInfo.join,
+                entityLabel: entityInfo.label
               });
-              if (groupTasks.length) {
-                taskGroups.push({
-                  join: entityInfo.join,
-                  label: entityInfo.label,
-                  tasks: groupTasks
-                });
-              }
+              groupTasks.push(namespacedTask);
+              allTasks.push(namespacedTask);
             });
-            if (downloadTask || !enabledEntities.length) {
-              downloadTask = downloadTask || {name: 'download', title: ts('Download Spreadsheet')};
-              allTasks.push(downloadTask);
-              if (taskGroups.length === 1) {
-                taskGroups[0].tasks.push(downloadTask);
-                taskGroups[0].tasks.sort((a, b) => a.title.localeCompare(b.title));
-              } else {
-                taskGroups.push({
-                  join: null,
-                  label: '',
-                  tasks: [downloadTask]
-                });
-              }
+            if (groupTasks.length) {
+              taskGroups.push({
+                join: entityInfo.join,
+                label: entityInfo.label,
+                tasks: groupTasks
+              });
             }
-            ctrl.allTasks = allTasks;
-            ctrl.taskGroups = taskGroups;
           });
+          if (downloadTask || !enabledEntities.length) {
+            downloadTask = downloadTask || {name: 'download', title: ts('Download Spreadsheet')};
+            allTasks.push(downloadTask);
+            if (taskGroups.length === 1) {
+              taskGroups[0].tasks.push(downloadTask);
+              taskGroups[0].tasks.sort((a, b) => a.title.localeCompare(b.title));
+            } else {
+              taskGroups.push({
+                join: null,
+                label: '',
+                tasks: [downloadTask]
+              });
+            }
+          }
+          ctrl.allTasks = allTasks;
+          ctrl.taskGroups = taskGroups;
         });
       }
 
@@ -124,7 +122,7 @@
             if (Array.isArray(ctrl.display.settings.actions)) {
               const prefix = join ? join + ':' : '';
               ctrl.display.settings.actions = ctrl.display.settings.actions.filter((name) => {
-                return prefix ? !name.startsWith(prefix) : name.includes(':');
+                return name === 'download' || (prefix ? !name.startsWith(prefix) : name.includes(':'));
               });
             }
           } else {
@@ -190,8 +188,7 @@
         if (typeof this.display.settings.actions === 'boolean') {
           return true;
         }
-        return this.display.settings.actions.includes(task.name) ||
-          (ctrl.enabledEntityCount === 1 && task.unprefixedName && this.display.settings.actions.includes(task.unprefixedName));
+        return this.display.settings.actions.includes(task.name);
       };
 
     }

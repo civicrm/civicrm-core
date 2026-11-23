@@ -12,6 +12,7 @@
       let fetchedMetadata;
       this.tasks = null;
       this.entityInfo = null;
+      this.entityInfoMap = null;
 
       this.getMetadata = function() {
         if (!fetchedMetadata) {
@@ -20,10 +21,12 @@
             display: displayCtrl.display,
           }).then(function(result) {
             mngr.entityInfo = result.editable.entityInfo;
+            mngr.entityInfoMap = result.editable.entityInfoMap || {};
             mngr.tasks = result;
           }, function(failure) {
             mngr.tasks = [];
             mngr.entityInfo = {};
+            mngr.entityInfoMap = {};
           });
         }
         return fetchedMetadata;
@@ -33,13 +36,14 @@
         fetchedMetadata = null;
         this.tasks = null;
         this.entityInfo = null;
+        this.entityInfoMap = null;
       };
 
       this.getEntityInfo = function(entityName) {
-        if (!mngr.entityInfo) {
-          return {};
+        if (entityName && mngr.entityInfoMap && mngr.entityInfoMap[entityName]) {
+          return mngr.entityInfoMap[entityName];
         }
-        return (entityName && mngr.entityInfo[entityName]) || mngr.entityInfo;
+        return mngr.entityInfo || {};
       };
 
       this.getIdsForTask = function(task, selectedRowKeys) {
