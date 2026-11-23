@@ -764,6 +764,7 @@ EOHTML,
     $this->assertTrue($stats['submit_enabled']);
     $this->assertFalse($stats['submit_currently_open']);
     $this->assertSame(3, $stats['submission_count']);
+    $this->assertSame(['submit_enabled', 'submission_count', 'submit_currently_open'], array_keys($stats));
 
     // Prefilling and submitting are no longer allowed.
     try {
@@ -824,6 +825,11 @@ EOHTML,
     $this->assertTrue($stats['submit_enabled']);
     $this->assertFalse($stats['submit_currently_open']);
     $this->assertSame(5, $stats['submission_count']);
+    $this->assertSame(['submit_enabled', 'submission_count', 'submit_currently_open'], array_keys($stats));
+
+    // Filtering by submission aggregate fields in WHERE should still work
+    $this->assertCount(0, Afform::get()->addSelect('name')->addWhere('name', '=', $this->formName)->addWhere('submit_currently_open', '=', TRUE)->execute());
+    $this->assertCount(1, Afform::get()->addSelect('name')->addWhere('name', '=', $this->formName)->addWhere('submit_currently_open', '=', FALSE)->addWhere('submission_count', '=', 5)->execute());
 
     // Prefilling and submitting are no longer allowed.
     try {
