@@ -2,26 +2,18 @@
 
 namespace Civi\Financialacls;
 
-// I fought the Autoloader and the autoloader won.
 use Civi\Api4\LineItem;
+use Civi\Api4\Order;
 
+// I fought the Autoloader and the autoloader won.
 require_once 'BaseTestClass.php';
 
 /**
- * FIXME - Add test description.
- *
- * Tips:
- *  - With HookInterface, you may implement CiviCRM hooks directly in the test class.
- *    Simply create corresponding functions (e.g. "hook_civicrm_post(...)" or similar).
- *  - With TransactionalInterface, any data changes made by setUp() or test****() functions will
- *    rollback automatically -- as long as you don't manipulate schema or truncate tables.
- *    If this test needs to manipulate schema or truncate tables, then either:
- *       a. Do all that using setupHeadless() and Civi\Test.
- *       b. Disable TransactionalInterface, and handle all setup/teardown yourself.
- *
  * @group headless
  */
 class LineItemTest extends BaseTestClass {
+
+  protected $_apiversion = 4;
 
   /**
    * Test api applies permissions on line item actions (delete & get).
@@ -31,33 +23,28 @@ class LineItemTest extends BaseTestClass {
    */
   public function testLineItemApiPermissions($version): void {
     $contact1 = $this->individualCreate();
-    $lineItems = $this->callAPISuccess('LineItem', 'get', ['sequential' => TRUE])['values'];
-    $this->assertCount(0, $lineItems);
+    $this->assertCount(0, LineItem::get(FALSE)->execute());
     $this->createPriceSet();
-    $order = $this->callAPISuccess('Order', 'create', [
-      'financial_type_id' => 'Donation',
-      'contact_id' => $contact1,
-      'line_items' => [
-        [
-          'line_item' => [
-            [
-              'financial_type_id' => $this->getFinancialTypeID('Donation'),
-              'line_total' => 40,
-              'price_field_id' => $this->ids['PriceField']['default'],
-              'price_field_value_id' => $this->ids['PriceFieldValue']['default-1'],
-              'qty' => 1,
-            ],
-            [
-              'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
-              'line_total' => 50,
-              'price_field_id' => $this->ids['PriceField']['default'],
-              'price_field_value_id' => $this->ids['PriceFieldValue']['default-2'],
-              'qty' => 1,
-            ],
-          ],
-        ],
-      ],
-    ]);
+    $order = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $contact1,
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem([
+        'financial_type_id:name' => 'Donation',
+        'line_total' => 40,
+        'price_field_id' => $this->ids['PriceField']['default'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['default-1'],
+        'qty' => 1,
+      ])
+      ->addLineItem([
+        'financial_type_id:name' => 'Member Dues',
+        'line_total' => 50,
+        'price_field_id' => $this->ids['PriceField']['default'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['default-2'],
+        'qty' => 1,
+      ])
+      ->execute()->first();
     $this->_apiversion = $version;
 
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();

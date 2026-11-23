@@ -10,10 +10,13 @@
  */
 namespace Civi\Financialacls;
 
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
+
 require_once 'BaseTestClass.php';
 
 /**
- * Class CRM_Contribute_BAO_ContributionTest
+ * Class ContributionTest
  * @group headless
  */
 class ContributionTest extends BaseTestClass {
@@ -96,35 +99,37 @@ class ContributionTest extends BaseTestClass {
       'financial_type_id:name' => 'Donation',
     ], $identifier . '-2');
 
-    $params['line_items'][]['line_item'][] = [
-      'price_field_id' => $this->ids['PriceField'][$identifier . '-1'],
-      'price_field_value_id' => $this->ids['PriceFieldValue'][$identifier . '-1'],
-      'label' => 'price 1',
-      'qty' => 1,
-      'line_total' => 100,
-      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
-      'entity_table' => 'civicrm_contribution',
-    ];
-    $params['line_items'][]['line_item'][] = [
-      'price_field_id' => $this->ids['PriceField'][$identifier . '-2'],
-      'price_field_value_id' => $this->ids['PriceFieldValue'][$identifier . '-2'],
-      'label' => 'price 2',
-      'qty' => 1,
-      'line_total' => 200,
-      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
-      'entity_table' => 'civicrm_contribution',
-    ];
-
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
-    $params['contact_id'] = $this->createLoggedInUser();
-    $params['financial_type_id'] = 'Donation';
-    $params['total_amount'] = 300;
-    $order = $this->callAPISuccess('Order', 'create', $params + ['version' => 3]);
-    $this->callAPISuccess('Payment', 'create', [
-      'contribution_id' => $order['id'],
-      'total_amount' => $params['total_amount'],
-      'version' => 3,
-    ]);
+    $order = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->createLoggedInUser(),
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem([
+        'price_field_id' => $this->ids['PriceField'][$identifier . '-1'],
+        'price_field_value_id' => $this->ids['PriceFieldValue'][$identifier . '-1'],
+        'label' => 'price 1',
+        'qty' => 1,
+        'line_total' => 100,
+        'financial_type_id:name' => 'Event Fee',
+        'entity_table' => 'civicrm_contribution',
+      ])
+      ->addLineItem([
+        'price_field_id' => $this->ids['PriceField'][$identifier . '-2'],
+        'price_field_value_id' => $this->ids['PriceFieldValue'][$identifier . '-2'],
+        'label' => 'price 2',
+        'qty' => 1,
+        'line_total' => 200,
+        'financial_type_id:name' => 'Event Fee',
+        'entity_table' => 'civicrm_contribution',
+      ])
+      ->execute()->first();
+    Payment::create(FALSE)
+      ->setValues([
+        'contribution_id' => $order['id'],
+        'total_amount' => 300,
+      ])
+      ->execute();
   }
 
   public function testSuperPermissions(): void {

@@ -9,6 +9,8 @@ require_once 'BaseTestClass.php';
  */
 class ProductTest extends BaseTestClass {
 
+  protected $_apiversion = 4;
+
   /**
    * Test api applies permissions on line item actions (delete & get).
    *
