@@ -103,7 +103,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
         "1": "1",
         "plural": "%count Plurals \'%1\'",
       });',
-      ["Singular '%1'", "%count Plurals '%1'"],
+      ["Singular '%1'" => "%count Plurals '%1'"],
     ];
     // template literals, as minifiers write the strings of a bundled module
     $cases[] = [
@@ -116,7 +116,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     ];
     $cases[] = [
       'E.ts(`%1 contact`,{1:n,count:n,plural:`%1 contacts`})',
-      ['%1 contact', '%1 contacts'],
+      ['%1 contact' => '%1 contacts'],
     ];
     // a leading escaped quote belongs to the text
     $cases[] = [
@@ -138,9 +138,12 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
    */
   public function testParseStrings($jsCode, $expectedStrings) {
     $actualStrings = CRM_Utils_JS::parseStrings($jsCode);
-    sort($expectedStrings);
-    sort($actualStrings);
-    $this->assertEquals($expectedStrings, $actualStrings);
+    if (array_is_list($expectedStrings)) {
+      $expectedStrings = array_fill_keys($expectedStrings, NULL);
+    }
+    ksort($expectedStrings);
+    ksort($actualStrings);
+    $this->assertSame($expectedStrings, $actualStrings);
   }
 
   public static function dedupeClosureExamples() {

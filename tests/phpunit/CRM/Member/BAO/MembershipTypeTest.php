@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Domain;
 use Civi\Api4\MembershipBlock;
 use Civi\Api4\MembershipType;
 use Civi\Test\ContributionPageTestTrait;
@@ -52,6 +53,9 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->relationshipTypeDelete($this->ids['RelationshipType'][0]);
     $this->membershipStatusDelete($this->ids['MembershipStatus']['test']);
     $this->quickCleanUpFinancialEntities();
+    if (!empty($this->ids['Domain']['other'])) {
+      Domain::delete(FALSE)->addWhere('id', '=', $this->ids['Domain']['other'])->execute();
+    }
     parent::tearDown();
   }
 
@@ -368,6 +372,53 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       ->setValues(['auto_renew' => 1])->execute();
     $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
     $this->assertSame(2, reset($autoRenew));
+  }
+
+  /**
+   * Verify getAllMembershipTypes() domain filtering, and getMembershipType() can return types from any domain.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipTypeWithDomain(): void {
+    $currentDomainTypeID = $this->createGeneralMembershipType();
+    $otherDomainID = Domain::create(FALSE)
+      ->addValue('name', 'Other domain')
+      ->addValue('version', CRM_Utils_System::version())
+      ->execute()
+      ->first()['id'];
+    $this->ids['Domain']['other'] = $otherDomainID;
+    $otherDomainTypeID = MembershipType::create(FALSE)
+      ->setValues([
+        'title' => 'Other Domain Type',
+        'domain_id' => $otherDomainID,
+        'minimum_fee' => 50,
+        'duration_unit' => 'year',
+        'period_type' => 'fixed',
+        'member_of_contact_id' => $this->ids['Contact']['organization'],
+        'duration_interval' => 1,
+        'financial_type_id:name' => 'Donation',
+        'relationship_type_id' => $this->ids['RelationshipType'][0],
+        'visibility' => 'Public',
+        'is_active' => 1,
+      ])
+      ->execute()
+      ->first()['id'];
+
+    $currentDomainTypes = CRM_Member_BAO_MembershipType::getAllMembershipTypes();
+    $this->assertArrayHasKey($currentDomainTypeID, $currentDomainTypes);
+    $this->assertArrayNotHasKey($otherDomainTypeID, $currentDomainTypes);
+
+    $otherDomainTypes = CRM_Member_BAO_MembershipType::getAllMembershipTypes($otherDomainID);
+    $this->assertArrayHasKey($otherDomainTypeID, $otherDomainTypes);
+    $this->assertArrayNotHasKey($currentDomainTypeID, $otherDomainTypes);
+
+    $allDomainTypes = CRM_Member_BAO_MembershipType::getAllMembershipTypes(FALSE);
+    $this->assertArrayHasKey($currentDomainTypeID, $allDomainTypes);
+    $this->assertArrayHasKey($otherDomainTypeID, $allDomainTypes);
+
+    $otherType = CRM_Member_BAO_MembershipType::getMembershipType($otherDomainTypeID);
+    $this->assertSame('Other Domain Type', $otherType['title']);
+    $this->assertSame($otherDomainID, $otherType['domain_id']);
   }
 
 }

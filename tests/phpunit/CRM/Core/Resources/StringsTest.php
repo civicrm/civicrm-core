@@ -24,12 +24,12 @@ class CRM_Core_Resources_StringsTest extends CiviUnitTestCase {
     $strings = new CRM_Core_Resources_Strings(
       new CRM_Utils_Cache_ArrayCache(NULL)
     );
-    $this->assertEquals(
-      ['Hello from Javascript'],
+    $this->assertSame(
+      ['Hello from Javascript' => NULL],
       $strings->get('example', "$basedir/hello.js", 'text/javascript')
     );
-    $this->assertEquals(
-      ['Hello from HTML'],
+    $this->assertSame(
+      ['Hello from HTML' => NULL],
       $strings->get('example', "$basedir/hello.html", 'text/html')
     );
   }

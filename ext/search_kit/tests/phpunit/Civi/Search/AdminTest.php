@@ -293,6 +293,18 @@ class AdminTest extends Api4TestBase {
     );
   }
 
+  public function testEntityRefGetJoinsNonDaoEntity(): void {
+    $schema = Admin::getSchema();
+    $taggedEntity = $schema['TaggedEntity'];
+    $tagIdField = array_column($taggedEntity['fields'], NULL, 'name')['tag_id'];
+    $this->assertSame('Tag', $tagIdField['fk_entity']);
+
+    $joins = Admin::getEntityRefJoins($taggedEntity, $tagIdField);
+
+    $this->assertEquals([['tag_id', '=', 'TaggedEntity_Tag_tag_id.id']], $joins['TaggedEntity']['conditions']);
+    $this->assertEquals([['id', '=', 'Tag_TaggedEntity_tag_id.tag_id']], $joins['Tag']['conditions']);
+  }
+
   public function testEntityRefGetJoinsDfk(): void {
     $schema = Admin::getSchema();
     $aclEntityRole = $schema['ACLEntityRole'];

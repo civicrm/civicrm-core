@@ -389,13 +389,17 @@ class CRM_Core_I18n {
       if (!empty($domain)) {
         // It might be prettier to cast to an array, but this is high-traffic stuff.
         if (is_array($domain)) {
+          // A domain that lacks the string answers with the original, which for a plural is $plural.
+          $untranslated = (isset($count, $plural) && $count != 1) ? $plural : $text;
+          $translated = NULL;
           foreach ($domain as $d) {
             $candidate = $this->crm_translate_raw($text, $d, $count, $plural, $context);
-            if ($candidate != $text) {
-              $text = $candidate;
+            if ($candidate != $untranslated) {
+              $translated = $candidate;
               break;
             }
           }
+          $text = $translated ?? $untranslated;
         }
         else {
           $text = $this->crm_translate_raw($text, $domain, $count, $plural, $context);
@@ -479,9 +483,6 @@ class CRM_Core_I18n {
             $text = $plural;
           }
         }
-
-        // expand %count in translated string to $count
-        $text = strtr($text, ['%count' => $count]);
 
         // if not plural, but the locale's set, translate
       }
