@@ -20,6 +20,8 @@ use Civi\Api4\Payment;
  */
 class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   /**
    * Setup for test.
    */
@@ -184,38 +186,36 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
     $credits = [
       [
         'contact_id' => $this->ids['Contact']['individual_0'],
-        'soft_credit_type_id' => 3,
+        'soft_credit_type_id:name' => 'solicited',
         'amount' => 100,
       ],
       [
         'contact_id' => $this->ids['Contact']['individual_1'],
-        'soft_credit_type_id' => 2,
+        'soft_credit_type_id:name' => 'in_memory_of',
         'amount' => 600,
       ],
       [
         'contact_id' => $this->ids['Contact']['individual_2'],
-        'soft_credit_type_id' => 5,
+        'soft_credit_type_id:name' => 'workplace',
         'amount' => 150,
       ],
     ];
-    // Create sample soft contribution for contact.
     foreach ($credits as $index => $credit) {
-      $this->callAPISuccess('Contribution', 'create', [
+      $contribution = $this->createTestEntity('Contribution', [
         'contact_id' => $credit['contact_id'],
         // The assumption is the last to be created will have a later time.
-        'receive_date' => ' + ' . $index . ' minutes',
+        'receive_date' => date('Y-m-d H:i:s', strtotime('+' . $index . ' minutes')),
         'total_amount' => $credit['amount'],
-        'financial_type_id' => $this->getFinancialTypeID('Donation'),
-        'non_deductible_amount' => '10',
-        'contribution_status_id' => 1,
-        'soft_credit' => [
-          '1' => [
-            'contact_id' => $this->ids['Contact']['SoftCredit'],
-            'amount' => $credit['amount'],
-            'soft_credit_type_id' => $credit['soft_credit_type_id'],
-          ],
-        ],
-      ]);
+        'financial_type_id:name' => 'Donation',
+        'non_deductible_amount' => 10,
+        'contribution_status_id:name' => 'Completed',
+      ], 'soft_credit_' . $index);
+      $this->createTestEntity('ContributionSoft', [
+        'contribution_id' => $contribution['id'],
+        'contact_id' => $this->ids['Contact']['SoftCredit'],
+        'amount' => $credit['amount'],
+        'soft_credit_type_id:name' => $credit['soft_credit_type_id:name'],
+      ], 'soft_credit_' . $index);
     }
   }
 
