@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49f79329b385191c7fd544e79873a698",
+    "content-hash": "edbb349162899bdde3d3d28cfc1c600a",
     "packages": [
         {
             "name": "behat/mink",
