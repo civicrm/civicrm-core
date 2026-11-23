@@ -58,6 +58,35 @@
         .seriesAccessor((d) => d.key[0]);
 
       displayCtrl.buildCoordinateGrid();
+
+      // dc.seriesChart draws every series' bars at the same x, so with a bar display they
+      // overlap and the taller series hides the shorter one. When showing bars, offset each
+      // series within its category band so they sit side by side (a true grouped bar). Widths
+      // and x are read from the band scale on each render (dc resets them from the scale before
+      // this renderlet fires), so repeated renders do not accumulate the offset.
+      if (displayCtrl._settings.seriesDisplayType === 'bar') {
+        displayCtrl.chart.on('renderlet.groupSeriesBars', () => {
+          const chart = displayCtrl.chart;
+          const seriesCount = chart.selectAll('g.sub').nodes().length;
+          if (seriesCount < 2) {
+            return;
+          }
+          const bandWidth = (chart.x && chart.x().bandwidth) ? chart.x().bandwidth() : NaN;
+          if (!Number.isFinite(bandWidth) || bandWidth <= 0) {
+            return;
+          }
+          const gap = Math.min(4, Math.floor(bandWidth / (seriesCount * 4)));
+          const barWidth = Math.max(1, Math.floor((bandWidth - (gap * (seriesCount - 1))) / seriesCount));
+          for (let seriesIndex = 0; seriesIndex < seriesCount; seriesIndex++) {
+            const offset = seriesIndex * (barWidth + gap);
+            // Use chart.selectAll (dc's bundled d3 — there is no global d3 here) and offset via
+            // transform, which is absolute, so repeated renders do not accumulate the shift.
+            chart.selectAll(`.sub._${seriesIndex} rect.bar`)
+              .attr('width', barWidth)
+              .attr('transform', `translate(${offset}, 0)`);
+          }
+        });
+      }
     }
   };
 })(CRM.chart_kit.dc);
