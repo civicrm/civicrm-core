@@ -1,27 +1,17 @@
 <?php
 
+use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
 /**
- * FIXME - Add test description.
- *
- * Tips:
- *  - With HookInterface, you may implement CiviCRM hooks directly in the test class.
- *    Simply create corresponding functions (e.g. "hook_civicrm_post(...)" or similar).
- *  - With TransactionalInterface, any data changes made by setUp() or test****() functions will
- *    rollback automatically -- as long as you don't manipulate schema or truncate tables.
- *    If this test needs to manipulate schema or truncate tables, then either:
- *       a. Do all that using setupHeadless() and Civi\Test.
- *       b. Disable TransactionalInterface, and handle all setup/teardown yourself.
+ * Tests for credit note id generation on reversed contributions.
  *
  * @group headless
  */
 class SequentialcreditnotesTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
-
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\LookupHelperTrait;
 
   /**
    * Setup for headless test.
@@ -31,30 +21,28 @@ class SequentialcreditnotesTest extends \PHPUnit\Framework\TestCase implements H
    * @throws \CRM_Extension_Exception_ParseException
    */
   public function setUpHeadless(): \Civi\Test\CiviEnvBuilder {
-    // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
-    // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
     return \Civi\Test::headless()
       ->installMe(__DIR__)
       ->apply();
   }
 
   /**
-   * Check credit note id creation
-   * when a contribution is cancelled or refunded
-   * createCreditNoteId();
+   * Check a credit note id is created when a contribution is cancelled,
+   * and kept when the contribution is updated.
    *
    * @throws \CRM_Core_Exception
    */
   public function testCreateCreditNoteId(): void {
-    $this->_apiversion = 4;
-    $contactId = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => 'b@example.com'])['id'];
+    $contactID = Contact::create(FALSE)
+      ->setValues(['contact_type' => 'Individual', 'email_primary.email' => 'b@example.com'])
+      ->execute()->single()['id'];
 
-    $params = [
-      'contact_id' => $contactId,
+    $values = [
+      'contact_id' => $contactID,
       'currency' => 'USD',
-      'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'contribution_status_id' => 3,
-      'payment_instrument_id' => 1,
+      'financial_type_id:name' => 'Donation',
+      'contribution_status_id:name' => 'Cancelled',
+      'payment_instrument_id:name' => 'Credit Card',
       'source' => 'STUDENT',
       'receive_date' => '20080522000000',
       'receipt_date' => '20080522000000',
@@ -65,18 +53,22 @@ class SequentialcreditnotesTest extends \PHPUnit\Framework\TestCase implements H
       'trxn_id' => '76ereeswww835',
       'invoice_id' => '93ed39a9e9hd621bs0eafe3da82',
       'thankyou_date' => '20080522',
-      'sequential' => TRUE,
     ];
 
-    $creditNoteId = sequentialcreditnotes_create_credit_note_id();
-    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
-    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
-    $this->assertEquals($creditNoteId, $contribution['creditnote_id'], 'Check if credit note id is created correctly.');
+    $creditNoteID = sequentialcreditnotes_create_credit_note_id();
+    $contribution = Contribution::create(FALSE)
+      ->setValues($values)
+      ->execute()->single();
+    $this->assertSame($creditNoteID, $contribution['creditnote_id'], 'Check if credit note id is created correctly.');
 
-    $params['id'] = $contribution['id'];
-    $this->callAPISuccess('Contribution', 'create', $params);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $params['id']]);
-    $this->assertEquals($creditNoteId, $contribution['creditnote_id'], 'Check if credit note id was not altered.');
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->setValues($values)
+      ->execute();
+    $this->assertSame($creditNoteID, Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('creditnote_id')
+      ->execute()->single()['creditnote_id'], 'Check if credit note id was not altered.');
   }
 
 }
