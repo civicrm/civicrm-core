@@ -55,7 +55,6 @@ use PHPUnit\Framework\TestCase;
 class GroupTest extends TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
   use Test\ContactTestTrait;
   use Test\EntityTrait;
-  use Test\Api3TestTrait;
 
   /**
    * Civi\Test has many helpers, like install(), uninstall(), sql(), and

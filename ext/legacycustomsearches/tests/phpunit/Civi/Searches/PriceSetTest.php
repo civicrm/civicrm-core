@@ -27,8 +27,8 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\Order;
 use Civi\Test;
-use Civi\Test\Api3TestTrait;
 use Civi\Test\ContactTestTrait;
 use Civi\Test\EventTestTrait;
 use Civi\Test\HeadlessInterface;
@@ -45,7 +45,6 @@ use PHPUnit\Framework\TestCase;
 class CRM_Contact_Form_Search_Custom_PriceSetTest extends TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
 
   use EventTestTrait;
-  use Api3TestTrait;
   use ContactTestTrait;
   use LookupHelperTrait;
 
@@ -66,33 +65,21 @@ class CRM_Contact_Form_Search_Custom_PriceSetTest extends TestCase implements He
   public function testRunSearch(): void {
     $this->eventCreatePaid();
     $contactID = $this->individualCreate();
-    $this->callApiV3Success('Order', 'create', [
-      'total_amount' => 100,
-      'currency' => 'USD',
-      'contact_id' => $contactID,
-      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
-      'line_items' => [
-        [
-          'line_item' => [
-            [
-              'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
-              'price_field_id' => $this->ids['PriceField']['PaidEvent'],
-              'qty' => 1,
-              'line_total' => 100,
-              'entity_table' => 'civicrm_participant',
-            ],
-          ],
-          'params' => [
-            'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
-            'event_id' => $this->getEventID(),
-            'role_id' => 1,
-            'status_id' => 14,
-            'fee_currency' => 'USD',
-            'contact_id' => $contactID ,
-          ],
-        ],
-      ],
-    ]);
+    Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $contactID,
+        'financial_type_id:name' => 'Event Fee',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $contactID,
+        'entity_id.status_id:name' => 'Pending from pay later',
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+        'price_field_id' => $this->ids['PriceField']['PaidEvent'],
+        'qty' => 1,
+      ])
+      ->execute();
     $formValues = ['event_id' => $this->getEventID()];
     $form = new CRM_Contact_Form_Search_Custom_PriceSet($formValues);
     $sql = $form->all();
