@@ -22,8 +22,18 @@ class CRM_Core_I18n_NativeGettext {
    *
    * @return string
    */
-  public function translate($string) {
+  public function gettext($string) {
     return gettext($string);
+  }
+
+  /**
+   * @param string $string
+   *
+   * @return string
+   * @deprecated
+   */
+  public function translate($string) {
+    return $this->gettext($string);
   }
 
   /**
