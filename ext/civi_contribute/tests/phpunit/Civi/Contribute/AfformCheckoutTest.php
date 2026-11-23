@@ -62,6 +62,7 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
           <af-field name="source" />
           <!-- price field for Contribution -->
           <af-field name="default_contribution_amount.contribution_amount" />
+          <af-field name="recur_period:name" />
           <af-field name="checkout_option" />
         </div>
       </fieldset>
@@ -124,6 +125,58 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
     // the session should be pending so that should be our nextUrl
     $nextUrl = $session->getNextUrl();
     $this->assertTrue(\str_starts_with($nextUrl, 'https://now.go.to'));
+  }
+
+  /**
+   * A recurring contribution is linked to its ContributionRecur, with the
+   * schedule set, before checkout starts: payment processors read the
+   * schedule from there to set up the subscription.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testStartCheckoutRecurring(): void {
+    $response = $this->submitCheckoutForm(['recur_period:name' => 'monthly']);
+
+    $this->assertIsInt($response['test_recur']['contribution_recur_id']);
+    $this->assertSame('month', $response['test_recur']['contribution_recur_id.frequency_unit']);
+    $this->assertSame(1, $response['test_recur']['contribution_recur_id.frequency_interval']);
+  }
+
+  /**
+   * A one-off contribution reaches checkout with no ContributionRecur.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testStartCheckoutOneOff(): void {
+    $response = $this->submitCheckoutForm([]);
+
+    $this->assertNull($response['test_recur']['contribution_recur_id']);
+  }
+
+  private function submitCheckoutForm(array $contributionFields): array {
+    return Afform::submit(FALSE)
+      ->setName('testAfformCheckout')
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => 'Test',
+              'last_name' => 'Contact',
+            ],
+          ],
+        ],
+        'Contribution1' => [
+          [
+            'fields' => $contributionFields + [
+              'source' => 'testContributionCreate',
+              'default_contribution_amount.contribution_amount' => 5,
+              'checkout_option' => 'test_checkout_option',
+            ],
+          ],
+        ],
+      ])
+      ->execute()
+      ->single();
   }
 
   /**
