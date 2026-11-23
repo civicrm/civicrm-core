@@ -9,9 +9,12 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
 use Civi\Api4\Order;
 use Civi\Api4\Payment;
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
 
 /**
  * Trait OrderTrait
@@ -29,19 +32,18 @@ trait CRMTraits_Financial_OrderTrait {
     $this->createExtraneousContribution();
     $this->ids['contact'][0] = $this->individualCreate();
 
-    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', array_merge([
+    $contributionRecur = ContributionRecur::create(FALSE)->setValues([
       'contact_id' => $this->_contactID,
       'amount' => 1000,
-      'sequential' => 1,
       'installments' => 5,
-      'frequency_unit' => 'Month',
+      'frequency_unit:name' => 'month',
       'frequency_interval' => 1,
       'invoice_id' => 'xyz',
-      'contribution_status_id' => 2,
+      'contribution_status_id:name' => 'Pending',
       'payment_processor_id' => reset($this->ids['PaymentProcessor']),
       // processor provided ID - use contact ID as proxy.
       'processor_id' => $this->_contactID,
-    ]));
+    ])->execute()->single();
 
     $orderID = $this->callAPISuccess('Order', 'create', [
       'total_amount' => '200',
@@ -101,11 +103,7 @@ trait CRMTraits_Financial_OrderTrait {
               'line_total' => 100,
               'financial_type_id' => $this->getFinancialTypeID('Donation'),
               'entity_table' => 'civicrm_contribution',
-              'price_field_id' => $this->callAPISuccessGetValue('price_field', [
-                'return' => 'id',
-                'label' => 'Contribution Amount',
-                'options' => ['limit' => 1, 'sort' => 'id DESC'],
-              ]),
+              'price_field_id' => $this->getLatestPriceFieldID('Contribution Amount'),
               'price_field_value_id' => NULL,
             ],
           ],
@@ -145,16 +143,8 @@ trait CRMTraits_Financial_OrderTrait {
     $this->ids['contact'][1] = $this->individualCreate();
     $this->ids['MembershipType'][0] = $this->membershipTypeCreate();
     $this->ids['MembershipType'][1] = $this->membershipTypeCreate(['title' => 'Type 2']);
-    $priceFieldID = $this->callAPISuccessGetValue('price_field', [
-      'return' => 'id',
-      'label' => 'Membership Amount',
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
-    $generalPriceFieldValueID = $this->callAPISuccessGetValue('price_field_value', [
-      'return' => 'id',
-      'label' => 'General',
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
+    $priceFieldID = $this->getLatestPriceFieldID('Membership Amount');
+    $generalPriceFieldValueID = $this->getLatestPriceFieldValueID('General');
 
     $orderID = $this->callAPISuccess('Order', 'create', [
       'total_amount' => 400,
@@ -294,18 +284,48 @@ trait CRMTraits_Financial_OrderTrait {
         'line_total' => 200,
         'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'entity_table' => 'civicrm_membership',
-        'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', [
-          'return' => 'id',
-          'label' => 'Membership Amount',
-          'options' => ['limit' => 1, 'sort' => 'id DESC'],
-        ]),
-        'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', [
-          'return' => 'id',
-          'label' => 'General',
-          'options' => ['limit' => 1, 'sort' => 'id DESC'],
-        ]),
+        'price_field_id' => $this->getLatestPriceFieldID('Membership Amount'),
+        'price_field_value_id' => $this->getLatestPriceFieldValueID('General'),
       ],
     ];
+  }
+
+  /**
+   * Get the id of the most recently created price field with the given label.
+   *
+   * @param string $label
+   *
+   * @return int
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function getLatestPriceFieldID(string $label): int {
+    return PriceField::get(FALSE)
+      ->addWhere('label', '=', $label)
+      ->addSelect('id')
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()->single()['id'];
+  }
+
+  /**
+   * Get the id of the most recently created price field value with the given label.
+   *
+   * @param string $label
+   *
+   * @return int
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function getLatestPriceFieldValueID(string $label): int {
+    return PriceFieldValue::get(FALSE)
+      ->addWhere('label', '=', $label)
+      ->addSelect('id')
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()->single()['id'];
   }
 
 }
