@@ -15,6 +15,8 @@
  */
 class CRM_Event_Page_ManageEventTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   /**
    * Only campaign ids from the search form reach the where clause.
    *

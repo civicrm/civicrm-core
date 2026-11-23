@@ -17,6 +17,8 @@
  */
 class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   /**
    *  create() and deleteParticipantStatusType() method
    */
