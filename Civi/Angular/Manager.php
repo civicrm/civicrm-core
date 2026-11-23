@@ -269,19 +269,9 @@ class Manager {
    */
   public function getTranslatedStrings($name) {
     $module = $this->getModule($name);
-    $result = [];
-    $strings = $this->getStrings($name);
-    foreach ($strings as $string) {
-      // TODO: should we pass translation domain based on $module[ext] or $module[tsDomain]?
-      // It doesn't look like client side really supports the domain right now...
-      $translated = _ts($string, [
-        'domain' => [$module['ext'], NULL],
-      ]);
-      if ($translated != $string) {
-        $result[$string] = $translated;
-      }
-    }
-    return $result;
+    // TODO: should we pass translation domain based on $module[ext] or $module[tsDomain]?
+    // It doesn't look like client side really supports the domain right now...
+    return \CRM_Utils_JS::translateStrings($this->getStrings($name), [$module['ext'], NULL]);
   }
 
   /**
@@ -289,25 +279,26 @@ class Manager {
    *
    * @param string $name
    *   Angular module name.
-   * @return array
-   *   Translatable strings.
+   * @return array<string, string|null>
+   *   Translatable strings, each with its plural form or NULL.
    */
   public function getStrings($name) {
     $module = $this->getModule($name);
     $result = [];
     if (isset($module['js'])) {
       foreach ($module['js'] as $file) {
-        $strings = $this->res->getStrings()->get(
+        $strings = \CRM_Utils_JS::normalizeStrings($this->res->getStrings()->get(
           $module['ext'],
           $this->res->getPath($module['ext'], $file),
           'text/javascript'
-        );
-        $result = array_unique(array_merge($result, $strings));
+        ));
+        $result = array_filter($strings) + $result + $strings;
       }
     }
     $partials = $this->getPartials($name);
     foreach ($partials as $partial) {
-      $result = array_unique(array_merge($result, \CRM_Utils_JS::parseStrings($partial)));
+      $strings = \CRM_Utils_JS::parseStrings($partial);
+      $result = array_filter($strings) + $result + $strings;
     }
     return $result;
   }

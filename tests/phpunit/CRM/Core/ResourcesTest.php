@@ -18,6 +18,8 @@ use Civi\Test\Invasive;
  */
 class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
+  use CRM_Core_I18n_CatalogTestTrait;
+
   /**
    * @var CRM_Core_Resources
    */
@@ -56,6 +58,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $_REQUEST = $this->originalRequest;
     $_GET = $this->originalGet;
+    $this->resetCatalog();
     parent::tearDown();
   }
 
@@ -395,6 +398,23 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       [['q' => 'civicrm/test/page', 'snippet' => 'json'], TRUE],
       [['q' => 'civicrm/test/page', 'snippet' => 'foo'], FALSE],
     ];
+  }
+
+  /**
+   * The client-side ts() looks a plural up by its singular when count is 1, by its plural form otherwise.
+   */
+  public function testAddStringTranslatesBothFormsOfAPlural(): void {
+    $this->useCatalog([
+      "1 tag removed.\0%count tags removed." => "1 Tag entfernt.\0%count Tags entfernt.",
+      'Done' => 'Fertig',
+    ]);
+    $js = "msg = ts('1 tag removed.', {plural: '%count tags removed.', count: n}) + ts('Done') + ts('Not translated');";
+    $this->res->addString(CRM_Utils_JS::parseStrings($js));
+    $this->assertSame([
+      '1 tag removed.' => '1 Tag entfernt.',
+      '%count tags removed.' => '%count Tags entfernt.',
+      'Done' => 'Fertig',
+    ], $this->res->getSettings()['strings'] ?? []);
   }
 
   /**
