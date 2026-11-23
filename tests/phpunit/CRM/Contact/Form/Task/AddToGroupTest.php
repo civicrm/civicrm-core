@@ -18,7 +18,11 @@ use Civi\Test\Invasive;
  * @group headless
  */
 class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
+
+  use CRMTraits_Custom_CustomDataTrait;
   use FormTrait;
+
+  protected $_apiversion = 4;
 
   /**
    * Clean up after test.
@@ -125,9 +129,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
       'last_name' => 'Johnson',
     ]);
 
-    $customGroup = $this->customGroupCreate(['extends' => 'Group']);
-    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
-    $customFieldId = $customField['id'];
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Group'], 'text');
 
     $form = $this->getTestForm(
       'CRM_Contact_Form_Search_Basic',
@@ -138,7 +140,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
         'group_option' => 1,
         'title' => 'Test Group With Custom Field',
         'description' => '',
-        'custom_' . $customFieldId => 'Custom Value ABC',
+        $this->getCustomFieldName('text') => 'Custom Value ABC',
       ]
     );
     $form->processForm();
@@ -149,8 +151,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
       ->execute();
     $this->assertSame(1, $group->count());
     $group = $group->first();
-    $this->assertArrayKeyExists('new_custom_group.Custom_Field', $group);
-    $this->assertSame('Custom Value ABC', $group['new_custom_group.Custom_Field']);
+    $this->assertSame('Custom Value ABC', $group[$this->getCustomFieldName('text', 4)]);
 
     $groupCount = GroupContact::get()
       ->addWhere('group_id', '=', $group['id'])

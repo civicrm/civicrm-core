@@ -10,7 +10,11 @@ use Civi\Test\Invasive;
  * @group headless
  */
 class CRM_Event_Form_Task_AddToGroupTest extends CiviUnitTestCase {
+
+  use CRMTraits_Custom_CustomDataTrait;
   use FormTrait;
+
+  protected $_apiversion = 4;
 
   public function tearDown(): void {
     $this->relabelMailingList('Mailing List');
@@ -49,22 +53,22 @@ class CRM_Event_Form_Task_AddToGroupTest extends CiviUnitTestCase {
   public function testAddToNewGroupWithCustomField(): void {
     $contactID = $this->individualCreate();
     $this->participantCreate(['contact_id' => $contactID, 'event_id' => $this->eventCreateUnpaid()['id']]);
-    $customField = $this->customFieldCreate(['custom_group_id' => $this->customGroupCreate(['extends' => 'Group'])['id']]);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Group'], 'text');
 
     $this->getTestForm('CRM_Event_Form_Search', ['radio_ts' => 'ts_all', 'task' => CRM_Event_Task::GROUP_ADD])
       ->addSubsequentForm('CRM_Event_Form_Task_AddToGroup', [
         'group_option' => 1,
         'title' => 'Participants',
         'description' => '',
-        'custom_' . $customField['id'] => 'Custom Value ABC',
+        $this->getCustomFieldName('text') => 'Custom Value ABC',
       ])
       ->processForm();
 
     $group = Group::get(FALSE)
-      ->addSelect('id', 'new_custom_group.Custom_Field')
+      ->addSelect('id', $this->getCustomFieldName('text', 4))
       ->addWhere('title', '=', 'Participants')
       ->execute()->single();
-    $this->assertSame('Custom Value ABC', $group['new_custom_group.Custom_Field']);
+    $this->assertSame('Custom Value ABC', $group[$this->getCustomFieldName('text', 4)]);
     $this->assertCount(1, GroupContact::get(FALSE)
       ->addWhere('group_id', '=', $group['id'])
       ->addWhere('contact_id', '=', $contactID)
