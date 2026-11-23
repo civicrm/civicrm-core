@@ -18,7 +18,7 @@
     {{:: ts('Next') }}
   </button>
   <button class="crm-button crm-button-submit" ng-if="$ctrl.afFormCtrl.showSubmitButton && !$ctrl.hasNext()" ng-click="$ctrl.afFormCtrl.submit()">
-    {{ $ctrl.pageNavSubmitText }}
+    {{ $ctrl.pageNavSubmitText || ts('Submit') }}
   </button>
 </div>
 
