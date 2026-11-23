@@ -254,6 +254,27 @@ AND    domain_id = %2
         $ufmatch->uf_name = $uniqId;
       }
 
+      // uf_name is unique per domain. If another user already holds this
+      // email, link this user without a uf_name: otherwise the match is never
+      // saved and every login creates another contact (dev/core#6931).
+      if ((string) $ufmatch->uf_name !== '') {
+        $ufNameOwner = CRM_Core_DAO::singleValueQuery(
+          'SELECT uf_id FROM civicrm_uf_match WHERE uf_name = %1 AND domain_id = %2',
+          [
+            1 => [$ufmatch->uf_name, 'String'],
+            2 => [$ufmatch->domain_id, 'Integer'],
+          ]
+        );
+        if ($ufNameOwner) {
+          Civi::log()->warning(ts('%1 user %2 is linked without a uf_name, because its email is already the uf_name of %1 user %3', [
+            1 => $uf,
+            2 => $userKey,
+            3 => $ufNameOwner,
+          ]));
+          $ufmatch->uf_name = NULL;
+        }
+      }
+
       // Check that there are not two CMS IDs matching the same CiviCRM contact.
       // This happens when a CiviCRM user has two e-mails and there is a cms
       // match for each of them the gets rid of the nasty fata error but still
@@ -269,7 +290,7 @@ AND    domain_id    = %4
 
       $conflict = CRM_Core_DAO::singleValueQuery($sql, [
         1 => [$ufmatch->contact_id, 'Integer'],
-        2 => [$ufmatch->uf_name, 'String'],
+        2 => [$ufmatch->uf_name ?? '', 'String'],
         3 => [$ufmatch->uf_id, 'Integer'],
         4 => [$ufmatch->domain_id, 'Integer'],
       ]);
@@ -288,6 +309,7 @@ AND    domain_id    = %4
             4 => $conflict,
           ]
         );
+        Civi::log()->warning($msg);
         unset($conflict);
       }
     }
