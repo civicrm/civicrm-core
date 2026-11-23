@@ -9,7 +9,10 @@ use Civi\Test\FormWrapper;
  * @group headless
  */
 class CRM_Group_Form_EditTest extends CiviUnitTestCase {
+
   use FormTrait;
+
+  protected $_apiversion = 4;
 
   public function tearDown(): void {
     $this->relabelGroupType('Access Control', 'Access Control');
@@ -24,7 +27,7 @@ class CRM_Group_Form_EditTest extends CiviUnitTestCase {
    */
   public function testSmartGroupDoesNotOfferAccessControlWithRelabelledType(): void {
     $this->relabelGroupType('Access Control', 'Zugangskontrolle');
-    $savedSearchID = $this->callAPISuccess('SavedSearch', 'create', ['form_values' => ['contact_type' => 'Individual']])['id'];
+    $savedSearchID = $this->createTestEntity('SavedSearch', ['form_values' => ['contact_type' => 'Individual']])['id'];
     $groupID = $this->groupCreate(['saved_search_id' => $savedSearchID]);
 
     $formWrapper = $this->getTestForm('CRM_Group_Form_Edit', [], ['action' => 'update', 'id' => $groupID])->processForm(FormWrapper::BUILT);
