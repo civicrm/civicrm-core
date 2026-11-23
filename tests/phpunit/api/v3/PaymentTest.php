@@ -20,6 +20,8 @@ use Civi\Api4\Order;
  * @group headless
  */
 class api_v3_PaymentTest extends CiviUnitTestCase {
+  use CRMTraits_Financial_OrderTrait;
+
   protected $_apiversion = 3;
 
   /**

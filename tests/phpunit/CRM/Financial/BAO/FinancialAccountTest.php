@@ -21,6 +21,8 @@ use Civi\Core\HookInterface;
  * @group headless
  */
 class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements HookInterface {
+  use CRMTraits_Financial_OrderTrait;
+
   protected $_apiversion = 4;
 
   public function setUp(): void {
