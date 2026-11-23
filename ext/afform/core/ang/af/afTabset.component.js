@@ -68,6 +68,20 @@
 
       this.addTab = (tab) => {
         this.tabs.push(tab);
+        // A tab with af-if links after its siblings, so keep the list in markup order.
+        this.tabs.sort((a, b) => a.element[0].compareDocumentPosition(b.element[0]) & window.Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
+      };
+
+      this.removeTab = (tab) => {
+        const index = this.tabs.indexOf(tab);
+        if (index < 0) {
+          return;
+        }
+        this.tabs.splice(index, 1);
+        if (tab.name === this.selectedTab) {
+          // Not selectTab(), which would first validate the tab being removed.
+          this.selectedTab = this.tabs[Math.min(index, this.tabs.length - 1)]?.name ?? null;
+        }
       };
 
       this.selectTab = (tabName) => {
@@ -139,8 +153,11 @@
       link: function (scope, element, attrs, afTabsetCtrl) {
         scope.name = scope.name || 'tab' + tabNumber++;
         scope.afTabsetCtrl = afTabsetCtrl;
+        scope.element = element;
         scope.findInvalid = () => element.find('.ng-invalid');
         afTabsetCtrl.addTab(scope);
+        // af-if destroys a hidden tab
+        scope.$on('$destroy', () => afTabsetCtrl.removeTab(scope));
       }
     };
   });

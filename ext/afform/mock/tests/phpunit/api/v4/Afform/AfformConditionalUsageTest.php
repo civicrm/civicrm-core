@@ -318,4 +318,50 @@ EOHTML;
     }
   }
 
+  /**
+   * A page hidden by af-if must not enforce the required fields on it.
+   */
+  public function testConditionalPage(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'TestConditionals'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-tabset page-nav-buttons="true">
+    <af-tab title="Page 1">
+      <fieldset af-fieldset="Individual1" class="af-container">
+        <af-field name="first_name" />
+      </fieldset>
+    </af-tab>
+    <af-tab title="Page 2" af-if="([[&amp;quot;Individual1[0][fields][first_name]&amp;quot;,&amp;quot;=&amp;quot;,&amp;quot;\&amp;quot;A\&amp;quot;&amp;quot;]])">
+      <fieldset af-fieldset="Individual1" class="af-container">
+        <af-field name="last_name" defn="{required: true, input_attrs: {}}" />
+      </fieldset>
+    </af-tab>
+  </af-tabset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Page 2 shown: its required field is enforced
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => [['fields' => ['first_name' => 'A', 'last_name' => '']]]])
+        ->execute();
+      $this->fail('Should error without required field');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
+    }
+
+    // Page 2 hidden: its required field is not enforced
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => [['fields' => ['first_name' => 'B', 'last_name' => '']]]])
+      ->execute();
+    $this->assertGreaterThan(0, $result[0]['Individual1'][0]['id']);
+  }
+
 }
