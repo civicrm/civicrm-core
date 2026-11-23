@@ -74,19 +74,7 @@ function civicrm_api3_custom_field_create(array $params): array {
   $values = [];
   $customField = CRM_Core_BAO_CustomField::create($params);
   _civicrm_api3_object_to_array_unique_fields($customField, $values[$customField->id]);
-  _civicrm_api3_custom_field_flush_static_caches();
   return civicrm_api3_create_success($values, $params, 'CustomField', $customField);
-}
-
-/**
- * Flush static caches in functions that might have stored available custom fields.
- */
-function _civicrm_api3_custom_field_flush_static_caches() {
-  if (isset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name'])) {
-    unset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name']);
-  }
-  civicrm_api('CustomField', 'getfields', ['version' => 3, 'cache_clear' => 1]);
-  CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
 }
 
 /**

@@ -32,6 +32,8 @@ class MetadataFlush {
     // Keep it in sync with other metadata caches regardless of how the clear
     // was initiated (APIv3, APIv4, BAO hooks, or direct cache access).
     \Civi::$statics['civicrm_api3_generic_getfields'] = [];
+    unset(\Civi::$statics['UFFieldsFlat']);
+    unset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name']);
 
     // This seems to cause problems during unit test setup
     if (CIVICRM_UF === 'UnitTests') {
