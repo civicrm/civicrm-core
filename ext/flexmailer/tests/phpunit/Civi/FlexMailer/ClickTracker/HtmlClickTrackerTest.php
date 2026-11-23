@@ -19,6 +19,8 @@ use Civi\FlexMailer\ClickTracker\HtmlClickTracker;
  */
 class HtmlClickTrackerTest extends \CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   public function setUp(): void {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
