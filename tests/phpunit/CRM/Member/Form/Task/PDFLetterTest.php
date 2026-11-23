@@ -16,6 +16,8 @@
  */
 class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   /**
    * Clean up after each test.
    */
@@ -57,10 +59,9 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
         'join_date' => $date,
         'start_date' => $date,
         'end_date' => date('Y-m-d', strtotime("{$date} +1 year")),
-        'version' => 4,
       ];
-      $result = $this->callAPISuccess('Membership', 'create', $params);
-      $searchFormValues['mark_x_' . $result['id']] = 1;
+      $membership = $this->createTestEntity('Membership', $params, $date);
+      $searchFormValues['mark_x_' . $membership['id']] = 1;
       $params = array_merge($params,
         [
           'fee' => '100.00',
