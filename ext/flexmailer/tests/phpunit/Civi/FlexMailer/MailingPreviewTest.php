@@ -1,6 +1,8 @@
 <?php
 namespace Civi\FlexMailer;
 
+use Civi\Api4\Contact;
+
 /**
  * Class MailingPreviewTest
  *
@@ -8,17 +10,13 @@ namespace Civi\FlexMailer;
  */
 class MailingPreviewTest extends \CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   protected $_groupID;
   protected $_email;
   protected $_params = [];
   protected $_entity = 'Mailing';
   protected $_contactID;
-
-  /**
-   * APIv3 result from creating an example footer
-   * @var array
-   */
-  protected $footer;
 
   public function setUp(): void {
     // Activate before transactions are setup.
@@ -45,7 +43,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
       'footer_id' => '',
     ];
 
-    $this->footer = civicrm_api3('MailingComponent', 'create', [
+    $this->createTestEntity('MailingComponent', [
       'name' => 'test domain footer',
       'component_type' => 'footer',
       'body_html' => '<p>From {domain.address}. To opt out, go to {action.optOutUrl}.</p>',
@@ -62,9 +60,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
   public function testMailerPreview(): void {
     // BEGIN SAMPLE DATA
     $contactID = $this->individualCreate();
-    $displayName = $this->callAPISuccess('contact', 'get',
-      ['id' => $contactID]);
-    $displayName = $displayName['values'][$contactID]['display_name'];
+    $displayName = $this->getDisplayName($contactID);
     $this->assertTrue(!empty($displayName));
 
     $params = $this->_params;
@@ -76,7 +72,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     // END SAMPLE DATA
 
     $maxIDs = $this->getMaxIds();
-    $result = $this->callAPISuccess('mailing', 'create', $params);
+    $result = $this->callApiV3Success('Mailing', 'create', $params);
     $this->assertMaxIds($maxIDs);
 
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
@@ -99,14 +95,13 @@ class MailingPreviewTest extends \CiviUnitTestCase {
   public function testMailerPreviewWithoutId(): void {
     // BEGIN SAMPLE DATA
     $contactID = $this->createLoggedInUser();
-    $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
-    $displayName = $displayName['values'][$contactID]['display_name'];
+    $displayName = $this->getDisplayName($contactID);
     $this->assertTrue(!empty($displayName));
     $params = $this->_params;
     // END SAMPLE DATA
 
     $maxIDs = $this->getMaxIds();
-    $previewResult = $this->callAPISuccess('mailing', 'preview', $params);
+    $previewResult = $this->callApiV3Success('Mailing', 'preview', $params);
     $this->assertMaxIds($maxIDs);
 
     $this->assertSame("Hello $displayName",
@@ -130,16 +125,27 @@ class MailingPreviewTest extends \CiviUnitTestCase {
    */
   public function testMailerPreviewWithoutIdEmptyLanguage(): void {
     $contactID = $this->createLoggedInUser();
-    $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
-    $displayName = $displayName['values'][$contactID]['display_name'];
+    $displayName = $this->getDisplayName($contactID);
     $params = $this->_params + ['language' => ''];
 
     $maxIDs = $this->getMaxIds();
-    $previewResult = $this->callAPISuccess('mailing', 'preview', $params);
+    $previewResult = $this->callApiV3Success('Mailing', 'preview', $params);
     $this->assertMaxIds($maxIDs);
 
     $this->assertSame("Hello $displayName", $previewResult['values']['subject']);
     $this->assertSame('flexmailer', $previewResult['values']['_rendered_by_']);
+  }
+
+  /**
+   * @param int $contactID
+   *
+   * @return string
+   */
+  private function getDisplayName(int $contactID): string {
+    return Contact::get(FALSE)
+      ->addSelect('display_name')
+      ->addWhere('id', '=', $contactID)
+      ->execute()->single()['display_name'];
   }
 
   /**
