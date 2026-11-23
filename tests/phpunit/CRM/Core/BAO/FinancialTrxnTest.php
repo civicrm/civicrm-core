@@ -16,6 +16,7 @@ use Civi\Api4\Contribution;
  * @group headless
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
+  use CRMTraits_Financial_OrderTrait;
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();

@@ -9,7 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Test\Api3TestTrait;
+use Civi\Api4\LineItem;
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
 
 /**
  * Trait OrderTrait
@@ -17,8 +19,6 @@ use Civi\Test\Api3TestTrait;
  * Trait for setting up orders for tests.
  */
 trait CRMTraits_Financial_OrderTrait {
-
-  use Api3TestTrait;
 
   /**
    * Create a pending membership from a recurring order.
@@ -211,13 +211,57 @@ trait CRMTraits_Financial_OrderTrait {
   /**
    * Create an order for an event.
    *
-   * @param array $orderParams
+   * @param array $contributionValues
+   *   Overrides for the contribution values.
    *
    * @throws \CRM_Core_Exception
    */
-  protected function createEventOrder($orderParams = []) {
-    $this->ids['Contribution'][0] = $this->callAPISuccess('Order', 'create', array_merge($this->getParticipantOrderParams(3), $orderParams))['id'];
-    $this->ids['Participant'][0] = $this->callAPISuccessGetValue('ParticipantPayment', ['options' => ['limit' => 1], 'return' => 'participant_id', 'contribution_id' => $this->ids['Contribution'][0]]);
+  protected function createEventOrder(array $contributionValues = []): void {
+    $this->ids['Contribution'][0] = $this->createParticipantOrder($contributionValues)['id'];
+    $this->ids['Participant'][0] = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $this->ids['Contribution'][0])
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->addSelect('entity_id')
+      ->addOrderBy('id')
+      ->execute()->first()['entity_id'];
+  }
+
+  /**
+   * Create a pending order for two participants (total 300).
+   *
+   * @param array $contributionValues
+   *   Overrides for the contribution values.
+   *
+   * @return array
+   *   The created contribution.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function createParticipantOrder(array $contributionValues = []): array {
+    $orderParams = $this->getParticipantOrderParams();
+    return Order::create(FALSE)
+      ->setContributionValues(array_merge($orderParams['contribution_params'], $contributionValues))
+      ->setLineItems($orderParams['line_items'])
+      ->execute()->single();
+  }
+
+  /**
+   * Create a participant order (total 300) with a payment of 150.
+   *
+   * @return array
+   *   The created contribution.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function createPartiallyPaidParticipantOrder(): array {
+    $order = $this->createParticipantOrder();
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $order['id'])
+      ->addValue('total_amount', 150)
+      ->execute();
+    return $order;
   }
 
   /**

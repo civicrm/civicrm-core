@@ -22,6 +22,7 @@ use Civi\Api4\FinancialItem;
 class api_v3_OrderTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
+  use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_TaxTrait;
 
   protected $_financialTypeId;
