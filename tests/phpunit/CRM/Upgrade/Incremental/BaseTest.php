@@ -37,6 +37,13 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Queue tasks must return TRUE after applying message-template updates.
+   */
+  public function testMessageTemplateUpgradeTaskReturnsSuccess(): void {
+    $this->assertTrue(CRM_Upgrade_Incremental_Base::updateMessageTemplates(NULL, '6.21.alpha1'));
+  }
+
+  /**
    * Test that a string replacement in a message template can be done.
    *
    * @throws \CRM_Core_Exception

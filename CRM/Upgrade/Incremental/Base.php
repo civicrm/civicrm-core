@@ -501,9 +501,10 @@ class CRM_Upgrade_Incremental_Base {
    * @param CRM_Queue_TaskContext $ctx
    * @param string $version
    */
-  public static function updateMessageTemplates($ctx, $version) {
+  public static function updateMessageTemplates($ctx, $version): bool {
     $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates($version);
     $messageTemplateObject->updateTemplates();
+    return TRUE;
   }
 
   /**
