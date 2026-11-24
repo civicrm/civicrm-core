@@ -174,6 +174,10 @@ class CRM_Case_Audit_Audit {
 
       if ($printReport) {
         @uasort($caseActivities, [$this, "compareActivities"]);
+        foreach ($caseActivities as &$caseActivity) {
+          unset($caseActivity['sortValues']);
+        }
+        unset($caseActivity);
       }
       else {
         @uasort($retval, [$this, "compareActivities"]);
