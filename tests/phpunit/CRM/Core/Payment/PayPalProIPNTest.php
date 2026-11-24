@@ -191,6 +191,56 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->assertEquals(strtotime('03:59:05 Jul 14, 2013 PDT'), strtotime($payment['trxn_date']));
   }
 
+  public static function isEmailReceiptProvider(): array {
+    return [
+      'receipt enabled' => [TRUE],
+      'receipt disabled' => [FALSE],
+    ];
+  }
+
+  /**
+   * A one-off IPN payment should only send a receipt if the contribution page is configured to.
+   *
+   * @dataProvider isEmailReceiptProvider
+   */
+  public function testOneOffIPNPaymentReceiptFollowsContributionPageSetting(bool $isEmailReceipt): void {
+    $contributionPageID = $this->createTestEntity('ContributionPage', [
+      'title' => 'PayPal Pro receipt test page',
+      'financial_type_id' => $this->_financialTypeID,
+      'currency' => 'USD',
+      'is_email_receipt' => $isEmailReceipt,
+      'receipt_from_email' => 'receipts@example.org',
+    ])['id'];
+    $contributionID = $this->createTestEntity('Contribution', [
+      'contact_id' => $this->_contactID,
+      'financial_type_id' => $this->_financialTypeID,
+      'contribution_page_id' => $contributionPageID,
+      'total_amount' => 100,
+      'invoice_id' => 'xyz',
+      'contribution_status_id:name' => 'Pending',
+    ])['id'];
+
+    $mut = new CiviMailUtils($this, TRUE);
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN([
+      'rp_invoice_id' => 'i=xyz&m=contribute&c=' . $this->_contactID . '&b=' . $contributionID . '&p=' . $contributionPageID,
+      'processor_id' => $this->_paymentProcessorID,
+      'txn_type' => 'express_checkout',
+      'payment_status' => 'Completed',
+      'mc_gross' => '100.00',
+      'mc_fee' => '0.63',
+      'txn_id' => '8XA571746W2698126',
+      'payment_date' => '03:59:05 Jul 14, 2013 PDT',
+    ]);
+    $paypalIPN->main();
+
+    $contributionStatus = Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $contributionID)
+      ->execute()->single()['contribution_status_id:name'];
+    $this->assertEquals('Completed', $contributionStatus);
+    $this->assertCount($isEmailReceipt ? 1 : 0, $mut->getAllMessages());
+  }
+
   /**
    * Check a payment express IPN call does not throw any errors.
    *

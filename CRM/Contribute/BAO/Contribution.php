@@ -1141,8 +1141,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    *
    * @return bool
    * @throws \CRM_Core_Exception
+   *
+   * @internal
    */
-  protected static function isEmailReceipt(?bool $isEmailReceipt, int $contributionID, $recurringContributionID): bool {
+  public static function isEmailReceipt(?bool $isEmailReceipt, int $contributionID, $recurringContributionID): bool {
     if (isset($isEmailReceipt)) {
       return $isEmailReceipt;
     }
