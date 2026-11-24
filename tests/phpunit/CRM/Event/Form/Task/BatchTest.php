@@ -47,6 +47,46 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
   }
 
   /**
+   * The contribution is cancelled whatever its source says.
+   *
+   * The source may have been stored in another language or typed in by the
+   * registrant through a participant_source profile field.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCancelWithOtherSource(): void {
+    $this->createPayLaterRegistration('Anmeldung zu Annual CiviCRM meet (online)', 'Pending from pay later');
+    $this->submitParticipantStatus('Cancelled');
+    $this->assertContributionStatus('Cancelled');
+  }
+
+  /**
+   * The pending contribution is cancelled whichever status the participant had before.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCancelRegisteredParticipantCancelsPendingContribution(): void {
+    $this->createPayLaterRegistration('Online Event Registration: Annual CiviCRM meet', 'Registered');
+    $this->submitParticipantStatus('Cancelled');
+    $this->assertContributionStatus('Cancelled');
+  }
+
+  /**
+   * A contribution in progress may have a payment under way, so it is left alone.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCancelKeepsInProgressContribution(): void {
+    $this->createPayLaterRegistration('Online Event Registration: Annual CiviCRM meet', 'Pending from pay later');
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $this->ids['Contribution'][0])
+      ->addValue('contribution_status_id:name', 'In Progress')
+      ->execute();
+    $this->submitParticipantStatus('Cancelled');
+    $this->assertContributionStatus('In Progress');
+  }
+
+  /**
    * Registering the participant does not mark the pay-later contribution as paid.
    *
    * @throws \CRM_Core_Exception
@@ -95,7 +135,7 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   private function assertContributionStatus(string $status): void {
-    $this->assertEquals($status, Contribution::get(FALSE)
+    $this->assertSame($status, Contribution::get(FALSE)
       ->addWhere('id', '=', $this->ids['Contribution'][0])
       ->addSelect('contribution_status_id:name')
       ->execute()->single()['contribution_status_id:name']);
