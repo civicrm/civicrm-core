@@ -1269,7 +1269,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         // extract all the location stuff
         foreach ($value as $n => $v) {
           foreach ($v as $n1 => $v1) {
-            if (!strpos('_id', $n1) && $n1 != 'location_type') {
+            if ($n1 != 'location_type') {
               $n = str_replace(' ', '_', $n);
               $properties[] = "{$n}-{$n1}";
             }

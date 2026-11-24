@@ -693,58 +693,6 @@ function _civicrm_api3_greeting_format_params($params) {
 }
 
 /**
- * Get the order by string for the quicksearch query.
- *
- * Get the order by string. The string might be
- *  - sort name if there is no search value provided and the site is configured
- *    to search by sort name
- *  - empty if there is no search value provided and the site is not configured
- *    to search by sort name
- *  - exactFirst and then sort name if a search value is provided and the site is configured
- *    to search by sort name
- *  - exactFirst if a search value is provided and the site is not configured
- *    to search by sort name
- *
- * exactFirst means 'yes if the search value exactly matches the searched field. else no'.
- * It is intended to prioritise exact matches for the entered string so on a first name search
- * for 'kath' contacts with a first name of exactly Kath rise to the top.
- *
- * On short strings it is expensive. Per CRM-19547 there is still an open question
- * as to whether we should only do exactMatch on a minimum length or on certain fields.
- *
- * However, we have mitigated this somewhat by not doing an exact match search on
- * empty strings, non-wildcard sort-name searches and email searches where there is
- * no @ after the first character.
- *
- * For the user it is further mitigated by the fact they just don't know the
- * slower queries are firing. If they type 'smit' slowly enough 4 queries will trigger
- * but if the first 3 are slow the first result they see may be off the 4th query.
- *
- * @param string $name
- * @param bool $isPrependWildcard
- * @param string $field_name
- *
- * @return string
- */
-function _civicrm_api3_quicksearch_get_order_by($name, $isPrependWildcard, $field_name) {
-  $skipExactMatch = ($name === '%');
-  if ($field_name === 'email' && !strpos('@', $name)) {
-    $skipExactMatch = TRUE;
-  }
-
-  if (!\Civi::settings()->get('includeOrderByClause')) {
-    return $skipExactMatch ? '' : "ORDER BY exactFirst";
-  }
-  if ($skipExactMatch || (!$isPrependWildcard && $field_name === 'sort_name')) {
-    // If there is no wildcard then sorting by exactFirst would have the same
-    // effect as just a sort_name search, but slower.
-    return "ORDER BY sort_name";
-  }
-
-  return "ORDER BY exactFirst, sort_name";
-}
-
-/**
  * Merges given pair of duplicate contacts.
  *
  * @param array $params

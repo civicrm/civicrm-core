@@ -2995,6 +2995,20 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * An explicit contact_a.id in the ORDER BY should not be appended again.
+   */
+  public function testRunQueryDoesNotDuplicateContactIdInOrder(): void {
+    $this->setUpContactExportData();
+    $processor = new CRM_Export_BAO_ExportProcessor(CRM_Export_Form_Select::CONTACT_EXPORT, NULL, 'AND');
+    $processor->setReturnProperties(['sort_name' => 1]);
+    $processor->setComponentClause('contact_a.id IN (' . implode(',', $this->contactIDs) . ')');
+
+    [, $queryString] = $processor->runQuery([], 'sort_name ASC, contact_a.id DESC');
+
+    $this->assertStringEndsWith('ORDER BY `sort_name` ASC, `contact_a`.`id` DESC', $queryString);
+  }
+
+  /**
    * Test get preview function on export processor.
    */
   public function testExportGetPreview(): void {

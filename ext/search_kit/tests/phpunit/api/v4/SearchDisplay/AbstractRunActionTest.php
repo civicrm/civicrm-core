@@ -8,6 +8,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Individual;
 use Civi\Api4\Organization;
 use Civi\Test\HeadlessInterface;
+use Civi\Test\Invasive;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\Mailing;
 
@@ -25,6 +26,21 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
   public function tearDown(): void {
     CustomGroup::delete(FALSE)->addWhere('name', '=', 'Foods')->execute();
     parent::tearDown();
+  }
+
+  /**
+   * Where-clause values should ignore expressions containing functions.
+   */
+  public function testGetWhereClauseValuesSkipsExpressions(): void {
+    $run = new \Civi\Api4\Action\SearchDisplay\Run('SearchDisplay', 'run');
+    Invasive::set([$run, '_apiParams'], [
+      'where' => [
+        ['contact_type:name', '=', 'Individual'],
+        ['GROUP_CONCAT(contact_a.id)', '=', '1,2,3'],
+      ],
+    ]);
+
+    $this->assertSame(['contact_type:name' => 'Individual'], Invasive::call([$run, 'getWhereClauseValues']));
   }
 
   public function testReplaceTokens() {
