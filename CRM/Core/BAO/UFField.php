@@ -756,7 +756,7 @@ SELECT  id
     ];
 
     // include hook injected fields
-    $fields['Contact'] = array_merge($fields['Contact'], CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+    $fields['Contact'] = array_merge($fields['Contact'], CRM_Contact_BAO_Query_Hook::singleton()->getContactFields());
 
     // add current employer for individuals
     $fields['Individual']['current_employer'] = [
