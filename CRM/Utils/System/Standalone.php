@@ -865,6 +865,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function postContainerBoot(): void {
     $sess = \CRM_Core_Session::singleton();
     $sess->initialize();
+    // private/ sits inside the web root, so deny web access to it (Apache).
+    // A read-only private/ is skipped: restrictAccess() would throw on every request.
+    $privateDir = \Civi::paths()->getPath('[civicrm.private]/.');
+    if (is_writable($privateDir)) {
+      \CRM_Utils_File::restrictAccess($privateDir);
+    }
   }
 
   public function getRoleNames(): array {
