@@ -3,8 +3,7 @@
 /**
  * Report as written by extensions that still request SQL_CALC_FOUND_ROWS.
  *
- * The displayed query repeats a column name, which a top-level SELECT allows but a derived table does not,
- * so its total must come from FOUND_ROWS() rather than from counting the query again.
+ * The displayed query also repeats a column name, which a top-level SELECT allows but a derived table does not.
  */
 class CRM_Report_Form_LegacyFoundRowsForm extends CRM_Report_Form_Contribute_Detail {
 

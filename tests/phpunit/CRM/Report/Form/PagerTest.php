@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Test\Invasive;
 
 /**
  * Pager totals of report templates.
@@ -174,9 +175,13 @@ class CRM_Report_Form_PagerTest extends CiviReportTestCase {
 
   public function testLegacyOwnFoundRowsQueryTotalCountsAllPages(): void {
     $this->createLapsedMemberships();
-    [$report, $pager] = $this->runPagedReport('CRM_Report_Form_LegacyOwnQueryForm');
+    $deprecations = self::captureErrors(E_USER_DEPRECATED, function () use (&$report, &$pager) {
+      [$report, $pager] = $this->runPagedReport('CRM_Report_Form_LegacyOwnQueryForm');
+    });
     $this->assertCount(2, $report->getResultSet());
     $this->assertSame(3, (int) $pager->_totalItems);
+    $this->assertCount(1, $deprecations);
+    $this->assertStringContainsString('call setRowsFound()', $deprecations[0]);
   }
 
   public function testRowsFoundAcceptsLimitSyntaxes(): void {
@@ -192,6 +197,22 @@ class CRM_Report_Form_PagerTest extends CiviReportTestCase {
     $this->assertSame(6, $rowsFound("$sql LIMIT 2 OFFSET 2", 2));
     $this->assertSame(6, $rowsFound("$sql LIMIT 4 OFFSET 4", 2));
     $this->assertSame(6, $rowsFound($sql, 6));
+  }
+
+  public function testRowsFoundWithoutPagingRunsNoCount(): void {
+    $this->createDonors();
+    $report = new CRM_Report_Form_Contribute_Detail();
+    $report->setAddPaging(FALSE);
+    Invasive::call([$report, 'setRowsFound'], ['SELECT id FROM civicrm_contribution LIMIT 2', 2]);
+    $this->assertNull(Invasive::get([$report, '_rowsFound']));
+  }
+
+  public function testHistoryTotalCountsAllContacts(): void {
+    $this->createDonors();
+    foreach ([1, 2] as $page) {
+      [, $pager] = $this->runPagedReport('CRM_Report_Form_Contribute_History', $page);
+      $this->assertSame(3, (int) $pager->_totalItems, "page $page");
+    }
   }
 
   public function testTopDonorPagesAndContinuesRanks(): void {
