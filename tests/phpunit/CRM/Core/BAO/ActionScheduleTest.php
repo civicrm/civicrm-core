@@ -451,6 +451,34 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => '',
       'subject' => 'subject sched_membership_absolute_date',
     ];
+    $this->fixtures['sched_membership_absolute_date_repeat_until_end_date'] = [
+      'title' => 'sched_membership_absolute_date_repeat_until_end_date',
+      'absolute_date' => CRM_Utils_Date::processDate('20120601000000'),
+      'body_html' => '<p>body sched_membership_absolute_date_repeat_until_end_date</p>',
+      'body_text' => 'body sched_membership_absolute_date_repeat_until_end_date',
+      'end_action' => 'before',
+      'end_date' => 'membership_end_date',
+      'end_frequency_interval' => '0',
+      'end_frequency_unit' => 'hour',
+      'entity_status' => '',
+      'entity_value' => '',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '1',
+      'mapping_id' => 4,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '4',
+      'repetition_frequency_unit' => 'day',
+      'start_action_condition' => '',
+      'start_action_date' => '',
+      'start_action_offset' => '',
+      'start_action_unit' => '',
+      'subject' => 'subject sched_membership_absolute_date_repeat_until_end_date',
+    ];
     $this->fixtures['sched_on_membership_autorenew_before_end_date'] = [
       'title' => 'sched_on_membership_autorenew_before_end_date',
       'body_html' => '<p>Your membership will auto-renew tomorrow</p>',
@@ -2872,6 +2900,49 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'time' => '2012-06-14 04:00:00',
         'recipients' => [],
         'subjects' => [],
+      ],
+    ]);
+  }
+
+  /**
+   * A membership reminder with an absolute trigger date that repeats until
+   * before the membership end date must build valid SQL.
+   *
+   * The repeat end date is measured from the "Until" date field because there
+   * is no start_action_date to use when the trigger is an absolute date.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testMembershipScheduleWithAbsoluteDateRepeatUntilEndDate(): void {
+    // Membership end_date is 2012-06-15.
+    $membership = $this->createMembershipFromFixture('rolling_membership', 'Current', [
+      'email' => 'test-member@example.com',
+      'location_type_id' => $this->getLocationTypeID('Home'),
+    ]);
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], ['contact_id' => $membership['contact_id']]));
+    $this->createScheduleFromFixtures('sched_membership_absolute_date_repeat_until_end_date', ['entity_value' => $membership['membership_type_id']]);
+
+    $this->assertCronRuns([
+      [
+        // On the absolute date, send the first message.
+        'time' => '2012-06-01 00:00:00',
+        'recipients' => [['test-member@example.com']],
+      ],
+      [
+        // Before the repetition interval has passed, send nothing.
+        'time' => '2012-06-03 00:00:00',
+        'recipients' => [],
+      ],
+      [
+        // Four days after the first message, repeat.
+        'time' => '2012-06-05 01:00:00',
+        'recipients' => [['test-member@example.com']],
+      ],
+      [
+        // After the membership end date, stop repeating.
+        'time' => '2012-06-20 01:00:00',
+        'recipients' => [],
       ],
     ]);
   }
