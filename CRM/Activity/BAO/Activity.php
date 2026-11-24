@@ -625,6 +625,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
     $result = civicrm_api3('Activity', 'Get', $activityParams)['values'];
 
+    $bulkActivityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     // CRM-3553, need to check user has access to target groups.
@@ -691,7 +692,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           $activities[$id]['target_contact_name'] = [$displayedTarget[0]['contact_id'] => $displayedTarget[0]['contact_id.sort_name']];
         }
       }
-      if ($activities[$id]['activity_type_name'] === 'Bulk Email') {
+      if (!$bulkActivityTypeID || $bulkActivityTypeID == $activity['activity_type_id']) {
         // Get the total without permissions being passed but only display names after permissioning.
         $activities[$id]['recipients'] = ts('(%1 recipients)', [1 => $activities[$id]['target_contact_count']]);
         $activities[$id]['mailingId'] = $accessCiviMail &&
@@ -703,7 +704,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     // the moment as the bulk activity stuff needs unravelling & test coverage.
     $caseIds = [];
     foreach ($result as $id => $activity) {
-      $isBulkActivity = $activities[$id]['activity_type_name'] === 'Bulk Email';
+      $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID == $activity['activity_type_id']));
       foreach ($mappingParams as $apiKey => $expectedName) {
         // case related fields
         if ($apiKey == 'case_id' && !$isBulkActivity) {
