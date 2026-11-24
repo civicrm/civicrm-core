@@ -820,4 +820,114 @@ EOHTML;
     </af-form>
   EOHTML;
 
+  /**
+   * A join without af-repeat holds one record per af-join element; surplus records are dropped.
+   */
+  public function testNonRepeatingJoinSavesOneRecordPerElement(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithJoinLayout('<div af-join="Email"><af-field name="email" /></div>'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $emails = $this->submitEmailsPerContact([
+      ['email' => 'one@example.org'],
+      ['email' => 'two@example.org'],
+      'x' => ['email' => 'three@example.org'],
+    ]);
+    $this->assertSame([['one@example.org']], $emails);
+  }
+
+  public function testNonRepeatingJoinDeclaredTwiceSavesTwoRecords(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithJoinLayout(
+        '<div af-join="Email" data="{location_type_id: 1}"><af-field name="email" /></div>' .
+        '<div af-join="Email" data="{location_type_id: 2}"><af-field name="email" /></div>'
+      ),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $emails = $this->submitEmailsPerContact([
+      ['email' => 'home@example.org'],
+      ['email' => 'work@example.org'],
+      ['email' => 'surplus@example.org'],
+    ]);
+    $this->assertSame([['home@example.org', 'work@example.org']], $emails);
+  }
+
+  public function testRepeatingJoinHonoursMax(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithJoinLayout('<div af-join="Email" af-repeat="Add" max="2"><af-field name="email" /></div>'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $emails = $this->submitEmailsPerContact([
+      ['email' => 'one@example.org'],
+      ['email' => 'two@example.org'],
+      ['email' => 'three@example.org'],
+    ]);
+    $this->assertSame([['one@example.org', 'two@example.org']], $emails);
+  }
+
+  public function testRepeatingJoinWithoutMaxIsUnlimited(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithJoinLayout('<div af-join="Email" af-repeat="Add"><af-field name="email" /></div>'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $emails = $this->submitEmailsPerContact([
+      ['email' => 'one@example.org'],
+      ['email' => 'two@example.org'],
+      ['email' => 'three@example.org'],
+    ]);
+    $this->assertSame([['one@example.org', 'two@example.org', 'three@example.org']], $emails);
+  }
+
+  /**
+   * In a repeating fieldset the client numbers join offsets across items,
+   * so the second item's only record arrives at offset 1 behind a NULL.
+   */
+  public function testNonRepeatingJoinInRepeatingFieldset(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithJoinLayout('<div af-join="Email"><af-field name="email" /></div>', 'af-repeat="Add"'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $emails = $this->submitEmailsPerContact(
+      [['email' => 'first@example.org']],
+      [NULL, ['email' => 'second@example.org']],
+    );
+    $this->assertSame([['first@example.org'], ['second@example.org']], $emails);
+  }
+
+  private function getContactWithJoinLayout(string $joins, string $fieldsetAttributes = ''): string {
+    return <<<EOHTML
+      <af-form ctrl="afform">
+        <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="FBAC" />
+        <fieldset af-fieldset="Individual1" $fieldsetAttributes>
+          <af-field name="last_name" />
+          $joins
+        </fieldset>
+        <button class="af-button btn btn-primary" ng-click="afform.submit()">Submit</button>
+      </af-form>
+    EOHTML;
+  }
+
+  /**
+   * Submits one Individual1 record per argument and returns the saved emails of each contact.
+   */
+  private function submitEmailsPerContact(array ...$emailJoinsPerContact): array {
+    $lastName = uniqid('JoinLimit');
+    $records = array_map(fn($emailJoins) => [
+      'fields' => ['last_name' => $lastName],
+      'joins' => ['Email' => $emailJoins],
+    ], $emailJoinsPerContact);
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $records])
+      ->execute();
+    $contactIds = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addOrderBy('id')
+      ->execute()->column('id');
+    return array_map(fn($contactId) => Email::get(FALSE)
+      ->addWhere('contact_id', '=', $contactId)
+      ->addOrderBy('id')
+      ->execute()->column('email'), $contactIds);
+  }
+
 }

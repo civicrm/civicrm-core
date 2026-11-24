@@ -620,7 +620,6 @@ EOHTML,
           'fields' => [],
           'joins' => [
             'Email' => [
-              ['email' => 'test@example.org'],
               [],
             ],
           ],

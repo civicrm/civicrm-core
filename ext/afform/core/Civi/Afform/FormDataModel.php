@@ -213,6 +213,8 @@ class FormDataModel {
             }
           }
         }
+        // Without af-repeat, the client submits one record per af-join element
+        $joinProps['#count'] = ($existingJoin['#count'] ?? 0) + 1;
         $this->entities[$entity]['joins'][$node['af-join']] = $joinProps + $existingJoin;
         $this->parseFields($node['#children'] ?? [], $entity, $node['af-join'], NULL, $nodeAfIfConditions);
       }
