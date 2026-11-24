@@ -77,6 +77,7 @@
  * @property int|string|null $dedupe_rule_group_id
  * @property bool|string $is_billing_required
  * @property bool|string $is_show_calendar_links
+ * @property array|null $calendar_link_providers
  */
 class CRM_Event_DAO_Event extends CRM_Core_DAO_Base {
 }

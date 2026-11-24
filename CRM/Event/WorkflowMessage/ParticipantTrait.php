@@ -116,16 +116,19 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
   protected $isOnWaitlist;
 
   /**
-   * Whether links which send event data to Google Calendar should be displayed.
+   * Calendar-link providers selected for this event, keyed by provider name.
    *
-   * @var bool
+   * @var array
    *
    * @scope tplParams
    */
-  public $eventEnableGoogleCalendarLinks;
+  public $eventCalendarLinkProviders;
 
-  public function getEventEnableGoogleCalendarLinks(): bool {
-    return (bool) \Civi::settings()->get('event_enable_google_calendar_links');
+  public function getEventCalendarLinkProviders(): array {
+    $event = new CRM_Event_DAO_Event();
+    $event->id = $this->getEventID();
+    $event->find(TRUE);
+    return array_fill_keys(CRM_Event_BAO_Event::getCalendarLinkProviders($event->calendar_link_providers), TRUE);
   }
 
   private function isCiviContributeEnabled(): bool {

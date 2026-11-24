@@ -24,7 +24,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->revertTemplateToReservedTemplate();
     $this->quickCleanUpFinancialEntities();
     Civi::settings()->set('event_show_payment_on_confirm', []);
-    Civi::settings()->set('event_enable_google_calendar_links', TRUE);
     parent::tearDown();
   }
 
@@ -65,11 +64,13 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
-   * Google Calendar is an optional convenience link; iCalendar remains available.
+   * Calendar-link providers can be selected for an event.
    */
-  public function testGoogleCalendarLinksCanBeDisabled(): void {
-    Civi::settings()->set('event_enable_google_calendar_links', FALSE);
-    $this->submitPaidEvent(['is_show_calendar_links' => TRUE]);
+  public function testCalendarLinkProviders(): void {
+    $this->submitPaidEvent([
+      'is_show_calendar_links' => TRUE,
+      'calendar_link_providers' => ['ical'],
+    ]);
     $this->assertMailSentContainingStrings([
       'Download iCalendar entry for this event',
       'civicrm/event/ical',

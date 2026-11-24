@@ -94,6 +94,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $defaults['event_full_text'] ??= ts('This event is currently full.');
 
     $defaults['waitlist_text'] ??= ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
+    $defaults['calendar_link_providers'] ??= CRM_Event_BAO_Event::getDefaultCalendarLinkProviders();
     $defaults['template_id'] = $this->_templateId;
 
     $eventID = $this->getEventID() ?: $this->_templateId;
@@ -179,6 +180,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->addToggle('is_public', ts('Include in Upcoming Events'));
     $this->addToggle('is_share', ts('Social media sharing links'));
     $this->addToggle('is_show_calendar_links', ts('Calendar links'));
+    $this->addSelect('calendar_link_providers', ['multiple' => TRUE], TRUE);
 
     $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);

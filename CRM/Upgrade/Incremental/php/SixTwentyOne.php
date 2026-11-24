@@ -74,6 +74,22 @@ class CRM_Upgrade_Incremental_php_SixTwentyOne extends CRM_Upgrade_Incremental_B
       'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
     ]);
 
+    $this->addTask('Add Event.calendar_link_providers', 'alterSchemaField', 'Event', 'calendar_link_providers', [
+      'title' => ts('Calendar Link Providers'),
+      'sql_type' => 'varchar(128)',
+      'input_type' => 'Select',
+      'description' => ts('Calendar link providers displayed for this event.'),
+      'add' => '6.21',
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'input_attrs' => [
+        'multiple' => TRUE,
+        'label' => ts('Calendar Link Providers'),
+      ],
+      'pseudoconstant' => [
+        'option_group_name' => 'event_calendar_link_provider',
+      ],
+    ]);
+
     $this->addTask('Make the index UI_case_activity_id for civicrm_case_activity unique', 'makeCaseActivityIndexUnique');
     $this->addTask('Make "StatusPreference.ignore_severity" required', 'alterSchemaField', 'StatusPreference', 'ignore_severity', [
       'title' => ts('Ignore Severity'),

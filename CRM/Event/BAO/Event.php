@@ -2180,15 +2180,23 @@ WHERE  ce.loc_block_id = $locBlockId";
 
     if ($eventId) {
       $query['id'] = $eventId;
-      $endDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'end_date');
+      $event = new CRM_Event_DAO_Event();
+      $event->id = $eventId;
+      if (!$event->find(TRUE)) {
+        return $return;
+      }
+      $endDate = $event->end_date;
       if (empty($endDate) || strtotime($endDate) >= time()) {
-        $return[] = [
-          'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
-          'text' => ts('Download iCalendar entry for this event.'),
-          'icon' => 'fa-download',
-        ];
+        $providers = self::getCalendarLinkProviders($event->calendar_link_providers);
+        if (in_array('ical', $providers, TRUE)) {
+          $return[] = [
+            'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
+            'text' => ts('Download iCalendar entry for this event.'),
+            'icon' => 'fa-download',
+          ];
+        }
 
-        if (\Civi::settings()->get('event_enable_google_calendar_links')) {
+        if (in_array('google', $providers, TRUE)) {
           $return[] = [
             'url' => CRM_Utils_System::url('civicrm/event/ical', ['gCalendar' => 1] + $query, TRUE, NULL, TRUE),
             'text' => ts('Add event to Google Calendar'),
@@ -2206,6 +2214,29 @@ WHERE  ce.loc_block_id = $locBlockId";
     }
 
     return $return;
+  }
+
+  /**
+   * Get the calendar-link providers that preserve CiviEvent's historical output.
+   *
+   * @return string[]
+   */
+  public static function getDefaultCalendarLinkProviders(): array {
+    return ['ical', 'google'];
+  }
+
+  /**
+   * Normalize an event's selected calendar-link providers.
+   *
+   * Events created before the field was introduced have no stored value. They
+   * retain the historical output of both calendar links.
+   *
+   * @param array|string|null $providers
+   *
+   * @return string[]
+   */
+  public static function getCalendarLinkProviders(array|string|null $providers): array {
+    return $providers === NULL ? self::getDefaultCalendarLinkProviders() : CRM_Core_DAO::unSerializeField($providers, CRM_Core_DAO::SERIALIZE_COMMA);
   }
 
   /**

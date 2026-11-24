@@ -879,5 +879,20 @@ return [
       'add' => '5.68',
       'default' => TRUE,
     ],
+    'calendar_link_providers' => [
+      'title' => ts('Calendar Link Providers'),
+      'sql_type' => 'varchar(128)',
+      'input_type' => 'Select',
+      'description' => ts('Calendar link providers displayed for this event.'),
+      'add' => '6.21',
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'input_attrs' => [
+        'multiple' => TRUE,
+        'label' => ts('Calendar Link Providers'),
+      ],
+      'pseudoconstant' => [
+        'option_group_name' => 'event_calendar_link_provider',
+      ],
+    ],
   ],
 ];

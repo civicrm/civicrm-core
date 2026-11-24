@@ -119,6 +119,10 @@
       <td class="label">{$form.is_show_calendar_links.label} {help id="is_show_calendar_links"}</td>
       <td>{$form.is_show_calendar_links.html}</td>
     </tr>
+    <tr class="crm-event-manage-eventinfo-form-block-calendar_link_providers">
+      <td class="label">{$form.calendar_link_providers.label} {help id="calendar_link_providers"}</td>
+      <td>{$form.calendar_link_providers.html}</td>
+    </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_share">
       <td class="label">{$form.is_share.label} {help id="is_share"}</td>
       <td>{$form.is_share.html}</td>

@@ -73,7 +73,11 @@
 
 
 {htxt id='is_show_calendar_links'}
-{ts}Displays links to download an iCal file with the event information, as well as a link to add to Google Calendar. The links will be displayed on the event information page, as well as on the thank-you page and in the email receipt.{/ts}
+{ts}Displays the selected calendar links on the event information page, the thank-you page and in the email receipt.{/ts}
+{/htxt}
+
+{htxt id='calendar_link_providers'}
+{ts}Choose which calendar links to display for this event.{/ts}
 {/htxt}
 
 
