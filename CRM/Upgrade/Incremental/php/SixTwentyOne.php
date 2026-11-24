@@ -90,6 +90,8 @@ class CRM_Upgrade_Incremental_php_SixTwentyOne extends CRM_Upgrade_Incremental_B
       ],
     ]);
 
+    $this->addTask('Update event calendar link message templates', 'updateMessageTemplates', $rev);
+
     $this->addTask('Make the index UI_case_activity_id for civicrm_case_activity unique', 'makeCaseActivityIndexUnique');
     $this->addTask('Make "StatusPreference.ignore_severity" required', 'alterSchemaField', 'StatusPreference', 'ignore_severity', [
       'title' => ts('Ignore Severity'),

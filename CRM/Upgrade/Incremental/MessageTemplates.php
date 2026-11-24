@@ -96,6 +96,15 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_online_receipt', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '6.21.alpha1',
+        'upgrade_descriptor' => ts('Add selectable calendar link providers'),
+        'templates' => [
+          ['name' => 'event_offline_receipt', 'type' => 'html'],
+          ['name' => 'event_online_receipt', 'type' => 'html'],
+          ['name' => 'participant_confirm', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 
