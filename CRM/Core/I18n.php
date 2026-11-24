@@ -62,9 +62,9 @@ class CRM_Core_I18n {
   }
 
   /**
-   * A PHP-gettext instance for string translation;
+   * A translator instance for string translation;
    * should stay null if the strings are not to be translated (en_US).
-   * @var object
+   * @var \PhpMyAdmin\MoTranslator\Translator|\CRM_Core_I18n_NativeGettext|null
    */
   private $_phpgettext = NULL;
 
@@ -165,12 +165,8 @@ class CRM_Core_I18n {
    * @param string $locale
    */
   protected function setPhpGettextLocale($locale) {
-    require_once 'PHPgettext/streams.php';
-    require_once 'PHPgettext/gettext.php';
-
     $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
-    $streamer = new FileReader($mo_file);
-    $this->_phpgettext = new gettext_reader($streamer);
+    $this->_phpgettext = new \PhpMyAdmin\MoTranslator\Translator($mo_file);
     $this->_extensioncache['civicrm'] = $this->_phpgettext;
   }
 
@@ -474,7 +470,7 @@ class CRM_Core_I18n {
       if (isset($count, $plural)) {
 
         if ($this->_phpgettext) {
-          $text = $this->_phpgettext->ngettext($text, $plural, (int) $count);
+          $text = $this->_phpgettext->ngettext((string) $text, (string) $plural, (int) $count);
         }
         else {
           // if the locale's not set, we do ngettext work by hand
@@ -486,12 +482,12 @@ class CRM_Core_I18n {
 
         // if not plural, but the locale's set, translate
       }
-      elseif ($this->_phpgettext) {
+      elseif ($this->_phpgettext && $text !== NULL && $text !== '') {
         if ($context) {
-          $text = $this->_phpgettext->pgettext($context, $text);
+          $text = $this->_phpgettext->pgettext((string) $context, (string) $text);
         }
         else {
-          $text = $this->_phpgettext->translate($text);
+          $text = $this->_phpgettext->gettext((string) $text);
         }
       }
     }
@@ -513,7 +509,7 @@ class CRM_Core_I18n {
    *   the translated string
    */
   public function translate($string) {
-    return ($this->_phpgettext) ? $this->_phpgettext->translate($string) : $string;
+    return ($this->_phpgettext && $string !== NULL && $string !== '') ? $this->_phpgettext->gettext((string) $string) : $string;
   }
 
   /**
@@ -597,10 +593,11 @@ class CRM_Core_I18n {
           $this->_extensioncache[$key] = $domain;
         }
         else {
-          // phpgettext
+          // motranslator
           $mo_file = $path . $this->locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
-          $streamer = new FileReader($mo_file);
-          $this->_extensioncache[$key] = $streamer->length() ? new gettext_reader($streamer) : NULL;
+          $this->_extensioncache[$key] = (is_readable($mo_file) && filesize($mo_file) > 0)
+            ? new \PhpMyAdmin\MoTranslator\Translator($mo_file)
+            : NULL;
         }
       }
       catch (CRM_Extension_Exception $e) {

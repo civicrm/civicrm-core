@@ -23,14 +23,12 @@ trait CRM_Core_I18n_CatalogTestTrait {
    *   Catalogs of extension domains, keyed by extension key.
    */
   protected function useCatalog(array $translations, array $domains = []): void {
-    require_once 'PHPgettext/streams.php';
-    require_once 'PHPgettext/gettext.php';
     global $tsLocale;
-    $reader = new gettext_reader(new StringReader(self::compileCatalog($translations)));
+    $reader = self::buildTranslator($translations);
     $this->localeBeforeCatalog = $tsLocale;
     $readers = ['civicrm' => $reader];
     foreach ($domains as $key => $domainTranslations) {
-      $readers[$key] = new gettext_reader(new StringReader(self::compileCatalog($domainTranslations)));
+      $readers[$key] = self::buildTranslator($domainTranslations);
     }
     $translator = new CRM_Core_I18n('de_DE');
     (function () use ($reader, $readers) {
@@ -52,23 +50,13 @@ trait CRM_Core_I18n_CatalogTestTrait {
 
   /**
    * @param array<string, string> $translations
-   * @return string
-   *   The catalog in gettext's .mo format, with German plural rules.
    */
-  private static function compileCatalog(array $translations): string {
-    $translations = ['' => "Content-Type: text/plain; charset=UTF-8\nPlural-Forms: nplurals=2; plural=(n != 1);\n"] + $translations;
-    ksort($translations, SORT_STRING);
-    $count = count($translations);
-    $offset = 28 + 16 * $count;
-    $tables = ['', ''];
-    $data = '';
-    foreach ([array_keys($translations), array_values($translations)] as $side => $texts) {
-      foreach ($texts as $text) {
-        $tables[$side] .= pack('VV', strlen($text), $offset + strlen($data));
-        $data .= $text . "\0";
-      }
-    }
-    return pack('VVVVVVV', 0x950412DE, 0, $count, 28, 28 + 8 * $count, 0, 0) . $tables[0] . $tables[1] . $data;
+  private static function buildTranslator(array $translations): \PhpMyAdmin\MoTranslator\Translator {
+    $translator = new \PhpMyAdmin\MoTranslator\Translator(NULL);
+    $translator->setTranslations([
+      '' => "Content-Type: text/plain; charset=UTF-8\nPlural-Forms: nplurals=2; plural=(n != 1);\n",
+    ] + $translations);
+    return $translator;
   }
 
 }

@@ -109,7 +109,8 @@
     "dmore/chrome-mink-driver": "^2.9",
     "pontedilana/php-weasyprint": "^0.13.0 || ^1 || ^2",
     "knplabs/knp-snappy": "^1.4",
-    "smarty/smarty": "^5.8.4"
+    "smarty/smarty": "^5.8.4",
+    "phpmyadmin/motranslator": "^6.0"
   },
   "scripts": {
     "post-install-cmd": [
@@ -299,6 +300,9 @@
       },
       "pear/mail_mime": {
         "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://download.civicrm.org/patches/38231167f0c789e0b368b38c1499973d562de65e87094b402156a6b928cc4c38/crm_3133.patch"
+      },
+      "phpmyadmin/motranslator": {
+        "Disable global function wrappers in src/functions.php to prevent __() collision with WordPress": "https://download.civicrm.org/patches/9f4d8eb72bbdef1a6cf6fe7093339ebfaf276ea9825e749837c18bec40b1977e/halt-functions.patch"
       },
       "zetacomponents/mail": {
         "CiviCRM Custom Patches for ZetaCompoents mail": "https://download.civicrm.org/patches/6e4bd36dd432a1e62830b0c757a3bac9645ea1cfc551db39798a88c06d66aaf3/100-filename.patch",

@@ -1,0 +1,1 @@
+Disable global function wrappers in src/functions.php to prevent __() collision with WordPress
