@@ -129,7 +129,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $this->_fields = array_merge(CRM_Case_BAO_Query::getFields(), $this->_fields);
     }
 
-    $this->_fields = array_merge($this->_fields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+    $this->_fields = array_merge($this->_fields, CRM_Contact_BAO_Query_Hook::singleton()->getContactFields());
 
     $this->_selectFields = [];
     foreach ($this->_fields as $name => $field) {
