@@ -133,7 +133,7 @@
         {/if}
 
         {if {event.is_show_calendar_links|boolean}}
-          {if $eventCalendarLinkProviders.ical}
+          {if isset($eventCalendarLinkProviders.ical)}
             <tr>
               <td colspan="2" {$valueStyle}>
                 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
@@ -141,7 +141,7 @@
               </td>
             </tr>
           {/if}
-          {if $eventCalendarLinkProviders.google}
+          {if isset($eventCalendarLinkProviders.google)}
           <tr>
             <td colspan="2" {$valueStyle}>
               {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
