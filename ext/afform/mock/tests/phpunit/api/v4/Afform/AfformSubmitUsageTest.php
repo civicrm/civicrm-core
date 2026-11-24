@@ -879,6 +879,22 @@ EOHTML;
   }
 
   /**
+   * An empty add-button label still makes the join repeat.
+   */
+  public function testRepeatingJoinWithEmptyLabelIsUnlimited(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithJoinLayout('<div af-join="Email" af-repeat=""><af-field name="email" /></div>'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $emails = $this->submitEmailsPerContact([
+      ['email' => 'one@example.org'],
+      ['email' => 'two@example.org'],
+      ['email' => 'three@example.org'],
+    ]);
+    $this->assertSame([['one@example.org', 'two@example.org', 'three@example.org']], $emails);
+  }
+
+  /**
    * In a repeating fieldset the client numbers join offsets across items,
    * so the second item's only record arrives at offset 1 behind a NULL.
    */

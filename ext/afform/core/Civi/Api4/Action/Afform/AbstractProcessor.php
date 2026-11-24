@@ -848,7 +848,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $joinValues = array_filter($joinValues, fn($vals) => $vals !== NULL);
           // Enforce the limit set by join[max], or one record per af-join element without af-repeat
           $join = $entity['joins'][$joinEntity];
-          $maxRecords = empty($join['af-repeat']) ? $join['#count'] : ($join['max'] ?? NULL);
+          $maxRecords = isset($join['af-repeat']) ? ($join['max'] ?? NULL) : $join['#count'];
           $joinValues = array_slice($joinValues, 0, $maxRecords, TRUE);
           foreach ($joinValues as $index => $vals) {
             // As with the main entity, use default values from DisplayOnly fields + values from submittable fields
