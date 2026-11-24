@@ -27,7 +27,7 @@
           <Field>
             <Name>{$field.name|escape}</Name>
             <Label>{$field.label|escape}</Label>
-{if $field.category}
+{if !empty($field.category)}
             <Category>{$field.category|escape}</Category>
 {/if}
             <Value>{$field.value|escape}</Value>
