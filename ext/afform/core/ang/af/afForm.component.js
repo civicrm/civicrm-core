@@ -120,6 +120,8 @@
                 });
               });
               $element.unblock();
+              // Tokens in markup were rendered before the data arrived
+              $element[0].querySelectorAll('af-token').forEach((el) => el.render());
             }, (error) => {
               disableForm(error.error_message);
               $element.unblock();
