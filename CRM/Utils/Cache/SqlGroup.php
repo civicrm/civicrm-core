@@ -107,15 +107,27 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @return bool
    *
    * @throws \CRM_Core_Exception
-   * @throws \CRM_Utils_Cache_CacheException
    * @throws \CRM_Utils_Cache_InvalidArgumentException
    */
   public function set($key, $value, $ttl = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
 
-    $lock = Civi::lockManager()->acquire("cache.{$this->group}_{$key}._null");
+    $expires = round(microtime(1)) + CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TTL);
+    $dataSerialized = CRM_Core_BAO_Cache::encode($value);
+
+    // The caller already has the value, so a contended write is skipped at once rather than
+    // waited for: a writer inside a transaction holds the lock until it commits.
+    $lock = Civi::lockManager()->acquire("cache.{$this->group}_{$key}._null", 0);
     if (!$lock->isAcquired()) {
-      throw new \CRM_Utils_Cache_CacheException("SqlGroup: Failed to acquire lock on cache key.");
+      // Keep the value for this request, so a caller that reads the key back still gets it.
+      if (is_int($ttl) && $ttl <= 0) {
+        unset($this->valueCache[$key], $this->expiresCache[$key]);
+      }
+      else {
+        $this->valueCache[$key] = CRM_Core_BAO_Cache::decode($dataSerialized);
+        $this->expiresCache[$key] = $expires;
+      }
+      return FALSE;
     }
 
     if (is_int($ttl) && $ttl <= 0) {
@@ -125,9 +137,6 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     }
 
     $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM {$this->table} WHERE {$this->where($key)}");
-    $expires = round(microtime(1)) + CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TTL);
-
-    $dataSerialized = CRM_Core_BAO_Cache::encode($value);
 
     // This table has a wonky index, so we cannot use REPLACE or
     // "INSERT ... ON DUPE". Instead, use SELECT+(INSERT|UPDATE).
