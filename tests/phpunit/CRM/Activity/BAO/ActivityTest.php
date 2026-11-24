@@ -2,6 +2,7 @@
 
 use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\OptionValue;
 
@@ -1622,7 +1623,6 @@ $text
 
     // create a logged in USER since the code references it for sendEmail user.
     $this->createLoggedInUser();
-    $contact = $this->callAPISuccess('Contact', 'get', ['sequential' => 1, 'id' => ['IN' => [$contactId1, $contactId2]]]);
 
     // Create a campaign.
     $result = $this->callAPISuccess('Campaign', 'create', [
@@ -1646,24 +1646,7 @@ $text
     ], ['cid' => $contactId1 . ',' . $contactId2])
       ->processForm();
 
-    $result = $this->callAPISuccess('Activity', 'get', ['campaign_id' => $campaign_id]);
-    // An activity created for each of the two contacts
-    $this->assertSame(2, $result['count']);
-    $id = 0;
-    foreach ($result['values'] as $activity) {
-      $htmlValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $html);
-      $textValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $text);
-      $subjectValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $subject);
-      $details = "-ALTERNATIVE ITEM 0-
-$htmlValue
--ALTERNATIVE ITEM 1-
-$textValue
--ALTERNATIVE END-
-";
-      $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
-      $this->assertEquals($activity['subject'], $subjectValue, 'Activity subject does not match.');
-      $id++;
-    }
+    $this->assertEmailActivityPerContact($campaign_id, [$contactId1, $contactId2], $subject, $html, $text);
   }
 
   /**
@@ -1707,26 +1690,27 @@ $textValue
     ], ['cid' => $contactId1 . ',' . $contactId2 . ',' . $contactId3])
       ->processForm();
 
-    $result = $this->callAPISuccess('Activity', 'get', ['campaign_id' => $this->getCampaignID()]);
-    // An activity created for each of the two contacts
-    $this->assertSame(3, $result['count']);
-    $contactIDs = [$contactId1, $contactId2, $contactId3];
-    foreach (array_values($result['values']) as $index => $activity) {
-      $displayName = $this->callAPISuccessGetValue('Contact', ['id' => $contactIDs[$index], 'return' => 'display_name']);
-      $htmlValue = str_replace('{contact.display_name}', $displayName, $html);
-      $textValue = str_replace('{contact.display_name}', $displayName, $text);
-      $subjectValue = str_replace('{contact.display_name}', $displayName, $subject);
-      $details = "-ALTERNATIVE ITEM 0-
-$htmlValue
--ALTERNATIVE ITEM 1-
-$textValue
--ALTERNATIVE END-
-";
-      $this->assertEquals($details, $activity['details'], 'Activity details does not match.');
-      $this->assertEquals($subjectValue, $activity['subject'], 'Activity subject does not match.');
-    }
+    $this->assertEmailActivityPerContact($this->getCampaignID(), [$contactId1, $contactId2, $contactId3], $subject, $html, $text);
 
     unlink($fileUri);
+  }
+
+  /**
+   * Assert one email activity per contact, each rendered with that contact's display name.
+   */
+  private function assertEmailActivityPerContact(int $campaignID, array $contactIDs, string $subject, string $html, string $text): void {
+    $displayNames = Contact::get(FALSE)->addWhere('id', 'IN', $contactIDs)->execute()->column('display_name', 'id');
+    $activities = Activity::get(FALSE)
+      ->addSelect('subject', 'details', 'target_contact_id')
+      ->addWhere('campaign_id', '=', $campaignID)
+      ->execute();
+    $this->assertEqualsCanonicalizing($contactIDs, array_merge(...$activities->column('target_contact_id')));
+    foreach ($activities as $activity) {
+      $this->assertCount(1, $activity['target_contact_id']);
+      $render = fn(string $template) => str_replace('{contact.display_name}', $displayNames[$activity['target_contact_id'][0]], $template);
+      $this->assertSame($render($subject), $activity['subject'], 'Activity subject does not match.');
+      $this->assertSame("-ALTERNATIVE ITEM 0-\n{$render($html)}\n-ALTERNATIVE ITEM 1-\n{$render($text)}\n-ALTERNATIVE END-\n", $activity['details'], 'Activity details does not match.');
+    }
   }
 
   /**
