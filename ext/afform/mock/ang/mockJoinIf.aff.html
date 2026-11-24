@@ -1,0 +1,11 @@
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="FBAC" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="last_name" />
+    <af-field name="do_not_email" />
+    <div af-join="Email" af-if="([[&quot;Individual1[0][fields][do_not_email]&quot;,&quot;=&quot;,&quot;false&quot;]])">
+      <af-field name="email" />
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" ng-click="afform.submit()">Submit</button>
+</af-form>

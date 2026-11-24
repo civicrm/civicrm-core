@@ -81,9 +81,22 @@
           return meta;
         };
 
-        this.getJoinOffset = function(joinEntity) {
-          joinOffsets[joinEntity] = joinEntity in joinOffsets ? joinOffsets[joinEntity] + 1 : 0;
-          return joinOffsets[joinEntity];
+        // Each af-join element holds the lowest free offset, so one re-rendered by af-if reclaims its slot
+        this.getJoinOffset = (joinEntity) => {
+          if (!joinOffsets[joinEntity]) {
+            joinOffsets[joinEntity] = new Set();
+          }
+          const used = joinOffsets[joinEntity];
+          let offset = 0;
+          while (used.has(offset)) {
+            offset++;
+          }
+          used.add(offset);
+          return offset;
+        };
+
+        this.releaseJoinOffset = (joinEntity, offset) => {
+          joinOffsets[joinEntity]?.delete(offset);
         };
 
         // If `storeValue` setting is enabled, field values are cached in localStorage
