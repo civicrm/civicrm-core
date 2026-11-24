@@ -394,11 +394,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $joinIdField = CoreUtil::getIdFieldName($joinEntity);
     $join = $afEntity['joins'][$joinEntity];
     $multipleLocationBlocks = is_array($join['data']['location_type_id'] ?? NULL);
-    $limit = 1;
-    // Repeating blocks - set limit according to `max`, if set, otherwise 0 for unlimited
-    if (!empty($join['af-repeat'])) {
-      $limit = $join['max'] ?? 0;
-    }
+    // As many records as a submission saves: `max` (0 for unlimited) when repeating, else one per af-join element
+    $limit = isset($join['af-repeat']) ? ($join['max'] ?? 0) : $join['#count'];
     // Remove limit when handling multiple location blocks
     if ($multipleLocationBlocks) {
       $limit = 0;

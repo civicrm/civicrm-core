@@ -910,6 +910,58 @@ EOHTML;
     $this->assertSame([['first@example.org'], ['second@example.org']], $emails);
   }
 
+  public static function getJoinsHoldingTwoRecords(): array {
+    return [
+      'repeating with empty label' => ['<div af-join="Email" af-repeat=""><af-field name="email" /></div>'],
+      'declared twice' => [str_repeat('<div af-join="Email"><af-field name="email" /></div>', 2)],
+    ];
+  }
+
+  /**
+   * Prefill loads as many join records as a submission saves, and updating keeps their ids.
+   *
+   * @dataProvider getJoinsHoldingTwoRecords
+   */
+  public function testUpdateKeepsEveryJoinRecordTheFormHolds(string $joins): void {
+    $this->useValues([
+      'layout' => $this->getContactWithJoinLayout('<af-field name="id" />' . $joins),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $contactId = $this->saveTestRecords('Individual', ['records' => [['last_name' => 'JoinUpdate']]])->first()['id'];
+    $emailIds = $this->saveTestRecords('Email', [
+      'records' => [
+        ['contact_id' => $contactId, 'email' => 'one@example.org'],
+        ['contact_id' => $contactId, 'email' => 'two@example.org'],
+      ],
+    ])->column('id');
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('entity')
+      ->setArgs(['Individual1' => $contactId])
+      ->execute()
+      ->indexBy('name');
+    $this->assertSame(['one@example.org', 'two@example.org'], array_column($prefill['Individual1']['values'][0]['joins']['Email'], 'email'));
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => ['id' => $contactId, 'last_name' => 'JoinUpdate'],
+            'joins' => ['Email' => [['email' => 'one-new@example.org'], ['email' => 'two-new@example.org']]],
+          ],
+        ],
+      ])
+      ->execute();
+    $emails = Email::get(FALSE)
+      ->addWhere('contact_id', '=', $contactId)
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertSame($emailIds, $emails->column('id'));
+    $this->assertSame(['one-new@example.org', 'two-new@example.org'], $emails->column('email'));
+  }
+
   private function getContactWithJoinLayout(string $joins, string $fieldsetAttributes = ''): string {
     return <<<EOHTML
       <af-form ctrl="afform">
