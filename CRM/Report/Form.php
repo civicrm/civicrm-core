@@ -3350,14 +3350,14 @@ class CRM_Report_Form extends CRM_Core_Form {
       $count = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM ($sql) civicrm_report_rows_found");
     }
     catch (\Civi\Core\Exception\DBQueryException $e) {
-      // A derived table rejects repeated column names (error 1060); a CTE column list renames them.
+      // A derived table rejects repeated column names (error 1060), so such a query is streamed and its rows counted.
+      // @todo From CiviCRM 6.23, which requires MySQL 8.0, count it on the server through a CTE with a column list.
       if ($e->getSQLErrorCode() !== 1060) {
         throw $e;
       }
-      $columnCount = CRM_Core_DAO::executeQuery("$sql LIMIT 0")->getDatabaseResult()->numCols();
-      $columns = implode(', ', array_map(fn($i) => "column_$i", range(1, $columnCount)));
       $this->restoreRowsFoundVariables();
-      $count = (int) CRM_Core_DAO::singleValueQuery("WITH civicrm_report_rows_found ($columns) AS ($sql) SELECT COUNT(*) FROM civicrm_report_rows_found");
+      $dao = CRM_Core_DAO::executeUnbufferedQuery($sql);
+      for ($count = 0; $dao->fetch(); $count++);
     }
     finally {
       CRM_Core_DAO::reenableFullGroupByMode();
