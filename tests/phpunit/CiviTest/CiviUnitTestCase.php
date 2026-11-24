@@ -609,6 +609,10 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     error_reporting(E_ALL & ~E_NOTICE);
     $this->resetHooks();
     CRM_Core_Session::singleton()->reset(1);
+    // QuickForm wizard state sits beside the CiviCRM key, under a qfKey whose random suffix can recur.
+    foreach (preg_grep('/_container$/', array_keys($_SESSION ?? [])) as $container) {
+      unset($_SESSION[$container]);
+    }
 
     if ($this->tx) {
       $this->tx->rollback()->commit();
