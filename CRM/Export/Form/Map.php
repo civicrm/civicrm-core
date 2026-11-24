@@ -118,7 +118,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
     $exportParams = $this->controller->exportValues('Select');
 
     // Redirect back to search if "done" button pressed
-    if ($this->controller->getButtonName('done') == '_qf_Map_done') {
+    if ($this->controller->getButtonName() == '_qf_Map_done') {
       $currentPath = CRM_Utils_System::currentPath();
       $urlParams = NULL;
       $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
