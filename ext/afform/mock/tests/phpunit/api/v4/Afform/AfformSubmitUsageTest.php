@@ -293,65 +293,290 @@ EOHTML;
   }
 
   /**
-   * A database error during entity save must fail the submission rather than be reported
-   * as saved, while other errors stay silently ignored for optional entities left blank.
-   *
-   * Custom values are written by their own INSERT after the entity itself is saved, so a
-   * rejection there used to leave the submitter with a confirmation message and an entity
-   * whose custom fields were all empty.
+   * Activity fields whose hidden defaults complete the record without user input.
    */
-  public function testSubmitReportsDatabaseError(): void {
-    $layout = <<<EOHTML
-<af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC"  />
-  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
-    <af-field name="last_name" />
-  </fieldset>
-  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
-</af-form>
-EOHTML;
+  private const COMPLETE_ACTIVITY_FIELDS = '<af-field name="subject" />' .
+    '<af-field name="activity_type_id:name" defn="{input_type: \'Hidden\', afform_default: \'Meeting\'}" />' .
+    '<af-field name="source_contact_id" defn="{input_type: \'Hidden\', afform_default: \'Individual1\'}" />';
 
-    $this->useValues([
-      'layout' => $layout,
-      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
-    ]);
-
-    // A database error means data was lost, so it must reach the user.
-    $lastName = uniqid('DbError');
-    try {
-      $this->submitWhileFailing(new \Civi\Core\Exception\DBQueryException('Simulated database failure'), $lastName);
-      $this->fail('Should have thrown exception');
-    }
-    catch (\Civi\Core\Exception\DBQueryException $e) {
-      $this->assertSame('Simulated database failure', $e->getMessage());
-    }
-    $this->assertCount(0, \Civi\Api4\Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
-
-    // Anything else is still ignored, so an optional entity left blank does not break the form.
-    $lastName = uniqid('Ignored');
-    $this->submitWhileFailing(new \CRM_Core_Exception('Simulated non-database failure'), $lastName);
-    $this->assertCount(0, \Civi\Api4\Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+  public static function getSaveFailures(): array {
+    return [
+      'database error' => [new \Civi\Core\Exception\DBQueryException('Simulated database failure')],
+      'api error' => [new \CRM_Core_Exception('Simulated api failure')],
+    ];
   }
 
   /**
-   * Submit the form with the given exception thrown while the contact is being saved.
+   * An error saving any entity fails the submission and leaves nothing saved,
+   * including the entities saved before it and the submission record.
+   *
+   * @dataProvider getSaveFailures
    */
-  private function submitWhileFailing(\Throwable $failure, string $lastName): void {
-    $listen = function ($event) use ($failure) {
-      if ($event instanceof \Civi\Core\Event\PreEvent && $event->action === 'create') {
+  public function testSaveErrorRollsBackSubmission(\CRM_Core_Exception $failure): void {
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout(self::COMPLETE_ACTIVITY_FIELDS),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'create_submission' => TRUE,
+    ]);
+    $submitted = 0;
+    $countSubmitted = function () use (&$submitted) {
+      $submitted++;
+    };
+    $failActivity = function ($event) use ($failure) {
+      if ($event instanceof \Civi\Core\Event\PreEvent && $event->entity === 'Activity') {
         throw $failure;
       }
     };
+    $lastName = uniqid('Rollback');
+    \Civi::dispatcher()->addListener('civi.afform.submitted', $countSubmitted);
+    \Civi::dispatcher()->addListener('hook_civicrm_pre', $failActivity);
     try {
-      \Civi::dispatcher()->addListener('hook_civicrm_pre', $listen);
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => [['fields' => ['last_name' => $lastName]]]])
-        ->execute();
+      $this->submitContactWithActivity($lastName, ['subject' => 'Rolled back']);
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame($failure->getMessage(), $e->getMessage());
     }
     finally {
-      \Civi::dispatcher()->removeListener('hook_civicrm_pre', $listen);
+      \Civi::dispatcher()->removeListener('civi.afform.submitted', $countSubmitted);
+      \Civi::dispatcher()->removeListener('hook_civicrm_pre', $failActivity);
     }
+    $this->assertCount(0, Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+    $this->assertCount(0, AfformSubmission::get(FALSE)->addWhere('afform_name', '=', $this->formName)->execute());
+    $this->assertSame(0, $submitted);
+  }
+
+  /**
+   * A new record the user left blank is skipped when it lacks required values, and saved
+   * when the form's defaults complete it. A record the user filled in must be saved.
+   */
+  public function testBlankRecord(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('Blank');
+    $this->submitContactWithActivity($lastName, ['subject' => '']);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="status_id:name" defn="{afform_default: \'Scheduled\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('UntouchedDefault');
+    $this->submitContactWithActivity($lastName, ['subject' => '', 'status_id:name' => 'Scheduled']);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+
+    $lastName = uniqid('Entered');
+    try {
+      $this->submitContactWithActivity($lastName, ['subject' => 'No type, no source']);
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('mandatory_missing', $e->getErrorCode());
+    }
+    $this->assertCount(0, Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout(self::COMPLETE_ACTIVITY_FIELDS),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('Defaults');
+    $this->submitContactWithActivity($lastName, ['subject' => '']);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(1, $this->countActivities($contact['id']));
+  }
+
+  /**
+   * A value preset on the af-entity `data` attribute overrides submitted values
+   * server-side, so even when the field shows on the form it is not user input:
+   * an otherwise blank record stays dropped.
+   */
+  public function testBlankRecordWithPresetData(): void {
+    $statusId = \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'activity_status')
+      ->addWhere('name', '=', 'Scheduled')
+      ->execute()->single()['value'];
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="status_id" />', "{target_contact_id: ['Individual1'], status_id: $statusId}"),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('PresetData');
+    $this->submitContactWithActivity($lastName, ['subject' => '']);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+  }
+
+  /**
+   * replaceRelativeDates() turns a relative date filter default (e.g. "this.day")
+   * into an absolute date before the blank record check runs; the resolved value
+   * must still be recognized as the form default, so the blank record is dropped
+   * instead of reaching save and failing the whole submission.
+   */
+  public function testBlankRecordWithRelativeDateDefault(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="activity_date_time" defn="{afform_default: \'this.day\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('RelativeDateBlank');
+    $this->submitContactWithActivity($lastName, ['subject' => '', 'activity_date_time' => 'this.day']);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+  }
+
+  /**
+   * The browser turns a "now" date default into its own local date before submitting,
+   * which the server cannot reproduce: the field does not count as user input.
+   */
+  public function testBlankRecordWithClientResolvedDateDefault(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="activity_date_time" defn="{afform_default: \'now -1 day\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('NowDefaultBlank');
+    $this->submitContactWithActivity($lastName, ['subject' => '', 'activity_date_time' => date('Y-m-d', strtotime('-1 day'))]);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+  }
+
+  /**
+   * The browser turns a "user_contact_id" default into the logged-in contact's id.
+   */
+  public function testBlankRecordWithCurrentUserDefault(): void {
+    $userID = $this->createLoggedInUser();
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" /><af-field name="source_contact_id" defn="{afform_default: \'user_contact_id\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('UserDefaultBlank');
+    $this->submitContactWithActivity($lastName, ['subject' => '', 'source_contact_id' => $userID]);
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame(0, $this->countActivities($contact['id']));
+  }
+
+  public function testTextDefaultIsNotResolvedAsDate(): void {
+    [$resolved] = \CRM_Utils_Date::getFromTo('this.day');
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" defn="{afform_default: \'this.day\'}" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid('TextDate');
+    try {
+      $this->submitContactWithActivity($lastName, ['subject' => $resolved]);
+      $this->fail('Entered text must not be treated as a date default');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('mandatory_missing', $e->getErrorCode());
+    }
+    $this->assertCount(0, Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+  }
+
+  public function testDefaultComparisonForMultiValueFields(): void {
+    $call = [\Civi\Api4\Action\Afform\Submit::class, 'matchesDefault'];
+    $this->assertTrue(\Civi\Test\Invasive::call($call, [['a', 'b'], ['b', 'a'], FALSE, TRUE]));
+    $this->assertFalse(\Civi\Test\Invasive::call($call, [['a', 'c'], ['b', 'a'], FALSE, TRUE]));
+    $this->assertFalse(\Civi\Test\Invasive::call($call, [['a', 'b'], ['b', 'a'], FALSE, FALSE]));
+    $entered = [\Civi\Api4\Action\Afform\Submit::class, 'hasEnteredValue'];
+    $fields = ['subject' => ['defn' => ['input_type' => 'CheckBox', 'afform_default' => ['a', 'b']]]];
+    $this->assertFalse(\Civi\Test\Invasive::call($entered, [['subject' => ['b', 'a']], $fields, [], 'Activity', TRUE]));
+    $this->assertTrue(\Civi\Test\Invasive::call($entered, [['subject' => ['a', 'c']], $fields, [], 'Activity', TRUE]));
+  }
+
+  public function testJoinedPresetAndEnteredValues(): void {
+    $call = [\Civi\Api4\Action\Afform\Submit::class, 'hasEnteredValue'];
+    $fields = ['email' => ['defn' => []]];
+    $this->assertFalse(\Civi\Test\Invasive::call($call, [['email' => 'preset@example.org'], $fields, ['email' => 'preset@example.org'], 'Email', FALSE]));
+    $this->assertTrue(\Civi\Test\Invasive::call($call, [['email' => 'entered@example.org'], $fields, [], 'Email', FALSE]));
+  }
+
+  /**
+   * 'civi.afform.submitted' fires once, after the transaction is committed, with the saved ids.
+   */
+  public function testSubmittedEventFiresAfterCommit(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $seen = [];
+    $listener = function (\Civi\Afform\Event\AfformSubmittedEvent $event) use (&$seen) {
+      $seen[] = [
+        \CRM_Core_Transaction::isActive(),
+        $event->getEntityIds('Individual1')[0]['id'] ?? NULL,
+        $event->getRecords('Individual1')[0]['fields']['last_name'] ?? NULL,
+      ];
+    };
+    $lastName = uniqid('Submitted');
+    \Civi::dispatcher()->addListener('civi.afform.submitted', $listener);
+    try {
+      $this->submitContactWithActivity($lastName, ['subject' => '']);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('civi.afform.submitted', $listener);
+    }
+    $contact = Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute()->single();
+    $this->assertSame([[FALSE, $contact['id'], $lastName]], $seen);
+  }
+
+  /**
+   * Inside an enclosing transaction the event waits for its commit, and a rollback cancels it.
+   */
+  public function testSubmittedEventWaitsForEnclosingTransaction(): void {
+    $this->useValues([
+      'layout' => $this->getContactWithActivityLayout('<af-field name="subject" />'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $seen = [];
+    $listener = function (\Civi\Afform\Event\AfformSubmittedEvent $event) use (&$seen) {
+      $seen[] = $event->getRecords('Individual1')[0]['fields']['last_name'];
+    };
+    \Civi::dispatcher()->addListener('civi.afform.submitted', $listener);
+    try {
+      $committed = uniqid('Committed');
+      $transaction = \CRM_Core_Transaction::create();
+      $this->submitContactWithActivity($committed, ['subject' => '']);
+      $this->assertSame([], $seen);
+      $transaction->commit();
+      $this->assertSame([$committed], $seen);
+
+      $transaction = \CRM_Core_Transaction::create();
+      $this->submitContactWithActivity(uniqid('RolledBack'), ['subject' => '']);
+      $transaction->rollback()->commit();
+      $this->assertSame([$committed], $seen);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('civi.afform.submitted', $listener);
+    }
+  }
+
+  private function getContactWithActivityLayout(string $activityFields, string $activityData = "{target_contact_id: ['Individual1']}"): string {
+    return <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" actions="{create: true, update: true}" security="FBAC" />
+  <af-entity type="Activity" name="Activity1" actions="{create: true, update: true}" security="FBAC" data="$activityData" />
+  <fieldset af-fieldset="Individual1"><af-field name="last_name" /></fieldset>
+  <fieldset af-fieldset="Activity1">$activityFields</fieldset>
+</af-form>
+EOHTML;
+  }
+
+  private function submitContactWithActivity(string $lastName, array $activity): void {
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [['fields' => ['last_name' => $lastName]]],
+        'Activity1' => [['fields' => $activity]],
+      ])
+      ->execute();
+  }
+
+  private function countActivities(int $contactId): int {
+    return \Civi\Api4\ActivityContact::get(FALSE)
+      ->addWhere('contact_id', '=', $contactId)
+      ->addWhere('record_type_id:name', '=', 'Activity Targets')
+      ->execute()->count();
   }
 
   /**
