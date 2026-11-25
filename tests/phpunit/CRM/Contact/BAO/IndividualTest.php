@@ -158,4 +158,57 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
     \Civi::settings()->set('display_name_format', \Civi::settings()->getDefault('display_name_format'));
   }
 
+  /**
+   * Prefix/suffix pairs to pass in when testing preserveDBName.
+   */
+  public static function preserveDBNamePrefixSuffixCases(): array {
+    return [
+      'blank incoming prefix and suffix' => ['', ''],
+      'different incoming prefix and suffix' => ['Mrs.', 'Sr.'],
+    ];
+  }
+
+  /**
+   * Formatting with preserveDBName keeps the existing database prefix and suffix.
+   *
+   * @dataProvider preserveDBNamePrefixSuffixCases
+   */
+  public function testFormatPreservesExistingPrefixAndSuffix(string $incomingPrefix, string $incomingSuffix): void {
+    $this->useTransaction();
+    $contact = \Civi\Api4\Contact::create(FALSE)
+      ->setValues([
+        'contact_type' => 'Individual',
+        'first_name' => 'Existing',
+        'last_name' => 'Person',
+        'prefix_id:name' => 'Mr.',
+        'suffix_id:name' => 'Jr.',
+      ])
+      ->execute()
+      ->single();
+
+    $params = [
+      'contact_type' => 'Individual',
+      'id' => $contact['id'],
+      'first_name' => 'Existing',
+      'last_name' => 'Person',
+      'prefix_id' => $incomingPrefix === '' ? '' : CRM_Core_PseudoConstant::getKey('CRM_Contact_DAO_Contact', 'prefix_id', $incomingPrefix),
+      'suffix_id' => $incomingSuffix === '' ? '' : CRM_Core_PseudoConstant::getKey('CRM_Contact_DAO_Contact', 'suffix_id', $incomingSuffix),
+      'preserveDBName' => TRUE,
+    ];
+    $formattedContact = new CRM_Contact_DAO_Contact();
+    $formattedContact->id = $contact['id'];
+
+    CRM_Contact_BAO_Individual::format($params, $formattedContact);
+
+    $this->assertSame((int) $contact['prefix_id'], (int) $params['prefix_id']);
+    $this->assertSame((int) $contact['suffix_id'], (int) $params['suffix_id']);
+    $this->assertSame((int) $contact['prefix_id'], (int) $formattedContact->prefix_id);
+    $this->assertSame((int) $contact['suffix_id'], (int) $formattedContact->suffix_id);
+
+    // The formatted names must use the preserved labels, not the incoming
+    // ones, even when a different non-blank prefix/suffix is submitted.
+    $this->assertSame('Mr. Existing Person Jr.', $formattedContact->display_name);
+    $this->assertSame('Person, Existing Jr.', $formattedContact->sort_name);
+  }
+
 }
