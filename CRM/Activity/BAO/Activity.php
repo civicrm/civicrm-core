@@ -591,7 +591,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     if (!empty($params['sort'])) {
-      if (is_a($params['sort'], 'CRM_Utils_Sort')) {
+      if ($params['sort'] instanceof CRM_Utils_Sort) {
         $order = $params['sort']->orderBy();
       }
       elseif (trim($params['sort'])) {
