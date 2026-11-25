@@ -58,12 +58,12 @@ function message_admin_civicrm_searchKitTasks(array &$tasks, bool $checkPermissi
 
   // `revert` has its own entry in getEntityActionPermissions() - the permissions that
   // can edit system workflow templates, the only ones with an original to revert to.
-  // Ask the API which actions this user has rather than restating that set here.
-  $canRevert = civicrm_api4('MessageTemplate', 'getActions', [
-    'checkPermissions' => $checkPermissions,
-    'where' => [['name', '=', 'revert']],
-  ]);
-  if ($canRevert->count()) {
+  // Ask the API whether this user may revert rather than restating that set here.
+  // Not via MessageTemplate.getActions: that needs "access CiviCRM", and this hook
+  // runs for every search, so a front-end user's getSearchTasks would fail outright.
+  $canRevert = !$checkPermissions
+    || \Civi::service('civi_api_kernel')->runAuthorize('MessageTemplate', 'revert', ['version' => 4]);
+  if ($canRevert) {
     $tasks['MessageTemplate']['revert'] = [
       'title' => E::ts('Revert to Default'),
       'icon' => 'fa-undo',
