@@ -594,4 +594,46 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
     $this->assertContains('schedule.mapping_id', $selectKeys);
   }
 
+  public function testCheckLinkConditionsWithLogicalOperators(): void {
+    $run = new \Civi\Api4\Action\SearchDisplay\Run('SearchDisplay', 'run');
+    $run->setCheckPermissions(FALSE);
+    $run->setSavedSearch([
+      'api_entity' => 'Group',
+      'api_params' => ['version' => 4, 'select' => ['id']],
+    ]);
+
+    $link = [
+      'path' => '',
+      'entity' => 'Group',
+      'task' => 'refresh',
+      'join' => 'Group_1',
+    ];
+    Invasive::call([$run, 'preprocessLink'], [&$link]);
+    $this->assertSame(
+      [['OR', [['Group_1.saved_search_id', 'IS NOT EMPTY'], ['Group_1.children', 'IS NOT NULL']]]],
+      $link['conditions']
+    );
+    $this->assertSame(
+      ['Group_1.id', 'Group_1.saved_search_id', 'Group_1.children'],
+      Invasive::call([$run, 'getLinkTokens'], [$link])
+    );
+
+    $orLink = [
+      'conditions' => [
+        ['OR', [['saved_search_id', 'IS NOT EMPTY'], ['children', 'IS NOT NULL']]],
+      ],
+    ];
+    $this->assertFalse(Invasive::call([$run, 'checkLinkConditions'], [$orLink, ['saved_search_id' => NULL, 'children' => NULL]]));
+    $this->assertTrue(Invasive::call([$run, 'checkLinkConditions'], [$orLink, ['saved_search_id' => 5, 'children' => NULL]]));
+    $this->assertTrue(Invasive::call([$run, 'checkLinkConditions'], [$orLink, ['saved_search_id' => NULL, 'children' => '1,2']]));
+
+    $notLink = [
+      'conditions' => [
+        ['NOT', [['saved_search_id', 'IS NOT EMPTY']]],
+      ],
+    ];
+    $this->assertTrue(Invasive::call([$run, 'checkLinkConditions'], [$notLink, ['saved_search_id' => NULL]]));
+    $this->assertFalse(Invasive::call([$run, 'checkLinkConditions'], [$notLink, ['saved_search_id' => 5]]));
+  }
+
 }
