@@ -59,36 +59,15 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
     // we've not yet figured out how to bootstrap joomla, so we should
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
-      if (version_compare(JVERSION, '4.0', 'ge')) {
-        \Joomla\CMS\Plugin\PluginHelper::importPlugin('civicrm');
-        $app = \Joomla\CMS\Factory::getApplication();
-      }
-      else {
-        //Invoke the Joomla plugin system to observe to civicrm events.
-        jimport('joomla.plugin.helper');
-        jimport('cms.plugin.helper');
-        JPluginHelper::importPlugin('civicrm');
+      \Joomla\CMS\Plugin\PluginHelper::importPlugin('civicrm');
 
-        // get app based on cli or web
-        if (PHP_SAPI != 'cli') {
-          $app = JFactory::getApplication('administrator');
-        }
-        else {
-          // condition on Joomla version
-          if (version_compare(JVERSION, '3.0', 'lt')) {
-            $app = JCli::getInstance();
-          }
-          else {
-            $app = JApplicationCli::getInstance();
-          }
-        }
-      }
-
+      $app = \Joomla\CMS\Factory::getApplication();
       $result = $app->triggerEvent($fnSuffix, [&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6]);
 
       $moduleResult = $this->commonInvoke($numParams,
         $arg1, $arg2, $arg3, $arg4, $arg5, $arg6,
         $fnSuffix, 'joomla');
+
       if (!empty($moduleResult) && is_array($moduleResult)) {
         if (empty($result)) {
           $result = $moduleResult;

@@ -23,12 +23,7 @@ if (!defined('CIVI_SETUP')) {
 
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'installFiles'));
 
-    if (version_compare(JVERSION, '4.0', 'ge')) {
-      $liveSite = substr_replace(\Joomla\CMS\Uri\Uri::root(), '', -1, 1);
-    }
-    else {
-      $liveSite = substr_replace(JURI::root(), '', -1, 1);
-    }
+    $liveSite = substr_replace(\Joomla\CMS\Uri\Uri::root(), '', -1, 1);
 
     /**
      * @var \Civi\Setup\Model $m
@@ -52,13 +47,7 @@ if (!defined('CIVI_SETUP')) {
 
     foreach ($files as $fileSpec) {
       $str = \Civi\Setup\SettingsUtil::evaluate($tplPath, $fileSpec['params']);
-
-      if (version_compare(JVERSION, '4.0', 'ge')) {
-        \Joomla\Filesystem\File::write($fileSpec['file'], $str);
-      }
-      else {
-        JFile::write($fileSpec['file'], $str);
-      }
+      \Joomla\Filesystem\File::write($fileSpec['file'], $str);
     }
 
   }, \Civi\Setup::PRIORITY_LATE);

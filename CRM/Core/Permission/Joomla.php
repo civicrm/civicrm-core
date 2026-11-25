@@ -130,19 +130,16 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    */
   public function checkGroupRole($array) {
     $user = CRM_Core_Config::singleton()->userSystem->getCurrentJoomlaUser();
-    if (version_compare(JVERSION, '4.0', 'lt')) {
-      $db = JFactory::getDbo();
-    }
-    else {
-      $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-    }
+    $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
     $query = $db->getQuery(TRUE);
+
     $titles = '';
     foreach ($array as $group) {
       $titles .= $db->quoteName($group);
       $titles .= ',';
     }
     $titles = rtrim($titles, ',');
+
     $query
       ->select($db->quoteName('*'))
       ->from($db->quoteName('#__usergroups'))
@@ -196,12 +193,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *   Properties of the object are Joomla-fied permission names.
    */
   private function getUserGroupPermsAssociations() {
-    if (version_compare(JVERSION, '4.0', 'lt')) {
-      $db = JFactory::getDbo();
-    }
-    else {
-      $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-    }
+    $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
     $query = $db->getQuery(TRUE);
 
     $query
@@ -225,12 +217,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *   CRM_Core_Permission_Joomla->getUserGroupPermsAssociations().
    */
   private function updateGroupPermsAssociations($associations) {
-    if (version_compare(JVERSION, '4.0', 'lt')) {
-      $db = JFactory::getDbo();
-    }
-    else {
-      $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-    }
+    $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
     $query = $db->getQuery(TRUE);
 
     $query

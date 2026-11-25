@@ -14,49 +14,22 @@ namespace Civi\Authx;
 class Joomla implements AuthxInterface {
 
   /**
-   * Joomla constructor.
-   */
-  public function __construct() {
-    if (version_compare(JVERSION, '4.0', 'lt')) {
-      jimport('joomla.application.component.helper');
-      jimport('joomla.database.table');
-      jimport('joomla.user.helper');
-    }
-  }
-
-  /**
    * @inheritDoc
    */
   public function checkPassword(string $username, string $password) {
-    if (version_compare(JVERSION, '4.0', 'ge')) {
-      $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-      $JUserTable = new \Joomla\CMS\Table\User($db);
-    }
-    else {
-      $JUserTable = \JTable::getInstance('User', 'JTable');
-      $db = $JUserTable->getDbo();
-    }
-
+    $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+    $table = new \Joomla\CMS\Table\User($db);
     $query = $db->getQuery(TRUE);
     $query->select('id, name, username, email, password');
-    $query->from($JUserTable->getTableName());
+    $query->from($table->getTableName());
     $query->where('(LOWER(username) = LOWER(' . $db->quote($username) . ')) AND (block = 0)');
     $db->setQuery($query, 0, 0);
     $users = $db->loadObjectList();
 
     if (!empty($users)) {
       $user = array_shift($users);
-      if (version_compare(JVERSION, '4.0', 'ge')) {
-        $verified = \Joomla\CMS\User\UserHelper::verifyPassword($password, $user->password, $user->id);
-        return $verified ? $user->id : NULL;
-      }
-      elseif (is_callable(['JUserHelper', 'verifyPassword'])) {
-        $verified = \JUserHelper::verifyPassword($password, $user->password, $user->id);
-        return $verified ? $user->id : NULL;
-      }
-      else {
-        throw new \CRM_Core_Exception("This version of Joomla does not support verifyPassword().");
-      }
+      $verified = \Joomla\CMS\User\UserHelper::verifyPassword($password, $user->password, $user->id);
+      return $verified ? $user->id : NULL;
     }
 
     return NULL;
@@ -66,14 +39,8 @@ class Joomla implements AuthxInterface {
    * @inheritDoc
    */
   public function loginSession($userId) {
-    if (version_compare(JVERSION, '4.0', 'ge')) {
-      $user = new \Joomla\CMS\User\User($userId);
-      $session = \Joomla\CMS\Factory::getApplication()->getSession();
-    }
-    else {
-      $user = new \JUser($userId);
-      $session = \JFactory::getSession();
-    }
+    $user = new \Joomla\CMS\User\User($userId);
+    $session = \Joomla\CMS\Factory::getApplication()->getSession();
     $session->set('user', $user);
   }
 
@@ -81,12 +48,7 @@ class Joomla implements AuthxInterface {
    * @inheritDoc
    */
   public function logoutSession() {
-    if (version_compare(JVERSION, '4.0', 'ge')) {
-      $session = \Joomla\CMS\Factory::getApplication()->getSession();
-    }
-    else {
-      $session = \JFactory::getSession();
-    }
+    $session = \Joomla\CMS\Factory::getApplication()->getSession();
     $session->destroy();
   }
 
@@ -112,12 +74,7 @@ class Joomla implements AuthxInterface {
    * @inheritDoc
    */
   public function getCurrentUserId() {
-    if (version_compare(JVERSION, '4.0', 'ge')) {
-      $user = \Joomla\CMS\Factory::getApplication()->getIdentity();
-    }
-    else {
-      $user = \JFactory::getUser();
-    }
+    $user = \Joomla\CMS\Factory::getApplication()->getIdentity();
     return (empty($user) || $user->guest) ? NULL : $user->id;
   }
 
