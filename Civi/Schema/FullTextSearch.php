@@ -142,6 +142,10 @@ class FullTextSearch extends AutoService implements EventSubscriberInterface {
       }
       $sqls = array_map(fn ($name) => "ADD FULLTEXT INDEX {$name} (" . implode(',', $indices[$name]['columns']) . ")", $toAdd);
       $sql = "ALTER TABLE {$table} " . \implode(', ', $sqls);
+
+      // stopwords are unhelpful for contact_names, particularly as the default INNODB list contains "Will"
+      // TODO: make this settable per defined index?
+      \CRM_Core_DAO::executeQuery('SET @@SESSION.innodb_ft_enable_stopword = "OFF"');
       \CRM_Core_DAO::executeQuery($sql);
     }
   }
