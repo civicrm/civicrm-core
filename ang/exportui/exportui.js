@@ -136,7 +136,7 @@
           autoOpen: false,
           title: ts('Save Fields')
         });
-        var mappingNames = Object.fromEntries(Object.entries(CRM.vars.exportUi.mapping_names).map(([key, n]) => [key, n.toLowerCase()]));
+        const mappingNames = Object.values(CRM.vars.exportUi.mapping_names || {}).map((n) => n.toLowerCase());
         var model = {
           ts: ts,
           saving: false,
