@@ -24,7 +24,7 @@ return [
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Prev Next Cache ID'),
-      'sql_type' => 'int unsigned',
+      'sql_type' => 'bigint unsigned',
       'input_type' => 'Number',
       'required' => TRUE,
       'add' => '3.4',
