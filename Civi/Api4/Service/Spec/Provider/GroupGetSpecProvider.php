@@ -64,8 +64,8 @@ class GroupGetSpecProvider extends \Civi\Core\Service\AutoService implements Gen
    */
   public static function countContacts(array $field): string {
     return "COALESCE(
-      NULLIF((SELECT COUNT(contact_id) FROM `civicrm_group_contact_cache` WHERE `group_id` = {$field['sql_name']}), 0),
-      (SELECT COUNT(contact_id) FROM `civicrm_group_contact` WHERE `group_id` = {$field['sql_name']} AND `status` = 'Added')
+      NULLIF((SELECT COUNT(gcc.contact_id) FROM `civicrm_group_contact_cache` gcc INNER JOIN `civicrm_contact` c ON c.`id` = gcc.`contact_id` WHERE gcc.`group_id` = {$field['sql_name']} AND c.`is_deleted` = 0), 0),
+      (SELECT COUNT(gc.contact_id) FROM `civicrm_group_contact` gc INNER JOIN `civicrm_contact` c ON c.`id` = gc.`contact_id` WHERE gc.`group_id` = {$field['sql_name']} AND gc.`status` = 'Added' AND c.`is_deleted` = 0)
     )";
   }
 
