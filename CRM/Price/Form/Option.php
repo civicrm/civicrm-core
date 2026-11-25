@@ -336,9 +336,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     else {
       $params = $this->getSubmittedValues();
 
-      foreach ($this->_moneyFields as $field) {
-        $params[$field] = CRM_Utils_Rule::cleanMoney(trim($params[$field]));
-      }
       $params['price_field_id'] = $this->_fid;
       $params['is_default'] ??= FALSE;
       $params['is_active'] ??= FALSE;
