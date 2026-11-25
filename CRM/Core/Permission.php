@@ -1274,6 +1274,10 @@ class CRM_Core_Permission {
     $permissions['entity_financial_account']['get'] = $permissions['contribution']['get'];
     $permissions['financial_account']['get'] = $permissions['contribution']['get'];
     $permissions['financial_trxn']['get'] = $permissions['contribution']['get'];
+    // The 'manual batches' permissions are only enforced by the batch UI and would
+    // be difficult to implement for the API, so this is simplified without them.
+    $permissions['batch']['get'] = [['administer CiviCRM', ['access CiviCRM', 'access CiviContribute']]];
+    $permissions['entity_batch']['get'] = $permissions['batch']['get'];
     $permissions['contribution_soft'] = $permissions['contribution'];
     $permissions['contribution_product'] = $permissions['contribution'];
 
