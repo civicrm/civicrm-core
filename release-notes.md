@@ -15,6 +15,15 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 6.20.2
+
+Released November 24, 2026
+
+- **[Synopsis](release-notes/6.20.2.md#synopsis)**
+- **[Bugs resolved](release-notes/6.20.2.md#bugs)**
+- **[Credits](release-notes/6.20.2.md#credits)**
+- **[Feedback](release-notes/6.20.2.md#feedback)**
+
 ## CiviCRM 6.20.1
 
 Released November 19, 2026
