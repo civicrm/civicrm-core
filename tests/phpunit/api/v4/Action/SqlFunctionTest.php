@@ -224,6 +224,87 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
+   * Session group_concat_max_len to restore after a test has lowered it.
+   *
+   * @var int|null
+   */
+  private $originalGroupConcatMaxLen;
+
+  public function tearDown(): void {
+    if ($this->originalGroupConcatMaxLen !== NULL) {
+      \CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = ' . $this->originalGroupConcatMaxLen);
+    }
+    parent::tearDown();
+  }
+
+  /**
+   * A grouping longer than MySQL's default group_concat_max_len of 1024 bytes is returned whole.
+   */
+  public function testGroupConcatLongerThanDefaultMaxLen(): void {
+    $lastName = $this->createContactsWithLongLegalNames();
+    $legalNames = $this->getLongLegalNames();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addGroupBy('last_name')
+      ->addSelect('GROUP_CONCAT(legal_name ORDER BY legal_name) AS legal_names')
+      ->addSelect('GROUP_NTH(legal_name N= 10 ORDER BY legal_name) AS last_legal_name')
+      ->execute()->single();
+
+    $this->assertSame($legalNames, $result['legal_names']);
+    $this->assertSame($legalNames[9], $result['last_legal_name']);
+  }
+
+  /**
+   * The connection's GROUP_CONCAT limit is at least 1 MB, also on MySQL with its default of 1024 bytes.
+   */
+  public function testGroupConcatMaxLenIsAtLeastOneMegabyte(): void {
+    $limit = (int) \CRM_Core_DAO::singleValueQuery('SELECT @@SESSION.group_concat_max_len');
+    $this->assertGreaterThanOrEqual(1048576, $limit);
+  }
+
+  public static function groupConcatExpressions(): array {
+    return [
+      'List' => ['GROUP_CONCAT(legal_name ORDER BY legal_name) AS legal_names'],
+      'last item' => ['GROUP_NTH(legal_name N= -1 ORDER BY legal_name) AS last_legal_name'],
+    ];
+  }
+
+  /**
+   * A grouping cut off at group_concat_max_len fails instead of returning a partial or wrong value.
+   *
+   * @dataProvider groupConcatExpressions
+   */
+  public function testGroupConcatLongerThanMaxLenFails(string $select): void {
+    $lastName = $this->createContactsWithLongLegalNames();
+    $this->originalGroupConcatMaxLen = (int) \CRM_Core_DAO::singleValueQuery('SELECT @@SESSION.group_concat_max_len');
+    \CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = 1024');
+
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('longer than group_concat_max_len (1024 bytes)');
+    Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addGroupBy('last_name')
+      ->addSelect($select)
+      ->execute();
+  }
+
+  /**
+   * Ten names of 120 characters add up to more than 1200 bytes.
+   */
+  private function getLongLegalNames(): array {
+    return array_map(fn($letter) => str_repeat($letter, 120), range('a', 'j'));
+  }
+
+  private function createContactsWithLongLegalNames(): string {
+    $lastName = uniqid();
+    $this->saveTestRecords('Contact', [
+      'records' => array_map(fn($legalName) => ['last_name' => $lastName, 'legal_name' => $legalName], $this->getLongLegalNames()),
+    ]);
+    return $lastName;
+  }
+
+  /**
    * An unknown option value keeps its position in a GROUP_CONCAT of labels.
    */
   public function testGroupConcatLabelWithUnknownOption(): void {

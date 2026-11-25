@@ -96,6 +96,7 @@ abstract class Api4Query {
     $sql = $this->getSql();
     $this->debug('sql', $sql);
     $query = \CRM_Core_DAO::executeQuery($sql);
+    $this->assertNoGroupConcatTruncation();
     while ($query->fetch()) {
       $result = [];
       foreach ($this->selectAliases as $alias => $expr) {
@@ -106,6 +107,24 @@ abstract class Api4Query {
       $results[] = $result;
     }
     return $results;
+  }
+
+  /**
+   * MySQL cuts a GROUP_CONCAT at group_concat_max_len with only a warning (code 1260),
+   * which would make List, First and Nth return incomplete or wrong values.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function assertNoGroupConcatTruncation(): void {
+    if (!\CRM_Core_DAO::getConnection()->connection->warning_count) {
+      return;
+    }
+    foreach (\CRM_Core_DAO::executeQuery('SHOW WARNINGS')->fetchAll() as $warning) {
+      if ((int) $warning['Code'] === 1260) {
+        $limit = \CRM_Core_DAO::singleValueQuery('SELECT @@SESSION.group_concat_max_len');
+        throw new \CRM_Core_Exception("A grouped value is longer than group_concat_max_len ($limit bytes) and was cut off: {$warning['Message']}");
+      }
+    }
   }
 
   protected function isAggregateQuery() {
