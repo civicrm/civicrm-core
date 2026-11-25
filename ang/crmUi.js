@@ -113,7 +113,10 @@
                       requiredLength = element.val().length;
                     }
                   }
-                  ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
+                  const length = element.val().length;
+                  // A date-only picker on a datetime field still holds the stored time until the date is changed
+                  const isStoredDateTime = settings.time === false && length === 19;
+                  ngModel.$setValidity('incompleteDateTime', !(length && length !== requiredLength && !isStoredDateTime));
                 });
               });
           });
