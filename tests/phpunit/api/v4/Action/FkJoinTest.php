@@ -137,10 +137,10 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($this->getLocationTypeID('Home'), $contacts[0]['phone.location_type_id']);
   }
 
-  public function testCreateWithFkIsoCode(): void {
+  public function testCreateWithFkCountryName(): void {
     $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Frenchie')
-      ->addValue('address_primary.country_id.iso_code', 'FR')
+      ->addValue('address_primary.country_id.name', 'France')
       ->execute()
       ->first();
     $address = Address::get(FALSE)

@@ -141,7 +141,7 @@ United States';
     $messageTemplate->setOrder($mockOrder);
     $messageTemplate->setParticipantContacts($participantContacts);
     $roleID = Event::get(FALSE)->addWhere('id', '=', $example['event_id'])->addSelect('default_role_id')->execute()->first()['default_role_id'];
-    $messageTemplate->setParticipant(['id' => $isPrimary ? $primaryParticipantID : $otherParticipantID, 'registered_by_id' => $isPrimary ? NULL : $primaryParticipantID, 'register_date' => date('Y-m-d'), 'role_id' => $roleID, 'event_id' => $example['event_id']]);
+    $messageTemplate->setParticipant(['id' => $isPrimary ? $primaryParticipantID : $otherParticipantID, 'registered_by_id' => $isPrimary ? NULL : $primaryParticipantID, 'register_date' => date('Y-m-d'), 'role_id' => $roleID, 'event_id' => $example['event_id'], 'status_id.class' => 'Positive']);
   }
 
   /**
