@@ -242,8 +242,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    */
   public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE, $isActive = TRUE) {
-
-    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . $isCurrentDomainOnly . '_' . CRM_Core_Config::domainID();
+    global $tsLocale;
+    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . $isCurrentDomainOnly . '_' . CRM_Core_Config::domainID() . '_' . $tsLocale;
     if (!$reset) {
       $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
       if (!empty($processors)) {
