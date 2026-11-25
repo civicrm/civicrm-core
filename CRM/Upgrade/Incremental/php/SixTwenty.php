@@ -363,6 +363,17 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     if (Civi::settings()->get('search_mysql_fts')) {
       $this->addTask('Rebuild FTS indexes without stopwords', 'forceRebuildFtsIndices');
     }
+    $this->addTask('Ensure "MailingAB.created_date" is a timestamp defaulting to now', 'alterSchemaField', 'MailingAB', 'created_date', [
+      'title' => ts('AB Test Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'description' => ts('When was this item created'),
+      'add' => '4.6',
+      'default' => 'CURRENT_TIMESTAMP',
+      'input_attrs' => [
+        'format_type' => 'mailing',
+      ],
+    ]);
   }
 
   /**
