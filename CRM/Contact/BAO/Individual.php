@@ -154,7 +154,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           $dbName = "{$name}_id";
 
           $value = $individual->$dbName;
-          if (in_array($name, $useDBNames)) {
+          if (in_array($dbName, $useDBNames)) {
             $params[$dbName] = $value;
             $contact->$dbName = $value;
             if ($value) {
@@ -163,6 +163,9 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
             else {
               $$name = NULL;
             }
+            // Keep the label in sync with the preserved id; otherwise the
+            // formatted name may still use the incoming (unpreserved) label.
+            $params["{$dbName}:label"] = $$name;
           }
           elseif (array_key_exists($dbName, $params)) {
             // CRM-5278
