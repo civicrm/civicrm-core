@@ -17,4 +17,19 @@ class CRM_AfformAdmin_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * Delete the old afAdminFormSubmissionList if a local copy exists,
+   * as it will override the civicrm/admin/afform/submissions path and cause errors.
+   *
+   * @return bool
+   * @throws Exception
+   */
+  public function upgrade_0002(): bool {
+    $this->ctx->log->info('Applying update 0002');
+    \Civi\Api4\Afform::revert(FALSE)
+      ->addWhere('name', '=', 'afAdminFormSubmissionList')
+      ->execute();
+    return TRUE;
+  }
+
 }
