@@ -384,6 +384,10 @@ AND    domain_id    = %4
    *   Email to be modified for the user.
    */
   public static function updateContactEmail($contactId, $emailAddress) {
+    // Without a contact ID the lookup below would match any user.
+    if (!$contactId) {
+      return;
+    }
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $emailAddress = $strtolower($emailAddress);
 
@@ -391,9 +395,15 @@ AND    domain_id    = %4
     $ufmatch->contact_id = $contactId;
     $ufmatch->domain_id = CRM_Core_Config::domainID();
     if ($ufmatch->find(TRUE)) {
-      // Save the email in UF Match table.
-      $ufmatch->uf_name = $emailAddress;
-      CRM_Core_BAO_UFMatch::create((array) $ufmatch);
+      // Save the email in UF Match table, unless another user already holds
+      // it: uf_name is unique per domain (dev/core#6931, see CRM-6928).
+      $ufDupeName = new CRM_Core_DAO_UFMatch();
+      $ufDupeName->uf_name = $emailAddress;
+      $ufDupeName->domain_id = $ufmatch->domain_id;
+      if (!$ufDupeName->find(TRUE) || $ufDupeName->id == $ufmatch->id) {
+        $ufmatch->uf_name = $emailAddress;
+        CRM_Core_BAO_UFMatch::create((array) $ufmatch);
+      }
 
       // If CMS integration is disabled skip Civi email update if CMS user email
       // is changed.

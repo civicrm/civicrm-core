@@ -81,6 +81,37 @@ class CRM_Core_BAO_UFMatchTest extends CiviUnitTestCase {
   }
 
   /**
+   * Adding a user in the CMS saves the match, then copies the user's email to
+   * uf_name. Another user already holds it, so uf_name stays empty.
+   */
+  public function testUpdateContactEmailKeepsUFNameHeldByAnotherUser(): void {
+    $email = 'taken@example.org';
+    $this->createUFMatch(100, $email, $this->individualCreate(['email' => $email]));
+    $this->synchronizeUser(200, $email, FALSE);
+    $contactID = $this->getLinkedContactID(200);
+
+    CRM_Core_BAO_UFMatch::updateContactEmail($contactID, $email);
+
+    $this->assertEquals($contactID, $this->getLinkedContactID(200));
+    $this->assertNull(CRM_Core_DAO::singleValueQuery('SELECT uf_name FROM civicrm_uf_match WHERE uf_id = 200'));
+    $this->assertEquals($email, CRM_Core_DAO::singleValueQuery('SELECT uf_name FROM civicrm_uf_match WHERE uf_id = 100'));
+  }
+
+  /**
+   * Without a contact ID the lookup has no contact filter, so it must not
+   * give the email to any match or contact.
+   */
+  public function testUpdateContactEmailWithoutContactChangesNothing(): void {
+    $email = 'nobody@example.org';
+    $this->createUFMatch(100, 'changed@example.org', $this->individualCreate(['email' => 'changed@example.org']));
+
+    CRM_Core_BAO_UFMatch::updateContactEmail(NULL, $email);
+
+    $this->assertNull(CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_uf_match WHERE uf_name = %1', [1 => [$email, 'String']]));
+    $this->assertSame([], $this->getContactIDsWithEmail($email));
+  }
+
+  /**
    * A login takes the email-only match. A form submission takes the dedupe
    * rule.
    */
