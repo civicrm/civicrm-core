@@ -23,7 +23,9 @@
       const apiParams = ctrl.taskManager.getApiParams();
       delete apiParams.return;
       delete apiParams.limit;
-      apiParams.filters.id = ctrl.ids || null;
+      if (ctrl.ids && ctrl.ids.length && !ctrl.displayCtrl.allRowsSelected) {
+        apiParams.rowKeys = ctrl.ids;
+      }
       apiParams.format = ctrl.format;
       // Use AJAX to fetch file with arrayBuffer
       const httpConfig = {

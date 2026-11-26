@@ -12,7 +12,33 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
+      function updateTaskGroups(tasks) {
+        if (!tasks) {
+          ctrl.taskGroups = null;
+          ctrl.menuTasks = null;
+          return;
+        }
+        const menuTasks = tasks.filter((task) => task.inMenu !== false);
+        ctrl.menuTasks = menuTasks;
+        const groups = [];
+        const groupMap = {};
+        menuTasks.forEach((task) => {
+          const groupKey = task.join === null ? '__global__' : (task.join || '');
+          if (!groupMap[groupKey]) {
+            groupMap[groupKey] = {
+              key: groupKey,
+              label: task.entityLabel || '',
+              tasks: [],
+            };
+            groups.push(groupMap[groupKey]);
+          }
+          groupMap[groupKey].tasks.push(task);
+        });
+        ctrl.taskGroups = groups;
+      }
+
       this.$onInit = function() {
+        $scope.$watchCollection('$ctrl.taskManager.tasks', updateTaskGroups);
         if (ctrl.displayMode === 'buttons') {
           ctrl.taskManager.getMetadata();
         }
@@ -25,15 +51,21 @@
         });
       };
 
+      this.getTaskIds = function(action) {
+        return ctrl.taskManager.getIdsForTask(action, ctrl.ids);
+      };
+
       this.isActionAllowed = function(action) {
-        return $scope.$eval('' + ctrl.ids.length + action.number);
+        return $scope.$eval('' + ctrl.getTaskIds(action).length + action.number);
       };
 
       this.getActionTitle = function(action) {
+        const ids = ctrl.getTaskIds(action);
         if (ctrl.isActionAllowed(action)) {
-          return ctrl.ids.length ?
-            ts('Perform action on %1 %2', {1: ctrl.ids.length, 2: ctrl.taskManager.entityInfo[ctrl.ids.length === 1 ? 'title' : 'title_plural']}) :
-            ts('Perform action on all %1', {1: ctrl.taskManager.entityInfo.title_plural});
+          const entityInfo = ctrl.taskManager.getEntityInfo(action.entity);
+          return ids.length ?
+            ts('Perform action on %1 %2', {1: ids.length, 2: entityInfo[ids.length === 1 ? 'title' : 'title_plural']}) :
+            ts('Perform action on all %1', {1: entityInfo.title_plural});
         }
         return ts('Selected number must be %1', {1: action.number.replace('===', '')});
       };
@@ -42,7 +74,7 @@
         if (!ctrl.isActionAllowed(action)) {
           return;
         }
-        ctrl.taskManager.doTask(action, ctrl.ids);
+        ctrl.taskManager.doTask(action, ctrl.getTaskIds(action));
       };
     }
   });

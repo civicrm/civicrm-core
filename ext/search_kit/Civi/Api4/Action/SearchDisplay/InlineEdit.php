@@ -11,8 +11,8 @@ use Civi\Api4\Utils\CoreUtil;
  *
  * @method $this setValues(array $values)
  * @method array getValues()
- * @method $this setRowKey(int $rowKey)
- * @method int getRowKey()
+ * @method $this setRowKey(int|string $rowKey)
+ * @method int|string getRowKey()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class InlineEdit extends Run {
@@ -25,7 +25,7 @@ class InlineEdit extends Run {
   protected $display;
 
   /**
-   * @var int
+   * @var int|string
    */
   protected $rowKey;
 
@@ -60,14 +60,22 @@ class InlineEdit extends Run {
    */
   public function updateExistingRow(): void {
     // Apply rowKey to filters
-    $entityName = $this->savedSearch['api_entity'];
-    $keyName = $filterKey = $this->getRowKeyName();
-    // Hack to support relationships
-    if ($entityName === 'RelationshipCache') {
-      $filterKey = 'relationship_id';
-      $entityName = 'Relationship';
+    $keyFields = array_values($this->getRowKeyFields());
+    if (!$keyFields) {
+      throw new \CRM_Core_Exception('Inline edit failed.');
     }
-    $this->applyFilter($filterKey, $this->rowKey);
+    $keyParts = count($keyFields) > 1 ? explode(',', (string) $this->rowKey) : [$this->rowKey];
+    $whereIndices = [];
+    foreach ($keyFields as $idx => $filterKey) {
+      $val = $keyParts[$idx] ?? '';
+      if ($val === '' || $val === NULL) {
+        $this->_apiParams['where'][] = [$filterKey, 'IS NULL'];
+        $whereIndices[$filterKey] = array_key_last($this->_apiParams['where']);
+      }
+      else {
+        $this->applyFilter($filterKey, $val);
+      }
+    }
     $this->return = NULL;
     $this->_apiParams['offset'] = 0;
 
@@ -101,14 +109,17 @@ class InlineEdit extends Run {
         $links = !empty($column['links']) ? $column['links'] : [$column['link']];
         foreach ($links as $link) {
           if (!empty($link['task']) && ($link['action'] === 'update') && ($link['api_params']['values'] ?? NULL) === $this->values) {
-            $taskKey = 'update' . $this->rowKey;
-            if (empty($tasks[$entityName][$taskKey]['record'])) {
-              $tasks[$entityName][$taskKey]['action'] = 'update';
-              $tasks[$entityName][$taskKey]['record'] = [
-                $keyName => $this->rowKey,
+            $linkEntity = ($link['entity'] === 'RelationshipCache') ? 'Relationship' : ($link['entity'] ?: $this->savedSearch['api_entity']);
+            $linkIdKey = CoreUtil::getIdFieldName($linkEntity);
+            $recordId = !empty($link['key']) ? ($existingValues['data'][$link['key']] ?? NULL) : $this->rowKey;
+            $taskKey = 'update' . $recordId;
+            if ($recordId && empty($tasks[$linkEntity][$taskKey]['record'])) {
+              $tasks[$linkEntity][$taskKey]['action'] = 'update';
+              $tasks[$linkEntity][$taskKey]['record'] = [
+                $linkIdKey => $recordId,
               ];
               foreach ($this->values as $key => $value) {
-                $tasks[$entityName][$taskKey]['record'][$key] = $value;
+                $tasks[$linkEntity][$taskKey]['record'][$key] = $value;
               }
             }
           }
@@ -124,10 +135,13 @@ class InlineEdit extends Run {
     // Run create/update tasks
     foreach ($tasks as $editableEntity => $editableItems) {
       foreach ($editableItems as $editableItem) {
-        civicrm_api4($editableEntity, $editableItem['action'], [
+        $saved = civicrm_api4($editableEntity, $editableItem['action'], [
           'checkPermissions' => $checkPermissions,
           'values' => $editableItem['record'],
-        ]);
+        ])->first();
+        if ($editableItem['action'] === 'create' && !empty($editableItem['id_path']) && isset($whereIndices[$editableItem['id_path']]) && !empty($saved[$editableItem['id_key']])) {
+          $this->_apiParams['where'][$whereIndices[$editableItem['id_path']]] = [$editableItem['id_path'], '=', $saved[$editableItem['id_key']]];
+        }
       }
     }
   }
@@ -247,12 +261,17 @@ class InlineEdit extends Run {
     // For hierarchical entities, also allow parent_field to be updated.
     $parentField = CoreUtil::getInfoItem($entityName, 'parent_field');
     if ($parentField && array_key_exists($parentField, $this->values)) {
-      $values[$parentField] = $this->values[$parentField];
+      $parentValue = $this->values[$parentField];
+      if (is_string($parentValue) && str_contains($parentValue, ',')) {
+        $parentValue = explode(',', $parentValue)[0];
+      }
+      $values[$parentField] = $parentValue;
     }
+    $rowId = str_contains((string) $this->rowKey, ',') ? explode(',', (string) $this->rowKey)[0] : $this->rowKey;
     civicrm_api4($entityName, 'update', [
       'checkPermissions' => empty($this->display['acl_bypass']),
       'where' => [
-        [$keyName, '=', $this->rowKey],
+        [$keyName, '=', $rowId],
       ],
       'values' => $values,
     ]);

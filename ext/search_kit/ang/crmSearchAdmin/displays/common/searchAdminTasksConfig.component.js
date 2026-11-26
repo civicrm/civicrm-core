@@ -7,15 +7,88 @@
       apiEntity: '<',
       apiParams: '<'
     },
+    require: {
+      crmSearchAdmin: '^crmSearchAdmin'
+    },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminTasksConfig.html',
-    controller: function($scope, $timeout, searchMeta) {
+    controller: function($scope, $timeout, $q, searchMeta) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.$onInit = function() {
-        searchMeta.getSearchTasks(ctrl.apiEntity).then(function(tasks) {
-          ctrl.allTasks = tasks;
+      function getEnabledEntityJoins() {
+        const validJoins = new Set(ctrl.actionableEntities.map((e) => e.join));
+        if (Array.isArray(ctrl.display.settings.actions_entities)) {
+          const valid = ctrl.display.settings.actions_entities.filter((j) => validJoins.has(j));
+          if (valid.length || ctrl.display.settings.actions_entities.length === 0) {
+            return valid;
+          }
+        }
+        if (!ctrl.actionableEntities.length) {
+          return [];
+        }
+        return [validJoins.has('') ? '' : ctrl.actionableEntities[0].join];
+      }
+
+      function loadTasks() {
+        ctrl.actionableEntities = ctrl.crmSearchAdmin.getActionableEntities();
+        const enabledJoins = getEnabledEntityJoins();
+        const enabledEntities = ctrl.actionableEntities.filter((e) => enabledJoins.includes(e.join));
+        ctrl.enabledEntityCount = enabledEntities.length;
+        $q.all(enabledEntities.map((entityInfo) =>
+          searchMeta.getSearchTasks(entityInfo.entity).then((tasks) => ({entityInfo, tasks}))
+        )).then((results) => {
+          const allTasks = [];
+          const taskGroups = [];
+          let downloadTask = null;
+          results.forEach(({entityInfo, tasks}) => {
+            const prefix = entityInfo.join ? entityInfo.join + ':' : '';
+            const groupTasks = [];
+            tasks.forEach((task) => {
+              if (task.name === 'download') {
+                if (!downloadTask) {
+                  downloadTask = structuredClone(task);
+                }
+                return;
+              }
+              const namespacedTask = Object.assign({}, task, {
+                name: prefix + task.name,
+                unprefixedName: task.name,
+                join: entityInfo.join,
+                entityLabel: entityInfo.label
+              });
+              groupTasks.push(namespacedTask);
+              allTasks.push(namespacedTask);
+            });
+            if (groupTasks.length) {
+              taskGroups.push({
+                join: entityInfo.join,
+                label: entityInfo.label,
+                tasks: groupTasks
+              });
+            }
+          });
+          if (downloadTask || !enabledEntities.length) {
+            downloadTask = downloadTask || {name: 'download', title: ts('Download Spreadsheet')};
+            allTasks.push(downloadTask);
+            if (taskGroups.length === 1) {
+              taskGroups[0].tasks.push(downloadTask);
+              taskGroups[0].tasks.sort((a, b) => a.title.localeCompare(b.title));
+            } else {
+              taskGroups.push({
+                join: null,
+                label: '',
+                tasks: [downloadTask]
+              });
+            }
+          }
+          ctrl.allTasks = allTasks;
+          ctrl.taskGroups = taskGroups;
         });
+      }
+
+      this.$onInit = function() {
+        loadTasks();
+        $scope.$watch('$ctrl.apiParams', loadTasks, true);
         // Set default mode for editing old searches that were created before this setting was added
         if (this.display.settings.actions) {
           this.display.settings.actions_display_mode = this.display.settings.actions_display_mode || 'menu';
@@ -26,10 +99,65 @@
         this.display.settings.actions = !this.display.settings.actions;
         if (!this.display.settings.actions) {
           delete this.display.settings.actions_display_mode;
+          delete this.display.settings.actions_entities;
         } else {
           this.display.settings.actions_display_mode = 'menu';
+          loadTasks();
         }
         ctrl.menuOpen = false;
+        ctrl.entitiesMenuOpen = false;
+      };
+
+      this.isEntityEnabled = function(join) {
+        return getEnabledEntityJoins().includes(join);
+      };
+
+      this.toggleEntity = function(join) {
+        $timeout(function() {
+          const current = getEnabledEntityJoins();
+          const idx = current.indexOf(join);
+          if (idx > -1) {
+            current.splice(idx, 1);
+            // Remove unchecked entity's tasks from actions array if present
+            if (Array.isArray(ctrl.display.settings.actions)) {
+              const prefix = join ? join + ':' : '';
+              ctrl.display.settings.actions = ctrl.display.settings.actions.filter((name) => {
+                return name === 'download' || (prefix ? !name.startsWith(prefix) : name.includes(':'));
+              });
+            }
+          } else {
+            current.push(join);
+            if (Array.isArray(ctrl.display.settings.actions)) {
+              const entityInfo = ctrl.actionableEntities.find((e) => e.join === join);
+              if (entityInfo) {
+                searchMeta.getSearchTasks(entityInfo.entity).then((tasks) => {
+                  const prefix = join ? join + ':' : '';
+                  tasks.forEach((task) => {
+                    if (task.name !== 'download') {
+                      const fullName = prefix + task.name;
+                      if (!ctrl.display.settings.actions.includes(fullName)) {
+                        ctrl.display.settings.actions.push(fullName);
+                      }
+                    }
+                  });
+                });
+              }
+            }
+          }
+          ctrl.display.settings.actions_entities = current;
+          loadTasks();
+        });
+      };
+
+      this.getEnabledEntitiesLabel = function() {
+        const enabled = getEnabledEntityJoins();
+        if (!enabled.length) {
+          return ts('None');
+        }
+        return ctrl.actionableEntities
+          .filter((e) => enabled.includes(e.join))
+          .map((e) => e.label)
+          .join(', ');
       };
 
       this.toggleTask = function(name) {
@@ -56,8 +184,11 @@
         });
       };
 
-      this.isEnabled = function(name) {
-        return (typeof this.display.settings.actions === 'boolean') || this.display.settings.actions.includes(name);
+      this.isEnabled = function(task) {
+        if (typeof this.display.settings.actions === 'boolean') {
+          return true;
+        }
+        return this.display.settings.actions.includes(task.name);
       };
 
     }

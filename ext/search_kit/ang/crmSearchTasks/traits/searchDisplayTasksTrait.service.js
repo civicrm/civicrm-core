@@ -12,6 +12,7 @@
       let fetchedMetadata;
       this.tasks = null;
       this.entityInfo = null;
+      this.entityInfoMap = null;
 
       this.getMetadata = function() {
         if (!fetchedMetadata) {
@@ -20,13 +21,44 @@
             display: displayCtrl.display,
           }).then(function(result) {
             mngr.entityInfo = result.editable.entityInfo;
+            mngr.entityInfoMap = result.editable.entityInfoMap || {};
             mngr.tasks = result;
           }, function(failure) {
             mngr.tasks = [];
-            mngr.entityInfo = [];
+            mngr.entityInfo = {};
+            mngr.entityInfoMap = {};
           });
         }
         return fetchedMetadata;
+      };
+
+      this.resetMetadata = function() {
+        fetchedMetadata = null;
+        this.tasks = null;
+        this.entityInfo = null;
+        this.entityInfoMap = null;
+      };
+
+      this.getEntityInfo = function(entityName) {
+        if (entityName && mngr.entityInfoMap && mngr.entityInfoMap[entityName]) {
+          return mngr.entityInfoMap[entityName];
+        }
+        return mngr.entityInfo || {};
+      };
+
+      this.getIdsForTask = function(task, selectedRowKeys) {
+        if (!selectedRowKeys || !selectedRowKeys.length || !task || typeof task.keyIndex !== 'number') {
+          return selectedRowKeys || [];
+        }
+        const ids = [];
+        selectedRowKeys.forEach((key) => {
+          const raw = (typeof key === 'string' && key.includes(',')) ? key.split(',')[task.keyIndex] : (task.keyIndex === 0 ? key : undefined);
+          if (raw !== undefined && raw !== null && raw !== '') {
+            const num = Number(raw);
+            ids.push(!Number.isNaN(num) && String(num) === String(raw) ? num : raw);
+          }
+        });
+        return [...new Set(ids)];
       };
 
       this.getApiParams = function() {
@@ -43,14 +75,15 @@
       };
 
       this.doTask = function(task, ids, isLink) {
+        const entityName = task.entity || mngr.entityInfo.name;
         const data = {
           ids: ids,
-          entity: mngr.entityInfo.name,
+          entity: entityName,
           search: displayCtrl.search,
           display: displayCtrl.display,
           displayCtrl: displayCtrl,
           taskManager: mngr,
-          entityInfo: mngr.entityInfo,
+          entityInfo: mngr.getEntityInfo(entityName),
           isLink: isLink,
           task: structuredClone(task),
         };
@@ -82,7 +115,7 @@
           });
           dialogService.open('crmSearchTask', (task.uiDialog && task.uiDialog.templateUrl) || '~/crmSearchTasks/crmSearchTaskApiBatch.html', data, options)
             // Reload results on success, do nothing on cancel
-            .then((result) => mngr.refreshAfterTask(result, ids), () => {});
+            .then((result) => mngr.refreshAfterTask(result, isLink ? [isLink] : ids), () => {});
         }
       };
 
@@ -204,12 +237,16 @@
       },
 
       // If link is to a task rather than an ordinary href, run the task
-      onClickLink: function(link, id, event) {
+      onClickLink: function(link, rowKey, event) {
         if (link.task) {
           const mngr = this.taskManager;
           event.preventDefault();
           mngr.getMetadata().then(function() {
-            mngr.doTask(Object.assign({title: link.title}, mngr.getTaskInfo(link.task)), [id], true);
+            const task = mngr.getTaskInfo(link.task);
+            if (task) {
+              const ids = mngr.getIdsForTask(task, [rowKey]);
+              mngr.doTask(Object.assign({title: link.title}, task), ids, rowKey);
+            }
           });
         }
       },

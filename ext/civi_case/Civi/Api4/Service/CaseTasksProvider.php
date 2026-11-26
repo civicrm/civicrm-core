@@ -23,7 +23,8 @@ class CaseTasksProvider {
    */
   #[CiviEventListener(event: 'hook_civicrm_searchKitTasks', priority: 100)]
   public function addTasks(GenericHookEvent $event): void {
-    if (\CRM_Core_Permission::access('CiviCase') || !$event->checkPermissions) {
+    if (!$event->checkPermissions || \CRM_Core_Permission::access('CiviCase')) {
+      $hasCaseTasks = isset($event->tasks['Case']);
       $event->tasks['Contact']['contact.addCase'] = [
         'title' => E::ts('Case - Open New Case'),
         'uiDialog' => ['templateUrl' => '~/civiCaseTasks/civiCaseTaskOpenCase.html'],
@@ -44,8 +45,9 @@ class CaseTasksProvider {
         'relationshipTypes' => [],
       ];
       // In search mode, load relationship types enabled in case roles
-      if (!empty($event->search) && $event->search['api_entity'] === 'Case') {
-        $event->tasks['Case']['case.addRole']['relationshipTypes'] = $this->getCaseRoles($event->search['api_params']);
+      if (!empty($event->search) && $hasCaseTasks) {
+        $apiParams = ($event->search['api_entity'] ?? NULL) === 'Case' ? ($event->search['api_params'] ?? []) : [];
+        $event->tasks['Case']['case.addRole']['relationshipTypes'] = $this->getCaseRoles($apiParams);
       }
     }
   }

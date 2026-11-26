@@ -120,12 +120,13 @@
           .then(function(newWeights) {
             const weightColumn = ctrl.settings.columns.findIndex(col => col.key === weightField);
             ctrl.results.forEach(function(row) {
-              if (row.key in newWeights) {
-                row.data[weightField] = newWeights[row.key];
+              const primaryKey = (typeof row.key === 'string' && row.key.includes(',')) ? row.key.split(',')[0] : row.key;
+              if (primaryKey in newWeights) {
+                row.data[weightField] = newWeights[primaryKey];
                 // If there is a column containing 'weight' as a value, update it and
                 // hope it doesn't use rewrite or any advanced formatting; 'cause this is but a simple refresh function
                 if (weightColumn >= 0) {
-                  row.columns[weightColumn].val = newWeights[row.key];
+                  row.columns[weightColumn].val = newWeights[primaryKey];
                   // Break reference to trigger an Angular view refresh
                   row.columns[weightColumn] = JSON.parse(angular.toJson(row.columns[weightColumn]));
                 }

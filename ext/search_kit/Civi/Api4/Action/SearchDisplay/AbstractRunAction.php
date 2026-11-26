@@ -175,14 +175,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * Transforms each row into an array of raw data and an array of formatted columns
    *
    * @param iterable $result
-   * @return array{data: array, columns: array, key: int, cssClass: string}[]
+   * @return array{data: array, columns: array, key: int|string, cssClass: string}[]
    */
   protected function formatResult(iterable $result): array {
     $rows = [];
-    $keyName = $this->getRowKeyName();
-    if ($this->savedSearch['api_entity'] === 'RelationshipCache') {
-      $keyName = 'relationship_id';
-    }
     foreach ($result as $index => $record) {
       $data = $columns = [];
       foreach ($this->getSelectClause() as $key => $item) {
@@ -199,8 +195,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if ($style) {
         $row['cssClass'] = implode(' ', $style);
       }
-      if (isset($record[$keyName])) {
-        $row['key'] = $record[$keyName];
+      $rowKey = $this->getRowKey($record);
+      if (isset($rowKey)) {
+        $row['key'] = $rowKey;
       }
       $rows[] = $row;
     }
@@ -862,11 +859,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       $idField = CoreUtil::getIdFieldName($link['entity']);
       $idKey = $this->getIdKeyName($link['entity']);
-      $id = $data[$link['prefix'] . $idKey] ?? NULL;
+      $idPath = !empty($link['key']) ? $link['key'] : ($link['prefix'] . $idKey);
+      $id = $data[$idPath] ?? NULL;
       if ($id) {
         $values = [$idField => $id];
         // If not aggregated, add other values to help checkAccess be efficient
-        if (!is_array($data[$link['prefix'] . $idKey])) {
+        if (!is_array($id)) {
           $values += \CRM_Utils_Array::filterByPrefix($data, $link['prefix']);
         }
         // These 2 lines are the heart of the `checkAccess` api action.
@@ -1058,6 +1056,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $link['path'] = preg_replace('/&/', '?', $link['path'], 1);
       }
     }
+    $task = NULL;
     if ($entity && CoreUtil::entityExists($entity)) {
       $idKey = $this->getIdKeyName($entity);
       // Hack to support links to relationships
@@ -1089,7 +1088,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       // Process task links
       elseif (!$link['path'] && !empty($link['task'])) {
-        $task = $this->getTask($link['task']);
+        $taskKey = !empty($link['join']) && !str_starts_with($link['task'], $link['join'] . ':') ? $link['join'] . ':' . $link['task'] : $link['task'];
+        $task = $this->getTask($taskKey);
         $link['conditions'] = array_merge($link['conditions'], $task['conditions'] ?? []);
         // Convert legacy tasks (which have a url)
         if (!empty($task['crmPopup'])) {
@@ -1099,7 +1099,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $idsKey = array_search("ids.join(',')", $data);
           unset($data[$idsKey], $link['task']);
           $amp = strpos($link['path'], '?') ? '&' : '?';
-          $link['path'] .= $amp . $idsKey . '=[' . $link['prefix'] . $idKey . ']';
+          $link['path'] .= $amp . $idsKey . '=[' . ($task['idField'] ?? ($link['prefix'] . $idKey)) . ']';
           // Add the rest of the data items
           foreach ($data as $dataKey => $dataRaw) {
             $link['path'] .= '&' . $dataKey . '=' . \CRM_Utils_JS::decode($dataRaw);
@@ -1109,13 +1109,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           if (!strlen($link['title'])) {
             $link['title'] = $task['title'];
           }
+          $link['task'] = $task['name'];
           // Fill in the api action if known, for the sake of $this->checkLinkAccess
           $link['action'] = $task['apiBatch']['action'] ?? NULL;
           // Used by inlineEdit action when running inline tasks
           $link['api_params'] = $task['apiBatch']['params'] ?? [];
         }
+        elseif (!$task) {
+          unset($link['task']);
+        }
       }
-      $link['key'] = $link['prefix'] . $idKey;
+      $link['key'] = $task['idField'] ?? ($link['prefix'] . $idKey);
     }
     // Add join prefix to predefined conditions
     foreach ($link['conditions'] as &$condition) {
@@ -1143,7 +1147,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     $tokens = [];
     if (!$link['path'] && !empty($link['task'])) {
-      $tokens[] = $link['prefix'] . $this->getIdKeyName($link['entity']);
+      $tokens[] = !empty($link['key']) ? $link['key'] : ($link['prefix'] . $this->getIdKeyName($link['entity']));
     }
     foreach ($link['conditions'] ?? [] as $condition) {
       if (!empty($condition[0]) && $condition[0] !== 'check user permission') {
@@ -1702,12 +1706,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
 
-    // Add primary key field if actions, draggable, or editable are enabled
-    // (only needed for non-dao entities, as Api4SelectQuery will auto-add the id)
-    if (!CoreUtil::isType($this->savedSearch['api_entity'], 'DAOEntity') &&
-      ($isEditable  || !empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable']))
-    ) {
-      $this->addSelectExpression(CoreUtil::getIdFieldName($this->savedSearch['api_entity']));
+    // Add primary key fields if actions, draggable, or editable are enabled
+    if ($isEditable || !empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable'])) {
+      foreach ($this->getRowKeyFields() as $idField) {
+        $this->addSelectExpression($idField);
+      }
     }
 
     // Add fields referenced via token
@@ -2177,20 +2180,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $values;
-  }
-
-  protected function getRowKeyName(): string {
-    // If grouping by a primary key, use that field
-    $groupBy = $this->savedSearch['api_params']['groupBy'] ?? [];
-    foreach ($groupBy as $fieldName) {
-      $field = $this->getField($fieldName);
-      if ($field && (CoreUtil::getIdFieldName($field['entity']) === $field['name'])) {
-        return $fieldName;
-      }
-    }
-    // Use primary key of main entity
-    $entityName = $this->savedSearch['api_entity'];
-    return CoreUtil::getIdFieldName($entityName);
   }
 
   /**

@@ -785,12 +785,104 @@
       if (savedSearch.api_params.groupBy.indexOf(arg.path) > -1) {
         return false;
       }
+      // If this is an FK field and its target entity's id is in groupBy (e.g. `contact_id.id`), no
+      if (arg.field.fk_entity) {
+        const fkPk = searchMeta.getEntity(arg.field.fk_entity)?.primary_key?.[0];
+        if (fkPk && savedSearch.api_params.groupBy.includes(arg.path + '.' + fkPk)) {
+          return false;
+        }
+      }
+      // If this is an implicit join field and its parent FK field is in groupBy (e.g. `contact_id`), no
+      if (arg.prefix && savedSearch.api_params.groupBy.includes(arg.prefix.slice(0, -1))) {
+        return false;
+      }
       const primaryKeys = searchMeta.getEntity(arg.field.entity)?.primary_key;
       if (!primaryKeys || !primaryKeys.length) {
         return true;
       }
       // If the entity this column belongs to is being grouped by primary key, then also no
       return savedSearch.api_params.groupBy.indexOf(arg.prefix + primaryKeys[0]) < 0;
+    };
+
+    // Returns all non-aggregated entities in the savedSearch that support row-level actions
+    this.getActionableEntities = function(savedSearch) {
+      savedSearch = savedSearch || ctrl.savedSearch;
+      const entities = [];
+      // Ungrouped aggregate query (e.g. COUNT without groupBy) has no actionable rows
+      if (!(savedSearch.api_params?.groupBy?.length) && (savedSearch.api_params?.select || []).some((expr) => searchMeta.parseExpr(expr, savedSearch).fn?.category === 'aggregate')) {
+        return entities;
+      }
+      const seen = new Set();
+      const addEntity = (join, entityName, label) => {
+        if (seen.has(join) || !entityName) {
+          return;
+        }
+        const resolvedEntity = entityName === 'RelationshipCache' ? 'Relationship' : entityName;
+        const entityInfo = searchMeta.getEntity(resolvedEntity) || searchMeta.getEntity(entityName);
+        if (!entityInfo) {
+          return;
+        }
+        seen.add(join);
+        entities.push({
+          join: join,
+          entity: resolvedEntity,
+          label: label
+        });
+      };
+
+      // Main entity
+      const mainEntity = searchMeta.getEntity(savedSearch.api_entity);
+      const mainIdField = savedSearch.api_entity === 'RelationshipCache' ? 'relationship_id' : mainEntity?.primary_key?.[0];
+      if (mainEntity && mainIdField && !ctrl.mustAggregate(mainIdField, savedSearch)) {
+        addEntity('', savedSearch.api_entity, mainEntity.title_plural);
+      }
+
+      // Explicit joins (excluding EXCLUDE joins)
+      (savedSearch.api_params?.join || []).forEach(joinClause => {
+        if (joinClause[1] === 'EXCLUDE') {
+          return;
+        }
+        const join = searchMeta.getJoin(savedSearch, joinClause[0]);
+        const joinEntity = join && searchMeta.getEntity(join.entity);
+        const joinIdField = join?.entity === 'RelationshipCache' ? 'relationship_id' : joinEntity?.primary_key?.[0];
+        if (join && joinIdField && !ctrl.mustAggregate(join.alias + '.' + joinIdField, savedSearch)) {
+          addEntity(join.alias, join.entity, join.label);
+        }
+      });
+
+      // Implicit joins / FK fields in select and groupBy
+      const candidates = [
+        ...(savedSearch.api_params?.select || []),
+        ...(savedSearch.api_params?.groupBy || [])
+      ];
+      candidates.forEach(expr => {
+        if (typeof expr !== 'string' || expr.includes(' AS ') || expr.includes('(')) {
+          return;
+        }
+        const arg = searchMeta.parseExpr(expr, savedSearch).args[0];
+        if (!arg?.field || !['Field', 'Custom'].includes(arg.field.type)) {
+          return;
+        }
+        let idFieldName = null;
+        if (arg.field.fk_entity && !arg.suffix) {
+          idFieldName = arg.path;
+        } else if (arg.field.name !== arg.field.fieldName && !arg.field.custom_field_id) {
+          idFieldName = arg.path.slice(0, -1 - arg.field.name.length);
+        }
+        if (!idFieldName || seen.has(idFieldName)) {
+          return;
+        }
+        const idField = searchMeta.parseExpr(idFieldName, savedSearch).args[0]?.field;
+        if (idField?.fk_entity && !ctrl.mustAggregate(idFieldName, savedSearch)) {
+          const fkEntity = searchMeta.getEntity(idField.fk_entity);
+          if (fkEntity && idField.fk_entity !== 'Relationship') {
+            const label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs?.label || idField.label);
+            addEntity(idFieldName, idField.fk_entity, label);
+          }
+        }
+      });
+
+      return entities;
     };
 
     this.fieldsForSelect = function() {

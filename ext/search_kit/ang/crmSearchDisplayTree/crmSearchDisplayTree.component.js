@@ -40,10 +40,11 @@
         if (!parentField) {
           return results;
         }
-        // Index by item.key
+        // Index by primary entity id (first part of composite row key if applicable)
         const indexedResults = results.reduce((acc, item) => {
           item.children = [];
-          acc[item.key] = item;
+          const primaryKey = (typeof item.key === 'string' && item.key.includes(',')) ? item.key.split(',')[0] : item.key;
+          acc[primaryKey] = item;
           return acc;
         }, {});
         // Place children into their parents

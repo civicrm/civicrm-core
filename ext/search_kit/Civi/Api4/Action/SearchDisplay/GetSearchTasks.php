@@ -38,17 +38,180 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     $this->loadSavedSearch();
     $this->loadSearchDisplay();
 
-    // Adding checkPermissions filters out actions the user is not allowed to perform
-    $entityName = $this->savedSearch['api_entity'];
     // Hack to support relationships
-    $entityName = ($entityName === 'RelationshipCache') ? 'Relationship' : $entityName;
+    $mainEntityName = $this->savedSearch['api_entity'];
+    $mainEntityName = ($mainEntityName === 'RelationshipCache') ? 'Relationship' : $mainEntityName;
 
-    $entity = Entity::get(FALSE)->addWhere('name', '=', $entityName)
+    $actionableEntities = $this->getActionableEntities();
+    $enabledEntities = !empty($this->display['settings']['actions']) ? $this->getEnabledActionEntities() : [];
+    $rowKeyFields = $this->getRowKeyFields();
+    $keyIndices = array_flip(array_keys($rowKeyFields));
+
+    $targetEntities = [];
+    foreach ($enabledEntities as $alias => $info) {
+      $targetEntities[$alias] = $info + [
+        'inMenu' => TRUE,
+        'keyIndex' => $keyIndices[$alias] ?? NULL,
+      ];
+    }
+    $linkTaskKeys = [];
+    // Include any actionable entity referenced by an in-row task link
+    foreach ($this->display['settings']['columns'] ?? [] as $column) {
+      $links = !empty($column['links']) ? $column['links'] : (!empty($column['link']) ? [$column['link']] : []);
+      foreach ($links as $link) {
+        if (!empty($link['task']) && empty($link['path'])) {
+          $alias = $link['join'] ?? '';
+          $linkTaskKeys[($alias !== '' ? "$alias:" : '') . $link['task']] = TRUE;
+          if (isset($actionableEntities[$alias]) && !isset($targetEntities[$alias])) {
+            $targetEntities[$alias] = $actionableEntities[$alias] + [
+              'inMenu' => FALSE,
+              'keyIndex' => $keyIndices[$alias] ?? NULL,
+            ];
+          }
+        }
+      }
+    }
+
+    $entityNames = array_unique(array_merge([$mainEntityName], array_column($targetEntities, 'entity')));
+    $entityInfoMap = Entity::get(FALSE)
+      ->addWhere('name', 'IN', $entityNames)
       ->addSelect('name', 'title', 'title_plural', 'primary_key')
-      ->execute()->single();
-    // Used by searchDisplayTasksTrait
-    $result->editable['entityInfo'] = $entity;
+      ->execute()
+      ->indexBy('name');
+    // Used by searchDisplayTasksTrait (keep entityInfo as main entity for backwards compatibility)
+    $result->editable['entityInfo'] = $entityInfoMap[$mainEntityName] ?? [];
+    $result->editable['entityInfoMap'] = (array) $entityInfoMap;
 
+    $tasks = [];
+    $builtEntities = [];
+    foreach ($targetEntities as $targetInfo) {
+      $entityName = $targetInfo['entity'];
+      if (!isset($builtEntities[$entityName]) && isset($entityInfoMap[$entityName])) {
+        $builtEntities[$entityName] = TRUE;
+        $this->buildEntityTasks($entityInfoMap[$entityName], $tasks);
+      }
+    }
+    // Seed global "Download Spreadsheet" task on the main entity before the hook so listeners can modify or unset it
+    $tasks[$mainEntityName]['download'] = [
+      'module' => 'crmSearchTasks',
+      'title' => E::ts('Download Spreadsheet'),
+      'icon' => 'fa-download',
+      'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
+      // Does not require any rows to be selected
+      'number' => '>= 0',
+    ];
+
+    // Call `hook_civicrm_searchKitTasks` which serves 3 purposes:
+    // 1. For extensions to augment this list of tasks
+    // 2. To allow tasks to be added/removed per search display
+    //    Note: Use Events::W_LATE to do so after the tasks are filtered per search-display settings.
+    // 3. To get a full list of Angular modules which provide tasks.
+    $null = NULL;
+    $checkPermissions = $this->checkPermissions;
+    $userId = $this->checkPermissions ? \CRM_Core_Session::getLoggedInContactID() : NULL;
+    \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId', 'search', 'display'],
+      $tasks, $checkPermissions, $userId,
+      $this->savedSearch, $this->display, $null, 'civicrm_searchKitTasks'
+    );
+
+    $enabledActions = $this->display['settings']['actions'] ?? NULL;
+    $outputTasks = [];
+    $menuEntityCount = count($enabledEntities);
+
+    foreach ($targetEntities as $alias => $targetInfo) {
+      $entityName = $targetInfo['entity'];
+      $entityTasks = $tasks[$entityName] ?? [];
+      // If the entity is Individual, Organization, or Household, add the "Contact" actions
+      if (CoreUtil::isContact($entityName)) {
+        $entityTasks = array_merge($entityTasks, $tasks['Contact'] ?? []);
+      }
+
+      $aliasTasks = [];
+      $prefix = $alias !== '' ? "$alias:" : '';
+      foreach ($entityTasks as $name => $task) {
+        if ($name === 'download') {
+          continue;
+        }
+        $namespacedName = $prefix . $name;
+        $isFiltered = !empty($task['_filteredBySubscriber']);
+        unset($task['_filteredBySubscriber']);
+        $inMenu = $task['inMenu'] ?? $targetInfo['inMenu'];
+        if ($targetInfo['inMenu'] && is_array($enabledActions) && $isFiltered) {
+          $inMenu = in_array($namespacedName, $enabledActions, TRUE);
+          if (!$inMenu && empty($linkTaskKeys[$namespacedName])) {
+            continue;
+          }
+        }
+        elseif (!$targetInfo['inMenu']) {
+          $inMenu = FALSE;
+        }
+
+        $task['name'] = $namespacedName;
+        $task['entity'] = $entityName;
+        $task['join'] = $alias;
+        $task['entityLabel'] = $targetInfo['label'];
+        $task['idField'] = $targetInfo['idField'];
+        $task['keyIndex'] = $targetInfo['keyIndex'];
+        $task['inMenu'] = $inMenu;
+        // Add default for number of rows action requires
+        $task += ['number' => '> 0'];
+        if (!empty($task['apiBatch']['fields'])) {
+          if (!$this->getApiBatchFields($task)) {
+            continue;
+          }
+        }
+        // If action includes a WHERE clause, add it to the conditions (see e.g. the enable/disable actions)
+        if (!empty($task['apiBatch']['params']['where'])) {
+          $task['conditions'] = array_merge($task['conditions'] ?? [], $task['apiBatch']['params']['where']);
+        }
+        $aliasTasks[] = $task;
+      }
+
+      usort($aliasTasks, function($a, $b) {
+        return strnatcasecmp($a['title'], $b['title']);
+      });
+      $outputTasks = array_merge($outputTasks, $aliasTasks);
+    }
+
+    // Add the global "Download Spreadsheet" task once when actions menu is enabled and not removed by hook/subscriber
+    if (!empty($enabledActions)) {
+      $downloadTask = $tasks[$mainEntityName]['download'] ?? NULL;
+      if ($downloadTask && CoreUtil::isContact($mainEntityName) && !empty($tasks['Contact']['download'])) {
+        $downloadTask = array_merge($downloadTask, $tasks['Contact']['download']);
+      }
+      if ($downloadTask) {
+        unset($downloadTask['_filteredBySubscriber']);
+        $firstTarget = reset($enabledEntities) ?: reset($targetEntities);
+        $outputTasks[] = $downloadTask + [
+          'name' => 'download',
+          'module' => 'crmSearchTasks',
+          'title' => E::ts('Download Spreadsheet'),
+          'icon' => 'fa-download',
+          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
+          // Does not require any rows to be selected
+          'number' => '>= 0',
+          'entity' => $firstTarget['entity'] ?? $mainEntityName,
+          'join' => $menuEntityCount > 1 ? NULL : ($firstTarget['alias'] ?? ''),
+          'entityLabel' => $menuEntityCount > 1 ? '' : ($firstTarget['label'] ?? ($entityInfoMap[$mainEntityName]['title_plural'] ?? '')),
+          'idField' => $firstTarget['idField'] ?? NULL,
+          'keyIndex' => NULL,
+          'inMenu' => TRUE,
+        ];
+        if ($menuEntityCount <= 1) {
+          usort($outputTasks, function($a, $b) {
+            return strnatcasecmp($a['title'], $b['title']);
+          });
+        }
+      }
+    }
+
+    $result->exchangeArray($outputTasks);
+  }
+
+  /**
+   * Populate core/entity tasks for a single entity into $tasks[$entity['name']].
+   */
+  private function buildEntityTasks(array $entity, array &$tasks): void {
     $actions = [];
     $fields = [];
     try {
@@ -65,7 +228,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       // Limited access user
     }
 
-    $tasks = [$entity['name'] => []];
+    $tasks[$entity['name']] ??= [];
 
     if (array_key_exists('get', $actions)) {
       if (CoreUtil::isContact($entity['name']) || array_key_exists($entity['name'], \CRM_Export_BAO_Export::getComponents())) {
@@ -81,15 +244,6 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         ];
       }
     }
-
-    $tasks[$entity['name']]['download'] = [
-      'module' => 'crmSearchTasks',
-      'title' => E::ts('Download Spreadsheet'),
-      'icon' => 'fa-download',
-      'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
-      // Does not require any rows to be selected
-      'number' => '>= 0',
-    ];
 
     if (array_key_exists('update', $actions)) {
       $tasks[$entity['name']]['update'] = [
@@ -260,56 +414,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         ];
         // In search mode, load relationship types enabled in case roles
         if (!empty($this->savedSearch)) {
-          $tasks[$entity['name']]['contact.relationship']['relationshipTypes'] = $this->getRelationshipTypes($this->savedSearch);
+          $tasks[$entity['name']]['contact.relationship']['relationshipTypes'] = $this->getRelationshipTypes($this->savedSearch, $entity['name']);
         }
       }
     }
-
-    // Call `hook_civicrm_searchKitTasks` which serves 3 purposes:
-    // 1. For extensions to augment this list of tasks
-    // 2. To allow tasks to be added/removed per search display
-    //    Note: Use Events::W_LATE to do so after the tasks are filtered per search-display settings.
-    // 3. To get a full list of Angular modules which provide tasks.
-    //    Note: That's why this hook needs the base-level array and not just the array of tasks for `$entity`.
-    //    Although it may seem wasteful to have extensions add tasks for all possible entities and then
-    //    discard most of it (all but the ones relevant to `$entity`), it's necessary to do it this way
-    //    so that they can be declared as angular dependencies - see search_kit_civicrm_angularModules().
-    $null = NULL;
-    $checkPermissions = $this->checkPermissions;
-    $userId = $this->checkPermissions ? \CRM_Core_Session::getLoggedInContactID() : NULL;
-    \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId', 'search', 'display'],
-      $tasks, $checkPermissions, $userId,
-      $this->savedSearch, $this->display, $null, 'civicrm_searchKitTasks'
-    );
-
-    // If the entity is Individual, Organization, or Household, add the "Contact" actions
-    if (CoreUtil::isContact($entity['name'])) {
-      $tasks[$entity['name']] = array_merge($tasks[$entity['name']], $tasks['Contact'] ?? []);
-    }
-
-    foreach ($tasks[$entity['name']] as $name => &$task) {
-      $task['name'] = $name;
-      $task['entity'] = $entity['name'];
-      // Add default for number of rows action requires
-      $task += ['number' => '> 0'];
-      if (!empty($task['apiBatch']['fields'])) {
-        $fieldPermission = $this->getApiBatchFields($task);
-        if (!$fieldPermission) {
-          unset($tasks[$entity['name']][$name]);
-          continue;
-        }
-      }
-      // If action includes a WHERE clause, add it to the conditions (see e.g. the enable/disable actions)
-      if (!empty($task['apiBatch']['params']['where'])) {
-        $task['conditions'] = array_merge($task['conditions'] ?? [], $task['apiBatch']['params']['where']);
-      }
-    }
-
-    usort($tasks[$entity['name']], function($a, $b) {
-      return strnatcasecmp($a['title'], $b['title']);
-    });
-
-    $result->exchangeArray($tasks[$entity['name']]);
   }
 
   private function getApiBatchFields(array &$task): bool {
@@ -353,6 +461,23 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'name' => 'entity',
       ],
       [
+        'name' => 'join',
+      ],
+      [
+        'name' => 'entityLabel',
+      ],
+      [
+        'name' => 'idField',
+      ],
+      [
+        'name' => 'keyIndex',
+        'data_type' => 'Integer',
+      ],
+      [
+        'name' => 'inMenu',
+        'data_type' => 'Boolean',
+      ],
+      [
         'name' => 'apiBatch',
         'data_type' => 'Array',
       ],
@@ -367,14 +492,14 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     ];
   }
 
-  private function getRelationshipTypes(array $savedSearch): array {
+  private function getRelationshipTypes(array $savedSearch, string $entityName = 'Contact'): array {
     $types = [];
     $where = [];
     // If this search is limited to certain contact types we can restrict side_a
-    if ($savedSearch['api_entity'] !== 'Contact') {
-      $where[] = ['contact_type_a', '=', $savedSearch['api_entity']];
+    if ($entityName !== 'Contact') {
+      $where[] = ['contact_type_a', '=', $entityName];
     }
-    else {
+    elseif (($savedSearch['api_entity'] ?? '') === 'Contact') {
       // Contact type might be specified in the WHERE clause
       foreach ($savedSearch['api_params']['where'] ?? [] as $clause) {
         if (in_array($clause[0], ['contact_type', 'contact_type:name'], TRUE) && in_array($clause[1], ['=', 'IN'], TRUE) && !empty($clause[2]) && empty($clause[3])) {

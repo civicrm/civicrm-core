@@ -61,17 +61,18 @@
         else {
           apiParams.values[weightField] = 1;
         }
-        apiParams.values[parentField] = ctrl.parentKey;
+        apiParams.values[parentField] = (typeof ctrl.parentKey === 'string' && ctrl.parentKey.includes(',')) ? ctrl.parentKey.split(',')[0] : ctrl.parentKey;
         crmStatus({}, crmApi4('SearchDisplay', 'inlineEdit', apiParams))
           .then(function(newWeights) {
             const weightColumn = ctrl.displayCtrl.settings.columns.findIndex(col => col.key === weightField);
             ctrl.displayCtrl.results.forEach(function(row) {
-              if (row.key in newWeights) {
-                row.data[weightField] = newWeights[row.key];
+              const primaryKey = (typeof row.key === 'string' && row.key.includes(',')) ? row.key.split(',')[0] : row.key;
+              if (primaryKey in newWeights) {
+                row.data[weightField] = newWeights[primaryKey];
                 // If there is a column containing 'weight' as a value, update it and
                 // hope it doesn't use rewrite or any advanced formatting; 'cause this is but a simple refresh function
                 if (weightColumn >= 0) {
-                  row.columns[weightColumn].val = newWeights[row.key];
+                  row.columns[weightColumn].val = newWeights[primaryKey];
                   // Break reference to trigger an Angular view refresh
                   row.columns[weightColumn] = JSON.parse(angular.toJson(row.columns[weightColumn]));
                 }

@@ -54,6 +54,21 @@ trait SavedSearchInspectorTrait {
    */
   private $_joinMap;
 
+  /**
+   * @var array|null
+   */
+  private $_actionableEntities;
+
+  /**
+   * @var array|null
+   */
+  private $_rowKeyFields;
+
+  /**
+   * @var bool|null
+   */
+  private $_hasAggregateSelect;
+
   private $_savedSearchParam;
 
   private $_displayParam;
@@ -85,6 +100,7 @@ trait SavedSearchInspectorTrait {
     }
     // Reset internal cached metadata
     $this->_selectQuery = $this->_selectClause = $this->_searchEntityFields = $this->_joinMap = NULL;
+    $this->_actionableEntities = $this->_rowKeyFields = $this->_hasAggregateSelect = NULL;
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
   }
 
@@ -122,6 +138,7 @@ trait SavedSearchInspectorTrait {
         'name' => NULL,
       ];
     }
+    $this->_rowKeyFields = NULL;
   }
 
   /**
@@ -234,34 +251,277 @@ trait SavedSearchInspectorTrait {
    * @param string $fieldPath
    * @return bool
    */
-  private function canAggregate($fieldPath) {
+  protected function canAggregate($fieldPath) {
     // Disregard suffix
     [$fieldPath] = explode(':', $fieldPath);
     $field = $this->getField($fieldPath);
     $apiParams = $this->savedSearch['api_params'] ?? [];
 
-    // If the query does not use grouping or the field doesn't exist, never
-    if (empty($apiParams['groupBy']) || !$field) {
+    // If the field doesn't exist, never
+    if (!$field) {
       return FALSE;
+    }
+    // If the query has no groupBy, fields can only aggregate if the select clause contains an aggregate function
+    if (empty($apiParams['groupBy'])) {
+      if (!isset($this->_hasAggregateSelect)) {
+        $this->_hasAggregateSelect = FALSE;
+        foreach ($apiParams['select'] ?? [] as $selectExpr) {
+          $expr = SqlExpression::convert($selectExpr, TRUE);
+          if ($expr instanceof SqlFunction && $expr->getCategory() === SqlFunction::CATEGORY_AGGREGATE) {
+            $this->_hasAggregateSelect = TRUE;
+            break;
+          }
+        }
+      }
+      return $this->_hasAggregateSelect;
     }
     // If the column is used for a groupBy, no
     if (in_array($fieldPath, $apiParams['groupBy'])) {
       return FALSE;
     }
+    // If this is an FK field and its target entity's id is in groupBy (e.g. `contact_id.id`), no
+    if (!empty($field['fk_entity']) && in_array($fieldPath . '.' . CoreUtil::getIdFieldName($field['fk_entity']), $apiParams['groupBy'])) {
+      return FALSE;
+    }
+    // If the entity this field belongs to is being grouped by its id, no
+    $prefix = substr($fieldPath, 0, 0 - strlen($field['name']));
+    if (in_array($prefix . CoreUtil::getIdFieldName($field['entity']), $apiParams['groupBy'])) {
+      return FALSE;
+    }
 
-    // If this is an implicit join, use the parent field
-    if (str_ends_with($fieldPath, '.' . $field['name'])) {
+    // If this is an implicit join, walk up parent FK fields to see if any parent or parent's entity id is grouped
+    while (str_ends_with($fieldPath, '.' . $field['name'])) {
       $baseFieldPath = substr($fieldPath, 0, -strlen('.' . $field['name']));
       $baseField = $this->getField($baseFieldPath);
-      if ($baseField) {
-        $fieldPath = $baseFieldPath;
-        $field = $baseField;
+      if (!$baseField) {
+        break;
+      }
+      if (in_array($baseFieldPath, $apiParams['groupBy'])) {
+        return FALSE;
+      }
+      $basePrefix = substr($baseFieldPath, 0, 0 - strlen($baseField['name']));
+      if (in_array($basePrefix . CoreUtil::getIdFieldName($baseField['entity']), $apiParams['groupBy'])) {
+        return FALSE;
+      }
+      $fieldPath = $baseFieldPath;
+      $field = $baseField;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Returns all non-aggregated entities in the savedSearch that support row-level actions.
+   *
+   * @return array<string, array{alias: string, entity: string, label: string, idField: string, isJoin: bool}>
+   */
+  protected function getActionableEntities(): array {
+    if (isset($this->_actionableEntities)) {
+      return $this->_actionableEntities;
+    }
+    $entities = [];
+    $mainEntity = $this->savedSearch['api_entity'] ?? NULL;
+    if (!$mainEntity || !CoreUtil::entityExists($mainEntity)) {
+      return $this->_actionableEntities = $entities;
+    }
+    // Hack to support relationships
+    $resolvedMain = ($mainEntity === 'RelationshipCache') ? 'Relationship' : $mainEntity;
+    $mainIdField = ($mainEntity === 'RelationshipCache') ? 'relationship_id' : CoreUtil::getIdFieldName($mainEntity);
+    if (!$this->canAggregate($mainIdField)) {
+      $entities[''] = [
+        'alias' => '',
+        'entity' => $resolvedMain,
+        'label' => CoreUtil::getInfoItem($resolvedMain, 'title_plural'),
+        'idField' => $mainIdField,
+        'isJoin' => FALSE,
+      ];
+    }
+
+    // Explicit joins (skip EXCLUDE joins)
+    $excludeJoins = [];
+    foreach ($this->savedSearch['api_params']['join'] ?? [] as $joinClause) {
+      if (($joinClause[1] ?? 'LEFT') === 'EXCLUDE') {
+        $alias = explode(' AS ', $joinClause[0])[1] ?? NULL;
+        if ($alias) {
+          $excludeJoins[] = $alias;
+        }
+      }
+    }
+    foreach ($this->getJoins() as $join) {
+      $alias = $join['alias'];
+      if (in_array($alias, $excludeJoins, TRUE)) {
+        continue;
+      }
+      $joinEntity = ($join['entity'] === 'RelationshipCache') ? 'Relationship' : $join['entity'];
+      $joinPk = ($join['entity'] === 'RelationshipCache') ? 'relationship_id' : CoreUtil::getIdFieldName($join['entity']);
+      $idField = "$alias.$joinPk";
+      if (!$this->canAggregate($idField)) {
+        $entities[$alias] = [
+          'alias' => $alias,
+          'entity' => $joinEntity,
+          'label' => $this->getJoinLabel($alias),
+          'idField' => $idField,
+          'isJoin' => TRUE,
+        ];
       }
     }
 
-    // If the entity this column belongs to is being grouped by id, then also no
-    $idField = substr($fieldPath, 0, 0 - strlen($field['name'])) . CoreUtil::getIdFieldName($field['entity']);
-    return !in_array($idField, $apiParams['groupBy']);
+    // Implicit joins / FK fields in select and groupBy
+    $apiParams = $this->savedSearch['api_params'] ?? [];
+    $groupBy = $apiParams['groupBy'] ?? [];
+    $select = $apiParams['select'] ?? [];
+    foreach (array_merge($select, $groupBy) as $exprStr) {
+      if (!is_string($exprStr) || str_contains($exprStr, ' AS ') || str_contains($exprStr, '(')) {
+        continue;
+      }
+      [$fieldPath, $suffix] = array_pad(explode(':', $exprStr, 2), 2, NULL);
+      $field = $this->getField($fieldPath);
+      if (!$field || !in_array($field['type'] ?? '', ['Field', 'Custom'], TRUE)) {
+        continue;
+      }
+      $fkAlias = NULL;
+      $fkField = NULL;
+      if (!empty($field['fk_entity']) && !$suffix) {
+        $fkAlias = $fieldPath;
+        $fkField = $field;
+      }
+      elseif (!empty($field['implicit_join']) && empty($field['custom_field_id'])) {
+        $basePath = substr($fieldPath, 0, -1 - strlen($field['name']));
+        $baseField = $basePath ? $this->getField($basePath) : NULL;
+        if ($baseField && !empty($baseField['fk_entity'])) {
+          $fkAlias = $basePath;
+          $fkField = $baseField;
+        }
+      }
+      if (!$fkAlias || isset($entities[$fkAlias])) {
+        continue;
+      }
+      $fkEntity = $fkField['fk_entity'];
+      $resolvedFkEntity = ($fkEntity === 'RelationshipCache') ? 'Relationship' : $fkEntity;
+      if (!CoreUtil::entityExists($resolvedFkEntity) || CoreUtil::getInfoItem($fkEntity, 'searchable') === 'none') {
+        continue;
+      }
+      if ($this->canAggregate($fkAlias)) {
+        continue;
+      }
+      $pk = ($fkEntity === 'RelationshipCache') ? 'relationship_id' : CoreUtil::getIdFieldName($fkEntity);
+      $pkPath = "$fkAlias.$pk";
+      if (in_array($pkPath, $groupBy, TRUE)) {
+        $idField = $pkPath;
+      }
+      elseif (in_array($fkAlias, $groupBy, TRUE)) {
+        $idField = $fkAlias;
+      }
+      elseif (in_array($pkPath, $select, TRUE)) {
+        $idField = $pkPath;
+      }
+      else {
+        $idField = $fkAlias;
+      }
+      $label = $fkField['input_attrs']['label'] ?? $fkField['label'];
+      if (!empty($fkField['explicit_join'])) {
+        $label = $this->getJoinLabel($fkField['explicit_join']) . ': ' . $label;
+      }
+      $entities[$fkAlias] = [
+        'alias' => $fkAlias,
+        'entity' => $resolvedFkEntity,
+        'label' => $label,
+        'idField' => $idField,
+        'isJoin' => FALSE,
+      ];
+    }
+
+    return $this->_actionableEntities = $entities;
+  }
+
+  /**
+   * Returns the subset of actionable entities enabled in display.settings.actions_entities.
+   *
+   * Defaults to the primary entity (`''`) if actionable, or the first actionable entity otherwise.
+   *
+   * @return array<string, array{alias: string, entity: string, label: string, idField: string, isJoin: bool}>
+   */
+  protected function getEnabledActionEntities(): array {
+    $actionable = $this->getActionableEntities();
+    if (!$actionable) {
+      return [];
+    }
+    $configured = isset($this->display) ? ($this->display['settings']['actions_entities'] ?? NULL) : NULL;
+    if (is_array($configured)) {
+      if ($configured === []) {
+        return [];
+      }
+      $enabled = array_intersect_key($actionable, array_flip($configured));
+      if ($enabled) {
+        return $enabled;
+      }
+    }
+    if (isset($actionable[''])) {
+      return ['' => $actionable['']];
+    }
+    $firstKey = array_key_first($actionable);
+    return [$firstKey => $actionable[$firstKey]];
+  }
+
+  /**
+   * Returns ordered map of entity alias => idFieldPath for constructing row keys.
+   *
+   * @return array<string, string>
+   */
+  protected function getRowKeyFields(): array {
+    if (isset($this->_rowKeyFields)) {
+      return $this->_rowKeyFields;
+    }
+    $actionable = $this->getActionableEntities();
+    if (!$actionable) {
+      return $this->_rowKeyFields = [];
+    }
+    $keys = [];
+    // Primary row key: '' if actionable, else first actionable entity (e.g. groupBy joined/FK PK)
+    if (isset($actionable[''])) {
+      $keys[''] = $actionable['']['idField'];
+    }
+    else {
+      $firstKey = array_key_first($actionable);
+      $keys[$firstKey] = $actionable[$firstKey]['idField'];
+    }
+    // Additional entities enabled in actions_entities (when actions are enabled)
+    if (!empty($this->display['settings']['actions'])) {
+      foreach ($this->getEnabledActionEntities() as $alias => $info) {
+        $keys[$alias] = $info['idField'];
+      }
+    }
+    // Additional actionable entities referenced by in-row task links
+    foreach ($this->display['settings']['columns'] ?? [] as $column) {
+      $links = !empty($column['links']) ? $column['links'] : (!empty($column['link']) ? [$column['link']] : []);
+      foreach ($links as $link) {
+        if (!empty($link['task']) && empty($link['path'])) {
+          $alias = $link['join'] ?? '';
+          if (isset($actionable[$alias])) {
+            $keys[$alias] = $actionable[$alias]['idField'];
+          }
+        }
+      }
+    }
+    return $this->_rowKeyFields = $keys;
+  }
+
+  /**
+   * Compute the row key value from a result record.
+   *
+   * @param array $record
+   * @return int|string|null
+   */
+  protected function getRowKey(array $record) {
+    $fields = $this->getRowKeyFields();
+    if (count($fields) === 1) {
+      $field = reset($fields);
+      return $record[$field] ?? NULL;
+    }
+    if (count($fields) > 1) {
+      return implode(',', array_map(fn($field) => $record[$field] ?? '', $fields));
+    }
+    return NULL;
   }
 
   private function renameIfAggregate(string $fieldPath, bool $asSelect = FALSE): string {
