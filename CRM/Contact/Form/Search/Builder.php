@@ -485,9 +485,10 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * if using IS NULL/NOT NULL, an array with no array key is created
    * convert that to simple NULL so processing can proceed
    *
-   * @param string $val
+   * @param mixed $val
    *
-   * @return null
+   * @return mixed
+   *   The original value, or NULL if it is an array with no non-empty keys.
    */
   public static function checkArrayKeyEmpty($val) {
     if (is_array($val)) {
