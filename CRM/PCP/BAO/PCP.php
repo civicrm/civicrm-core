@@ -290,46 +290,48 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
           'name' => ts('Edit Your Page'),
           'url' => 'civicrm/pcp/info',
           'qs' => 'action=update&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
-          'title' => ts('Configure'),
+          'title' => ts('Change the content and appearance of your page'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('URL for this Page'),
           'url' => 'civicrm/pcp/info',
           'qs' => 'reset=1&id=%%pcpId%%&component=%%pageComponent%%',
-          'title' => ts('URL for this Page'),
+          'title' => ts('Copy this link to share directly with your network!'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::BROWSE => [
           'name' => ts('Update Contact Information'),
           'url' => 'civicrm/pcp/info',
           'qs' => 'action=browse&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
-          'title' => ts('Update Contact Information'),
+          'title' => ts('Update your personal contact information'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'url' => 'civicrm/pcp',
           'qs' => 'action=enable&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
-          'title' => ts('Enable'),
+          'title' => ts('Activate the page (you can de-activate it later)'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'url' => 'civicrm/pcp',
           'qs' => 'action=disable&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
-          'title' => ts('Disable'),
+          'title' => ts('De-activate the page (you can re-activate it later)'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
       ];
 
-      // pcp.user.actions emits a malformed set of $links. But it is locked-in via unit-test, so we'll grandfather
-      // the bad one and fire new variants that are well-formed.
-      CRM_Utils_Hook::links('pcp.user.actions', 'Pcp', $pcpId, self::$_pcpLinks);
-      CRM_Utils_Hook::links('pcp.user.actions.add', 'Pcp', $pcpId, self::$_pcpLinks['add']);
-      CRM_Utils_Hook::links('pcp.user.actions.all', 'Pcp', $pcpId, self::$_pcpLinks['all']);
     }
-    return self::$_pcpLinks;
+    // The hooks run for each page, as listeners may add or remove links depending on the page.
+    $links = self::$_pcpLinks;
+    // pcp.user.actions emits a malformed set of $links. But it is locked-in via unit-test, so we'll grandfather
+    // the bad one and fire new variants that are well-formed.
+    CRM_Utils_Hook::links('pcp.user.actions', 'Pcp', $pcpId, $links);
+    CRM_Utils_Hook::links('pcp.user.actions.add', 'Pcp', $pcpId, $links['add']);
+    CRM_Utils_Hook::links('pcp.user.actions.all', 'Pcp', $pcpId, $links['all']);
+    return $links;
   }
 
   /**

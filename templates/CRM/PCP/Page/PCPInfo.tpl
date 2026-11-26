@@ -35,7 +35,7 @@
     {foreach from=$links key=k item=v}
       <tr>
         <td><a href="{crmURL p=$v.url q=$v.qs|replace:'%%pcpId%%':$replace.id|replace:'%%pageComponent%%':$replace.pageComponent|replace:'%%pcpBlock%%':$replace.block}" title="{$v.title|escape:'html'}" {if array_key_exists('extra', $v)}{$v.extra}{/if}><strong><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {$v.name}</strong></a></td>
-        <td>&nbsp;<cite>{$hints.$k}</cite></td>
+        <td>&nbsp;<cite>{$v.title|escape:'html'}</cite></td>
       </tr>
     {/foreach}
   </table>

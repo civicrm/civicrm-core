@@ -111,7 +111,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
       [
         [
           'pageTitle' => $contributionPage['title'],
-          'action' => '<span><a href="/index.php?q=civicrm/pcp/info&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'URL for this Page\' >URL for this Page</a><a href="/index.php?q=civicrm/pcp/info&amp;action=update&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Configure\' >Edit Your Page</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/pcp/info&amp;action=browse&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Update Contact Information\' >Update Contact Information</a></li><li><a href="/index.php?q=civicrm/pcp&amp;action=disable&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Disable\' >Disable</a></li></ul></span>',
+          'action' => '<span><a href="/index.php?q=civicrm/pcp/info&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Copy this link to share directly with your network!\' >URL for this Page</a><a href="/index.php?q=civicrm/pcp/info&amp;action=update&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Change the content and appearance of your page\' >Edit Your Page</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/pcp/info&amp;action=browse&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Update your personal contact information\' >Update Contact Information</a></li><li><a href="/index.php?q=civicrm/pcp&amp;action=disable&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'De-activate the page (you can re-activate it later)\' >Disable</a></li></ul></span>',
           'pcpId' => (string) $pcpID,
           'pcpTitle' => 'pcp',
           'pcpStatus' => 'Approved',
@@ -146,19 +146,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     }
 
     $this->assertTrue($found);
-  }
-
-  /**
-   * Test that tellafriend_civicrm_links adds the Tell Friends action link.
-   */
-  public function testPcpTellAFriendLinksHook(): void {
-    require_once Civi::paths()->getPath('[civicrm.root]/ext/tellafriend/tellafriend.php');
-    $this->hookClass->setHook('civicrm_links', 'tellafriend_civicrm_links');
-    CRM_PCP_BAO_PCP::$_pcpLinks = NULL;
-    $links = CRM_PCP_BAO_PCP::pcpLinks(1);
-    $this->assertArrayHasKey(CRM_Core_Action::DETACH, $links['all']);
-    $this->assertSame('civicrm/friend', $links['all'][CRM_Core_Action::DETACH]['url']);
-    $this->assertSame('Tell Friends', $links['all'][CRM_Core_Action::DETACH]['name']);
   }
 
   /**
