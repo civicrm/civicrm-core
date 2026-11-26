@@ -372,7 +372,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     if (!empty($savedSearch->api_entity)) {
       return CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, "/edit/$id?tab=group");
     }
-    // Classic search builder
+    // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
     if (!empty($savedSearch->mapping_id)) {
       $path = 'civicrm/contact/search/builder';
     }

@@ -42,6 +42,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $values = $this->controller->exportValues('Advanced');
     }
     elseif ($this->_action == CRM_Core_Action::PROFILE) {
+      // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
       $values = $this->controller->exportValues('Builder');
     }
     elseif ($this->_action == CRM_Core_Action::COPY) {
@@ -140,6 +141,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $isSearchBuilder = $this->get('isSearchBuilder');
 
     // add mapping record only for search builder saved search
+    // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
     $mappingId = NULL;
     if ($isAdvanced == '2' && $isSearchBuilder == '1') {
       //save the mapping for search builder

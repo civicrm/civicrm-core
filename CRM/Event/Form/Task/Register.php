@@ -51,6 +51,7 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
         break;
 
       case 'builder':
+        // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
         $urlString = 'civicrm/contact/search/builder';
         $this->_action = CRM_Core_Action::PROFILE;
         break;

@@ -52,6 +52,7 @@
      <page_type>1</page_type>
      <weight>12</weight>
   </item>
+  <!-- Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement. -->
   <item>
      <path>civicrm/contact/search/builder</path>
      <title>Search Builder</title>

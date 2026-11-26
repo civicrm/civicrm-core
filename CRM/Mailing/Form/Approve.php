@@ -176,6 +176,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
         $fragment = 'search';
       }
       elseif ($this->_action == CRM_Core_Action::PROFILE) {
+        // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
         $fragment = 'search/builder';
       }
       elseif ($this->_action == CRM_Core_Action::ADVANCED) {

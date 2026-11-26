@@ -70,6 +70,7 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
       $path = 'civicrm/contact/search/basic';
     }
     elseif (str_contains($qString, 'builder')) {
+      // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
       $path = 'civicrm/contact/search/builder';
     }
     $url = CRM_Utils_System::url($path, $args);

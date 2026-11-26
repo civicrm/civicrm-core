@@ -325,6 +325,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           break;
 
         case 'builder':
+          // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
           $searchType = $searchPath;
           $this->_action = CRM_Core_Action::PROFILE;
           break;
