@@ -27,10 +27,10 @@
       <a ng-href="#!/?provider={{provider.name}}">{{provider.title}}</a>
     </td>
     <td>
-      <span ng-if="!provider.client_count" class="crm-oauth-no-clients">None</span>
+      <span ng-if="!provider.client_count" class="crm-oauth-no-clients">{{ts('None')}}</span>
       <span ng-if="provider.client_count">{{provider.client_count}}</span>
       <span ng-if="provider.client_count > provider.active_client_count">
-        ({{provider.client_count - provider.active_client_count}} disabled)
+        ({{ts('%1 disabled', {1: provider.client_count - provider.active_client_count})}})
       </span>
     </td>
   </tr>

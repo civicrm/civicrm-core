@@ -1,7 +1,7 @@
 <div af-api4-ctrl="tokens" af-api4="['OAuthSysToken', 'get', {'where': [['client_id', '=', options.clientId]]}]">
 </div>
 <div ng-if="tokens.result.length == 0">
-  No tokens found
+  {{ts('No tokens found')}}
 </div>
 
 <table class="table" ng-if="tokens.result.length > 0">
@@ -35,8 +35,8 @@
 
         <a class="btn btn-danger"
            af-api4-action="['OAuthSysToken', 'delete', {where: [['id', '=', token.id]]}]"
-           af-api4-start-msg="'Deleting...'"
-           af-api4-success-msg="'Deleted'"
+           af-api4-start-msg="ts('Deleting...')"
+           af-api4-success-msg="ts('Deleted')"
            af-api4-success="tokens.refresh()"
         >Delete</a>
       </div>
