@@ -1251,4 +1251,19 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertSame('500 Original St', $upstream['street_address']);
   }
 
+  public function testWorldRegionInAddressDisplayFormat(): void {
+    $contact = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Region'], 'region_contact');
+    $this->createTestEntity('Address', [
+      'contact_id' => $contact['id'],
+      'location_type_id:name' => 'Home',
+      'country_id.name' => 'United States',
+    ], 'region_address');
+    Civi::settings()->set('address_format', '{contact.world_region}');
+
+    $address = CRM_Core_BAO_Address::getValues(['contact_id' => $contact['id']]);
+
+    $this->assertSame('America South, Central, North and Caribbean', trim($address[1]['display_text']));
+    Civi::settings()->revert('address_format');
+  }
+
 }

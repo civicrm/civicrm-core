@@ -436,7 +436,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
         //get world region
         $regionId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $address->country_id, 'region_id');
-        $values['world_region'] = CRM_Core_PseudoConstant::worldregion($regionId);
+        $values['world_region'] = $address->world_region = CRM_Core_PseudoConstant::worldregion($regionId);
       }
 
       $address->addDisplay($useMarkup);
