@@ -22,6 +22,7 @@ namespace api\v4\Entity;
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Group;
+use Civi\Api4\GroupContact;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -42,12 +43,13 @@ class GroupTest extends Api4TestBase implements TransactionalInterface {
 
   public function testSmartGroupCache(): void {
     \Civi::settings()->set('smartGroupCacheTimeout', 5);
+    $contact = $this->createTestRecord('Contact', ['first_name' => 'Smarty']);
     $savedSearch = $this->createTestRecord('SavedSearch', [
       'api_entity' => 'Contact',
       'api_params' => [
         'version' => 4,
         'select' => ['id'],
-        'where' => [],
+        'where' => [['first_name', '=', 'Smarty']],
       ],
     ]);
     $smartGroup = $this->createTestRecord('Group', [
@@ -75,14 +77,19 @@ class GroupTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', 'IN', $groupIds)
       ->execute();
     $this->assertCount(2, $refresh);
+    $refreshedIds = array_column((array) $refresh, 'id');
+    $this->assertEqualsCanonicalizing([$smartGroup['id'], $parentGroup['id']], $refreshedIds);
 
     $get = Group::get(FALSE)->addWhere('id', 'IN', $groupIds)
-      ->addSelect('id', 'cache_date', 'cache_expired')
+      ->addSelect('id', 'cache_date', 'cache_expired', 'contact_count')
       ->execute()->indexBy('id');
     $this->assertNull($get[$childGroup['id']]['cache_date']);
     $this->assertFalse($get[$childGroup['id']]['cache_expired']);
     $this->assertNotNull($get[$smartGroup['id']]['cache_date']);
     $this->assertFalse($get[$smartGroup['id']]['cache_expired']);
+    $this->assertNotNull($get[$parentGroup['id']]['cache_date']);
+    $this->assertFalse($get[$parentGroup['id']]['cache_expired']);
+    $this->assertSame(1, $get[$smartGroup['id']]['contact_count']);
 
     // Pretend the group was refreshed 6 minutes ago
     $lastRefresh = date('YmdHis', strtotime("-6 minutes"));
@@ -97,6 +104,40 @@ class GroupTest extends Api4TestBase implements TransactionalInterface {
     $this->assertFalse($get[$childGroup['id']]['cache_expired']);
     $this->assertNotNull($get[$smartGroup['id']]['cache_date']);
     $this->assertTrue($get[$smartGroup['id']]['cache_expired']);
+
+    // Adding another contact and re-refreshing should update cache and contact_count
+    $newSmarty = $this->createTestRecord('Contact', ['first_name' => 'Smarty']);
+
+    // Also add contact to child group
+    GroupContact::create(FALSE)
+      ->addValue('group_id', $childGroup['id'])
+      ->addValue('contact_id', $newSmarty['id'])
+      ->execute();
+
+    Group::refresh(FALSE)
+      ->addWhere('id', '=', $smartGroup['id'])
+      ->execute();
+
+    $updatedGroups = Group::get(FALSE)
+      ->addWhere('id', 'IN', [$smartGroup['id'], $parentGroup['id']])
+      ->addSelect('id', 'cache_expired', 'contact_count')
+      ->execute()->indexBy('id');
+    $this->assertFalse($updatedGroups[$smartGroup['id']]['cache_expired']);
+    $this->assertSame(2, $updatedGroups[$smartGroup['id']]['contact_count']);
+
+    // Contact was added to child group but cache wasn't refreshed for that group
+    $this->assertSame(0, $updatedGroups[$parentGroup['id']]['contact_count']);
+
+    // Now refresh it
+    Group::refresh(FALSE)
+      ->addWhere('id', '=', $parentGroup['id'])
+      ->execute();
+
+    $updatedGroups = Group::get(FALSE)
+      ->addWhere('id', 'IN', [$parentGroup['id']])
+      ->addSelect('id', 'cache_expired', 'contact_count')
+      ->execute()->indexBy('id');
+    $this->assertSame(1, $updatedGroups[$parentGroup['id']]['contact_count']);
   }
 
   public function testCreate(): void {
