@@ -30,12 +30,12 @@ class CRM_Contact_BAO_Query_Hook {
   /**
    * Singleton function used to manage this object.
    *
-   * @return object
+   * @return self
    */
   public static function singleton() {
     static $singleton = NULL;
     if (!$singleton) {
-      $singleton = new CRM_Contact_BAO_Query_Hook();
+      $singleton = new self();
     }
     return $singleton;
   }
