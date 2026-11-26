@@ -13,6 +13,7 @@ namespace Civi\Api4\Query;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
+use Civi\Api4\Service\Schema\Joinable\ExtraJoinable;
 use Civi\Api4\Service\Schema\Joiner;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
@@ -946,7 +947,9 @@ class Api4SelectQuery extends Api4Query {
         if (!$virtualField) {
           $conditions = $link->getConditionsForJoin($baseTableAlias, $tableAlias, $this->openJoin);
           if ($joinEntity) {
-            $aclStack = [
+            // ExtraJoinable uses custom join conditions rather than direct column equality,
+            // so its base column cannot be used to dedupe ACL clauses with the target entity.
+            $aclStack = $link instanceof ExtraJoinable ? [] : [
               $joinTreeNode['#path'] . $link->getBaseColumn(),
               $joinTreeNode[$joinName]['#path'] . $link->getTargetColumn(),
             ];

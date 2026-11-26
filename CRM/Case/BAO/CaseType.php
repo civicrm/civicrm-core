@@ -470,9 +470,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
-    // When a caseType is saved or deleted, flush xml and optionGroup cache
+    // When a caseType is saved or deleted, flush xml, optionGroup, and metadata cache
     CRM_Case_XMLRepository::singleton()->flush();
     CRM_Core_OptionGroup::flushAll();
+    Civi::cache('metadata')->clear();
   }
 
   /**
