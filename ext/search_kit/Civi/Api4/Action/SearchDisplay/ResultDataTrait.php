@@ -5,6 +5,7 @@ namespace Civi\Api4\Action\SearchDisplay;
 use Civi\Util\PhpSpreadsheetUtil;
 use League\Csv\Bom;
 use League\Csv\Writer;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -140,7 +141,16 @@ trait ResultDataTrait {
       foreach ($columns as $colNum => $col) {
         $value = $data['columns'][$colNum];
         $cell = $sheet->getCell([$colNum + 1, $rowNum + 2]);
-        $cell->setValue($this->formatColumnValue($col, $value));
+        $formattedValue = $this->formatColumnValue($col, $value);
+        if (is_string($formattedValue) && str_starts_with($formattedValue, '=')) {
+          // When a text starts with '=' then we set the data type to String
+          // Otherwise it will cause an error as PhpSpreadsheet thinks it is
+          // a formula.
+          $cell->setValueExplicit($formattedValue, DataType::TYPE_STRING);
+        }
+        else {
+          $cell->setValue($formattedValue);
+        }
 
         if (!empty($value['links'])) {
           $cell->getHyperlink()->setUrl($value['links'][0]['url']);
