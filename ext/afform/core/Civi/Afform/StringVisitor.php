@@ -82,11 +82,16 @@ class StringVisitor {
     // Translate content.
     $contentSelectors = \CRM_Utils_JS::getContentSelectors();
     $contentSelectors = implode(',', $contentSelectors);
+    $visited = new \SplObjectStorage();
     $doc->find($contentSelectors)->each(
-      function (\DOMElement $item) use ($contentSelectors, $callback) {
+      function (\DOMElement $item) use ($visited, $callback) {
+        if ($this->hasVisitedRelative($item, $visited)) {
+          return;
+        }
         $pqItem = pq($item);
         $markup = trim($pqItem->html());
-        if ($this->isWorthy($markup)) {
+        if ($this->isWorthy($markup) && trim(strip_tags($markup)) !== '') {
+          $visited->attach($item);
           $translated = $callback($markup, 'content');
           if ($markup !== $translated) {
             $pqItem->html($translated);
@@ -186,6 +191,29 @@ class StringVisitor {
         }
       }
     }
+  }
+
+  /**
+   * Check whether an ancestor or descendant of $item has already been visited.
+   *
+   * @param \DOMElement $item
+   * @param \SplObjectStorage $visited
+   * @return bool
+   */
+  protected function hasVisitedRelative(\DOMElement $item, \SplObjectStorage $visited): bool {
+    for ($parent = $item->parentNode; $parent; $parent = $parent->parentNode) {
+      if ($parent instanceof \DOMElement && $visited->contains($parent)) {
+        return TRUE;
+      }
+    }
+    foreach ($visited as $visitedElement) {
+      for ($parent = $visitedElement->parentNode; $parent; $parent = $parent->parentNode) {
+        if ($parent === $item) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
   protected function isWorthy($value): bool {
