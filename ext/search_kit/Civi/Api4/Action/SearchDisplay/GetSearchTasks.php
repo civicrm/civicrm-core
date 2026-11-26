@@ -401,7 +401,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           ],
         ];
       }
-      if (array_key_exists('update', $actions)) {
+      if (array_key_exists('update', $actions) && $this->canAddRelationships()) {
         $tasks[$entity['name']]['contact.relationship'] = [
           'title' => E::ts('Add Relationship'),
           'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskRelationship.html'],
@@ -490,6 +490,25 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'data_type' => 'Array',
       ],
     ];
+  }
+
+  /**
+   * The "Add Relationship" task loads the relationship types here and the
+   * Relationship fields in its dialog, so only offer it to a user who may do both.
+   *
+   * Being allowed to update a contact is not enough: Contact.update is checked
+   * per row, so a user can hold it without "access CiviCRM", and then loading
+   * the types would fail the whole request.
+   *
+   * @return bool
+   */
+  private function canAddRelationships(): bool {
+    if (!$this->checkPermissions) {
+      return TRUE;
+    }
+    $kernel = \Civi::service('civi_api_kernel');
+    return $kernel->runAuthorize('RelationshipType', 'get', ['version' => 4])
+      && $kernel->runAuthorize('Relationship', 'getFields', ['version' => 4]);
   }
 
   private function getRelationshipTypes(array $savedSearch, string $entityName = 'Contact'): array {
