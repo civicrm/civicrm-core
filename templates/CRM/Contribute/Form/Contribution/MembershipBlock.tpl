@@ -7,10 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div id="membership" class="crm-group membership-group">
-
-</div>
 {if $membershipBlock AND $is_quick_config}
+  <div class="crm-group">
     <div class="header-dark">
       {if $renewal_mode}
         {if array_key_exists('renewal_title', $membershipBlock) && $membershipBlock.renewal_title}
@@ -26,7 +24,7 @@
         {/if}
       {/if}
     </div>
-  {strip}
+    {strip}
     <div id="membership-listings">
       {foreach from=$membershipTypes item=row}
         <p>
@@ -35,5 +33,6 @@
         </p>
       {/foreach}
     </div>
-  {/strip}
+    {/strip}
+  </div>
 {/if}
