@@ -119,6 +119,8 @@
                   angular.merge(data[item.name][index], values, {fields: structuredClone(schema[item.name]?.data || {})});
                 });
               });
+              // Field data values have been updated, things like tokens may need to re-render
+              $element[0].dispatchEvent(new Event('change'));
               $element.unblock();
             }, (error) => {
               disableForm(error.error_message);
