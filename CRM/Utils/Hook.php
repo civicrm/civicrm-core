@@ -415,15 +415,21 @@ abstract class CRM_Utils_Hook {
    *   - 'qs' (string|array): the link URL query parameters to be used by sprintf() with $values (like reset=1&cid=%%id%% when $values['id'] is the contact ID)
    *   - 'title' (string) (optional): the text that appears when hovering over the link
    *   - 'extra' (optional): additional attributes for the <a> tag (fillable from $values)
-   *   - 'bit' (optional): a binary number that will be filtered by $mask (sending nothing as $links['bit'] means the link will always display)
+   *   - 'bit' (int) (strongly recommended): the CRM_Core_Action constant for what the link does
+   *     (eg CRM_Core_Action::UPDATE). $mask filters on it, and other extensions identify the link
+   *     by it. A link without 'bit' ignores $mask and is shown to every user who can see the list.
    *   - 'ref' (optional, recommended): a CSS class to apply to the <a> tag.
    *   - 'class' (string): Optional list of CSS classes
-   *   - 'weight' (int): Weight is used to order the links. If not set 0 will be used but e-notices could occur. This was introduced in CiviCRM 5.63 so it will not have any impact on earlier versions of CiviCRM.
+   *   - 'weight' (int) (required): orders the links. A link without 'weight' triggers a PHP notice when sorted.
    *   - 'accessKey' (string) (optional): HTML access key. Single letter or empty string.
    *   - 'icon' (string) (optional): FontAwesome class name
    *
    *   Depending on the specific screen, some fields (e.g. `icon`) may be ignored.
    *   If you have any idea of a clearer rule, then please update the docs.
+   *
+   *   Links passed through CRM_Core_Action::formLink() or filterLinks() are numbered from 0, with
+   *   the original action key in 'bit'. To find an existing link, match 'bit' with `&` (defaulting
+   *   it to 0), not the key or the translated 'name'.
    * @param int|null $mask
    *   (optional) the bitmask to show/hide links.
    * @param array $values
