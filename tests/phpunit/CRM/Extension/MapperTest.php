@@ -45,6 +45,11 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     $this->mapperWithSlash = new CRM_Extension_Mapper($this->containerWithSlash);
   }
 
+  public function tearDown(): void {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_extension WHERE full_name IN ('test.foo.bar', 'test.evil.escape')");
+    parent::tearDown();
+  }
+
   public function testClassToKey(): void {
     $this->assertSame("test.foo.bar", $this->mapper->classToKey('test_foo_bar'));
   }
@@ -52,7 +57,62 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
   public function testIsExtensionKey(): void {
     $this->assertFalse($this->mapper->isExtensionKey('test_foo_bar'));
     $this->assertTrue($this->mapper->isExtensionKey('test.foo.bar'));
+    $this->assertTrue($this->mapper->isExtensionKey('org.civicrm.afform-gui'));
     $this->assertFalse($this->mapper->isExtensionKey('CRM_Core_DAO'));
+    $this->assertFalse($this->mapper->isExtensionKey('../../etc/passwd.php'));
+    $this->assertFalse($this->mapper->isExtensionKey('../test.foo.bar'));
+    $this->assertFalse($this->mapper->isExtensionKey('phar://evil.phar'));
+    $this->assertFalse($this->mapper->isExtensionKey("test.foo.bar\n"));
+  }
+
+  public function testGetLegacyExtensionPath(): void {
+    file_put_contents("{$this->basedir}/weird/foobar/oddball.php", "<?php\n");
+
+    // Uninstalled extension on disk must not resolve.
+    $this->assertNull($this->mapper->getLegacyExtensionPath('test.foo.bar', 'report'));
+
+    // Path traversal / invalid keys must not resolve.
+    $this->assertNull($this->mapper->getLegacyExtensionPath('../../etc/passwd', 'report'));
+    $this->assertNull($this->mapper->getLegacyExtensionPath('../test.foo.bar', 'report'));
+
+    // Disabled extension in civicrm_extension must not resolve.
+    $dao = new CRM_Core_DAO_Extension();
+    $dao->type = 'report';
+    $dao->full_name = 'test.foo.bar';
+    $dao->name = 'test.foo.bar';
+    $dao->label = 'Test Foo Bar';
+    $dao->file = 'oddball';
+    $dao->is_active = 0;
+    $dao->save();
+    $this->assertNull($this->mapper->getLegacyExtensionPath('test.foo.bar', 'report'));
+
+    // Enabled extension resolves only for its exact legacy type.
+    $dao->is_active = 1;
+    $dao->save();
+    $this->assertNull($this->mapper->getLegacyExtensionPath('test.foo.bar', 'payment'));
+    $this->assertNull($this->mapper->getLegacyExtensionPath('test.foo.bar', 'module'));
+    $this->assertSame(
+      "{$this->basedir}/weird/foobar/oddball.php",
+      $this->mapper->getLegacyExtensionPath('test.foo.bar', 'report')
+    );
+
+    // Malformed <file> attempting path traversal must not resolve.
+    mkdir("{$this->basedir}/weird/escape");
+    file_put_contents("{$this->basedir}/weird/secret.php", "<?php\n");
+    file_put_contents(
+      "{$this->basedir}/weird/escape/info.xml",
+      "<extension key='test.evil.escape' type='report'><file>../secret</file></extension>"
+    );
+    $this->container->refresh();
+    $evilDao = new CRM_Core_DAO_Extension();
+    $evilDao->type = 'report';
+    $evilDao->full_name = 'test.evil.escape';
+    $evilDao->name = 'test.evil.escape';
+    $evilDao->label = 'Evil Escape';
+    $evilDao->file = '../secret';
+    $evilDao->is_active = 1;
+    $evilDao->save();
+    $this->assertNull($this->mapper->getLegacyExtensionPath('test.evil.escape', 'report'));
   }
 
   public function testKeyToClass(): void {

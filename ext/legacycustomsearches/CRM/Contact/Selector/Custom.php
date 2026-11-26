@@ -116,7 +116,20 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
     $ext = CRM_Extension_System::singleton()->getMapper();
     if ($ext->isExtensionKey($customSearchClass)) {
-      $customSearchClass = $ext->keyToClass($customSearchClass, 'search');
+      $customSearchKey = $customSearchClass;
+      $customSearchClass = $ext->keyToClass($customSearchKey);
+      if (!class_exists($customSearchClass)) {
+        $customSearchFile = $ext->getLegacyExtensionPath($customSearchKey, 'search');
+        if ($customSearchFile !== NULL) {
+          require_once $customSearchFile;
+        }
+      }
+    }
+    elseif (is_string($customSearchClass) && preg_match('/\A[a-zA-Z0-9_\\\\]+\z/', $customSearchClass) && !class_exists($customSearchClass) && $ext->isExtensionClass($customSearchClass)) {
+      $customSearchFile = $ext->getLegacyExtensionPath($ext->classToKey($customSearchClass), 'search');
+      if ($customSearchFile !== NULL) {
+        require_once $customSearchFile;
+      }
     }
     $this->_search = new $customSearchClass($formValues);
   }

@@ -49,6 +49,12 @@ class System {
       $ext = \CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($processor['class_name'])) {
         $paymentClass = $ext->keyToClass($processor['class_name'], 'payment');
+        if (!class_exists($paymentClass)) {
+          $paymentFile = $ext->getLegacyExtensionPath($processor['class_name'], 'payment');
+          if ($paymentFile !== NULL) {
+            require_once $paymentFile;
+          }
+        }
       }
       else {
         $paymentClass = 'CRM_Core_' . $processor['class_name'];
@@ -84,6 +90,12 @@ class System {
     $ext = \CRM_Extension_System::singleton()->getMapper();
     if ($ext->isExtensionKey($processor['class_name'])) {
       $paymentClass = $ext->keyToClass($processor['class_name'], 'payment');
+      if (!class_exists($paymentClass)) {
+        $paymentFile = $ext->getLegacyExtensionPath($processor['class_name'], 'payment');
+        if ($paymentFile !== NULL) {
+          require_once $paymentFile;
+        }
+      }
     }
     else {
       $paymentClass = 'CRM_Core_' . $processor['class_name'];

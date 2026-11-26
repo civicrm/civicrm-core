@@ -116,7 +116,7 @@ class CRM_Extension_Mapper {
   /**
    * Obsolete converter for ancient pre-civix snake_case extension class names.
    *
-   * @deprecated in 6.21 will be removed around 6.27
+   * @deprecated in 6.21 will be removed around 6.26
    */
   public function classToPath($clazz) {
     CRM_Core_Error::deprecatedFunctionWarning();
@@ -137,7 +137,7 @@ class CRM_Extension_Mapper {
    */
   public function isExtensionKey($key) {
     // check if the string is an extension name or the class
-    return (str_contains($key, '.')) ? TRUE : FALSE;
+    return is_string($key) && (bool) preg_match('/\A[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+\z/', $key);
   }
 
   /**
@@ -146,9 +146,9 @@ class CRM_Extension_Mapper {
    * @deprecated in 6.21 will be removed around 6.27
    */
   public function isExtensionClass($clazz) {
-    CRM_Core_Error::deprecatedFunctionWarning();
-    if (substr($clazz, 0, 4) != 'CRM_') {
-      return (bool) preg_match('/^[a-z0-9]+(_[a-z0-9]+)+$/', $clazz);
+    if (is_string($clazz) && !str_starts_with($clazz, 'CRM_') && preg_match('/\A[a-z0-9]+(_[a-z0-9]+)+\z/', $clazz)) {
+      CRM_Core_Error::deprecatedFunctionWarning();
+      return TRUE;
     }
     return FALSE;
   }
@@ -206,7 +206,54 @@ class CRM_Extension_Mapper {
    */
   public function keyToPath($key) {
     $info = $this->keyToInfo($key);
+    if ($info->file !== '' && $info->file !== NULL && (!preg_match('/\A[a-zA-Z0-9._-]+\z/', (string) $info->file) || str_contains((string) $info->file, '..'))) {
+      throw new CRM_Extension_Exception("Invalid file name in extension ({$key})");
+    }
     return $this->container->getPath($key) . DIRECTORY_SEPARATOR . $info->file . '.php';
+  }
+
+  /**
+   * Resolve the main PHP file of an installed, enabled legacy (non-module) extension.
+   *
+   * Returns NULL unless $key is a valid extension key for an active extension in
+   * civicrm_extension of $expectedType ('payment', 'report', or 'search') whose
+   * main file exists inside the extension's directory.
+   *
+   * @internal
+   * @deprecated in 6.21 will be removed in 6.26
+   */
+  public function getLegacyExtensionPath(string $key, string $expectedType): ?string {
+    if (!$this->isExtensionKey($key) || !in_array($expectedType, ['payment', 'report', 'search'], TRUE)) {
+      return NULL;
+    }
+    if (!empty(CRM_Extension_System::getCompatibilityInfo()[$key]['force-uninstall'])) {
+      return NULL;
+    }
+    $isActive = (bool) CRM_Core_DAO::singleValueQuery(
+      'SELECT id FROM civicrm_extension WHERE full_name = %1 AND type = %2 AND is_active = 1',
+      [
+        1 => [$key, 'String'],
+        2 => [$expectedType, 'String'],
+      ]
+    );
+    if (!$isActive) {
+      return NULL;
+    }
+    try {
+      $info = $this->keyToInfo($key);
+      if ($info->type !== $expectedType || empty($info->file)) {
+        return NULL;
+      }
+      $basePath = $this->container->getPath($key);
+      $filePath = $this->keyToPath($key);
+    }
+    catch (CRM_Extension_Exception $e) {
+      return NULL;
+    }
+    if (!CRM_Utils_File::isChildPath($basePath, $filePath) || !is_file($filePath)) {
+      return NULL;
+    }
+    return $filePath;
   }
 
   /**
@@ -506,9 +553,9 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Obsolete unused function.
+   * Obsolete converter for ancient pre-civix snake_case extension class names.
    *
-   * @deprecated in 6.21 will be removed around 6.27
+   * @deprecated in 6.21 will be removed around 6.26
    */
   public function getTemplatePath($clazz) {
     CRM_Core_Error::deprecatedFunctionWarning();
@@ -517,13 +564,17 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Obsolete unused function.
+   * Obsolete converter for ancient pre-civix snake_case extension class names.
    *
-   * @deprecated in 6.21 will be removed around 6.27
+   * @deprecated in 6.21 will be removed around 6.26
    */
   public function getTemplateName($clazz) {
     CRM_Core_Error::deprecatedFunctionWarning();
-    $info = $this->keyToInfo($this->classToKey($clazz));
+    $key = $this->classToKey($clazz);
+    $info = $this->keyToInfo($key);
+    if (empty($info->file) || !preg_match('/\A[a-zA-Z0-9._-]+\z/', (string) $info->file) || str_contains((string) $info->file, '..')) {
+      throw new CRM_Extension_Exception("Invalid template name in extension ({$key})");
+    }
     return (string) $info->file . '.tpl';
   }
 
