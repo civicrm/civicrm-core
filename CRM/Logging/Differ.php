@@ -461,10 +461,9 @@ ORDER BY log_date
    * @param array $tables
    *   Array of tables to inspect.
    *
-   * @return array
+   * @return int
    */
   public function getCountOfAllContactChangesForConnection($tables) {
-    $count = 0;
     $params = [1 => [$this->log_conn_id, 'String']];
     foreach ($tables as $table) {
       if (empty($sql)) {
@@ -475,8 +474,7 @@ ORDER BY log_date
       }
     }
     $countSQL = " SELECT count(*) as countOfContacts FROM ({$sql}) count";
-    $count = CRM_Core_DAO::singleValueQuery($countSQL, $params);
-    return $count;
+    return (int) CRM_Core_DAO::singleValueQuery($countSQL, $params);
   }
 
   /**

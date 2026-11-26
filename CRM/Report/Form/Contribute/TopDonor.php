@@ -48,6 +48,13 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   protected $_groupLimit = '';
 
   /**
+   * Offset of the current page, so ranks continue across pages.
+   *
+   * @var int
+   */
+  protected $rankOffset = 0;
+
+  /**
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
@@ -346,40 +353,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   }
 
   /**
-   * @param int $rowCount
+   * @inheritDoc
    */
   public function limit($rowCount = NULL) {
-    $rowCount ??= $this->getRowCount();
-    // lets do the pager if in html mode
-    $this->_limit = NULL;
-
-    // CRM-14115, over-ride row count if rowCount is specified in URL
-    if ($this->_dashBoardRowCount) {
-      $rowCount = $this->_dashBoardRowCount;
-    }
-    if ($this->_outputMode == 'html') {
-      // Replace only first occurrence of SELECT.
-      $this->_select = preg_replace('/SELECT/', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select, 1);
-      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer');
-
-      if (!$pageId && !empty($_POST) && isset($_POST['crmPID_B'])) {
-        if (!isset($_POST['PagerBottomButton'])) {
-          unset($_POST['crmPID_B']);
-        }
-        else {
-          $pageId = max((int) @$_POST['crmPID_B'], 1);
-        }
-      }
-
-      $pageId = $pageId ?: 1;
-      $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
-      $offset = ($pageId - 1) * $rowCount;
-
-      $offset = CRM_Utils_Type::escape($offset, 'Int');
-      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
-
-      $this->_limit = " LIMIT $offset, " . $rowCount;
-    }
+    $page = parent::limit($rowCount);
+    $this->rankOffset = $page[0] ?? (int) $this->_offsetValue;
+    return $page;
   }
 
   /**
@@ -393,7 +372,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-    $rank = 1;
+    $rank = $this->rankOffset + 1;
     if (!empty($rows)) {
       foreach ($rows as $rowNum => $row) {
 

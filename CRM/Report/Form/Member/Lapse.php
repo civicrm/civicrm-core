@@ -286,6 +286,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
 
       $rows[] = $row;
     }
+    $this->setRowsFound($sql, count($rows));
     $this->formatDisplay($rows);
 
     // assign variables to templates

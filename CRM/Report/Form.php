@@ -548,6 +548,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $optimisedForOnlyFullGroupBy = TRUE;
 
   /**
+   * User variables assigned by the last buildRows() query, restored before it is counted.
+   *
+   * @var string[]
+   */
+  private $rowsFoundVariables = [];
+
+  /**
    * Determines which chart types are supported for this report
    * @var string[]
    */
@@ -3251,10 +3258,16 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (!$this->optimisedForOnlyFullGroupBy) {
       CRM_Core_DAO::disableFullGroupByMode();
     }
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    if (stristr($this->_select, 'SQL_CALC_FOUND_ROWS')) {
-      $this->_rowsFound = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
+    // Report extensions may still build legacy SELECT SQL_CALC_FOUND_ROWS queries.
+    $sql = preg_replace('/\bSQL_CALC_FOUND_ROWS\b/i', '', $sql);
+    // Queries that number rows through user variables (e.g. a top-N filter on @rows)
+    // are counted again from the same start values.
+    preg_match_all('/@(\w+)\s*:=/', $sql, $variables);
+    $this->rowsFoundVariables = array_unique($variables[1]);
+    if ($this->rowsFoundVariables) {
+      CRM_Core_DAO::executeQuery('SET ' . implode(', ', array_map(fn($name) => "@civicrm_report_$name := @$name", $this->rowsFoundVariables)));
     }
+    $dao = CRM_Core_DAO::executeQuery($sql);
     CRM_Core_DAO::reenableFullGroupByMode();
     if (!is_array($rows)) {
       $rows = [];
@@ -3265,6 +3278,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $unselectedSectionColumns = $this->unselectedSectionColumns();
 
+    $fetched = 0;
     while ($dao->fetch()) {
       $row = [];
       foreach ($this->_columnHeaders as $key => $value) {
@@ -3281,6 +3295,82 @@ class CRM_Report_Form extends CRM_Core_Form {
       }
 
       $rows[] = $row;
+      $fetched++;
+    }
+    $this->setRowsFound($sql, $fetched);
+  }
+
+  /**
+   * Set the total number of rows a paged query matches, for the pager.
+   *
+   * A page that is not full already gives the total; otherwise the query is
+   * counted again without its trailing LIMIT clause.
+   *
+   * @param string $sql
+   *   The query as executed.
+   * @param int $fetched
+   *   Number of rows it returned.
+   */
+  protected function setRowsFound(string $sql, int $fetched): void {
+    if (!preg_match('/\sLIMIT\s+(\d+)(?:\s*,\s*(\d+)|\s+OFFSET\s+(\d+))?\s*$/i', $sql, $limit)) {
+      $this->_rowsFound = $fetched;
+      return;
+    }
+    $hasComma = ($limit[2] ?? '') !== '';
+    $offset = (int) ($hasComma ? $limit[1] : ($limit[3] ?? 0));
+    $rowCount = (int) ($hasComma ? $limit[2] : $limit[1]);
+    if ($fetched < $rowCount && ($fetched > 0 || $offset === 0)) {
+      $this->_rowsFound = $offset + $fetched;
+      return;
+    }
+    if (!$this->addPaging) {
+      // No pager is rendered, so the total stays unknown.
+      $this->_rowsFound = NULL;
+      return;
+    }
+    $this->_rowsFound = $this->countRowsFound(substr($sql, 0, -strlen($limit[0])));
+  }
+
+  /**
+   * Count the rows a query returns.
+   *
+   * @param string $sql
+   *   Query without LIMIT clause.
+   *
+   * @return int
+   */
+  protected function countRowsFound(string $sql): int {
+    if (!$this->optimisedForOnlyFullGroupBy) {
+      CRM_Core_DAO::disableFullGroupByMode();
+    }
+    // Report extensions may still pass legacy SELECT SQL_CALC_FOUND_ROWS queries.
+    $sql = preg_replace('/\bSQL_CALC_FOUND_ROWS\b/i', '', $sql);
+    try {
+      $this->restoreRowsFoundVariables();
+      $count = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM ($sql) civicrm_report_rows_found");
+    }
+    catch (\Civi\Core\Exception\DBQueryException $e) {
+      // A derived table rejects repeated column names (error 1060), so such a query is streamed and its rows counted.
+      // @todo From CiviCRM 6.23, which requires MySQL 8.0, count it on the server through a CTE with a column list.
+      if ($e->getSQLErrorCode() !== 1060) {
+        throw $e;
+      }
+      $this->restoreRowsFoundVariables();
+      $dao = CRM_Core_DAO::executeUnbufferedQuery($sql);
+      for ($count = 0; $dao->fetch(); $count++);
+    }
+    finally {
+      CRM_Core_DAO::reenableFullGroupByMode();
+    }
+    return $count;
+  }
+
+  /**
+   * Reset the user variables the report query assigns to their values before it ran.
+   */
+  private function restoreRowsFoundVariables(): void {
+    if ($this->rowsFoundVariables) {
+      CRM_Core_DAO::executeQuery('SET ' . implode(', ', array_map(fn($name) => "@$name := @civicrm_report_$name", $this->rowsFoundVariables)));
     }
   }
 
@@ -3707,8 +3797,6 @@ class CRM_Report_Form extends CRM_Core_Form {
       $rowCount = $this->_dashBoardRowCount;
     }
     if ($this->addPaging) {
-      $this->_select = preg_replace('/SELECT(\s+SQL_CALC_FOUND_ROWS)?\s+/i', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select);
-
       $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
       // @todo all http vars should be extracted in the preProcess
@@ -3756,9 +3844,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     if ($this->_limit && ($this->_limit != '')) {
-      if (!$this->_rowsFound) {
-        $sql = "SELECT FOUND_ROWS();";
-        $this->_rowsFound = CRM_Core_DAO::singleValueQuery($sql);
+      if ($this->_rowsFound === NULL && $this->addPaging) {
+        // Report extensions that run their own SELECT SQL_CALC_FOUND_ROWS query rely on this.
+        CRM_Core_Error::deprecatedWarning('Report pager totals from FOUND_ROWS() are deprecated: call setRowsFound() after running the report query.');
+        $this->_rowsFound = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
       }
       $params = [
         'total' => $this->_rowsFound,
