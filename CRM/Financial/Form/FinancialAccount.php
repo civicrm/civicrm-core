@@ -66,61 +66,86 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
+    $this->entityFields = [
+      'label' => [
+        'name' => 'label',
+        'required' => TRUE,
+        'label' => ts('Label'),
+      ],
+      'description' => [
+        'name' => 'description',
+        'label' => ts('Description'),
+      ],
+      'contact_id' => [
+        'name' => 'contact_id',
+        'description' => ts('Use this field to indicate the organization that owns this account.'),
+        'help' => ['id' => 'contact_id'],
+        'label' => ts('Owner'),
+      ],
+      'financial_account_type_id' => [
+        'name' => 'financial_account_type_id',
+        'required' => TRUE,
+      ],
+      'accounting_code' => [
+        'name' => 'accounting_code',
+        'description' => ts('Enter the corresponding account code used in your accounting system. This code will be available for contribution export, and included in accounting batch exports.'),
+      ],
+      'account_type_code' => [
+        'name' => 'account_type_code',
+        'description' => ts('Enter an account type code for this account. Account type codes are required for QuickBooks integration and will be included in all accounting batch exports.'),
+        'help' => ['id' => 'account_type_code'],
+      ],
+      'is_deductible' => [
+        'name' => 'is_deductible',
+        'description' => ts('Are transactions of this type tax-deductible?'),
+        'label' => ts('Tax-Deductible?'),
+      ],
+      'is_active' => ['name' => 'is_active'],
+      'is_tax' => [
+        'name' => 'is_tax',
+        'label' => ts('Is Tax?'),
+      ],
+      'tax_rate' => [
+        'name' => 'tax_rate',
+        'description' => ts('The default rate used to calculate the taxes collected into this account (e.g. for tax rate of 8.27%, enter 8.27).'),
+        'label' => ts('Tax Rate'),
+      ],
+      'is_default' => [
+        'name' => 'is_default',
+        'description' => ts('If selected, this account will be used as the default for any financial transactions that do not have a specific financial account assigned. Note: only one financial account can be set as the default.'),
+      ],
+    ];
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    parent::buildQuickForm();
-
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      return;
-    }
-    if ($this->isSubmitted()) {
-      $this->addCustomDataFieldsToForm('FinancialAccount');
-    }
-
-    $this->applyFilter('__ALL__', 'trim');
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialAccount');
-    $this->add('text', 'label', ts('Label'), $attributes['label'], TRUE);
-    $this->addRule('label', ts('A financial type with this label already exists. Please select another label.'),
-      'objectExists', ['CRM_Financial_DAO_FinancialAccount', $this->_id]);
-
-    $this->add('text', 'description', ts('Description'), $attributes['description']);
-    $this->add('text', 'accounting_code', ts('Accounting Code'), $attributes['accounting_code']);
-    $elementAccounting = $this->add('text', 'account_type_code', ts('Account Type Code'), $attributes['account_type_code']);
-    $this->addEntityRef('contact_id', ts('Owner'), [
-      'api' => ['params' => ['contact_type' => 'Organization']],
-      'create' => TRUE,
-    ]);
-    $this->add('text', 'tax_rate', ts('Tax Rate'), $attributes['tax_rate']);
-    $this->add('checkbox', 'is_deductible', ts('Tax-Deductible?'));
-    $elementActive = $this->add('checkbox', 'is_active', ts('Enabled?'));
-    $this->add('checkbox', 'is_tax', ts('Is Tax?'));
-
-    $element = $this->add('checkbox', 'is_default', ts('Default?'));
     // CRM-12470 freeze is default if is_default is set
     if ($this->_id && CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_default')) {
-      $element->freeze();
+      $this->entityFields['is_default']['is_freeze'] = TRUE;
     }
 
-    $financialAccountType = CRM_Financial_DAO_FinancialAccount::buildOptions('financial_account_type_id');
-    if (!empty($financialAccountType)) {
-      $element = $this->add('select', 'financial_account_type_id', ts('Financial Account Type'),
-        ['' => ts('- select -')] + $financialAccountType, TRUE, ['class' => 'crm-select2 huge']);
-      if ($this->_isARFlag) {
-        $element->freeze();
-        $elementAccounting->freeze();
-        $elementActive->freeze();
-      }
-      elseif ($this->_id && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount($this->_id)) {
-        $element->freeze();
-      }
+    if ($this->_isARFlag) {
+      $this->entityFields['financial_account_type_id']['is_freeze'] = TRUE;
+      $this->entityFields['account_type_code']['is_freeze'] = TRUE;
+      $this->entityFields['is_active']['is_freeze'] = TRUE;
+    }
+    elseif ($this->_id && CRM_Financial_BAO_FinancialAccount::validateFinancialAccount($this->_id)) {
+      $this->entityFields['financial_account_type_id']['is_freeze'] = TRUE;
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE &&
       CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_reserved')
     ) {
-      $this->freeze(['description', 'is_active']);
+      $this->entityFields['is_active']['is_freeze'] = TRUE;
     }
+    $this->buildQuickEntityForm();
+    $this->addRule('label', ts('A financial type with this label already exists. Please select another label.'),
+      'objectExists', ['CRM_Financial_DAO_FinancialAccount', $this->_id]);
     $this->addFormRule(['CRM_Financial_Form_FinancialAccount', 'formRule'], $this);
   }
 
