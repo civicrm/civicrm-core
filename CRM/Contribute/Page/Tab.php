@@ -191,6 +191,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    *
    * @return array|array[]
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public static function dashboardRecurLinks(int $recurID, int $contactID): array {
     $links = [];

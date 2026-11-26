@@ -17,6 +17,8 @@
 
 /**
  * This class is for building event(participation) block on user dashboard.
+ *
+ * @deprecated will be replaced by core extension user_dashboard
  */
 class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 

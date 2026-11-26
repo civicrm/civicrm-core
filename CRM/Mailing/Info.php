@@ -90,6 +90,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   /**
    * @inheritDoc
    * @return null
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public function getUserDashboardElement() {
     // no dashboard element for this component
@@ -98,6 +100,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
   /**
    * @return null
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public function getUserDashboardObject() {
     // no dashboard element for this component

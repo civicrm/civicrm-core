@@ -108,6 +108,8 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
 
   /**
    * @return array|null
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public function getUserDashboardElement() {
     return [

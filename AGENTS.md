@@ -61,6 +61,10 @@ To access private or protected object properties, use the Civi\Test\Invasive hel
 - In Afform `*.aff.html`, wrap hand-written text (headings, help text, button labels) in `{{:: ts('...') }}` so the string extractor collects it. Titles and field labels set in the FormBuilder editor (`af-title`, `af-field` `defn`) stay plain: Afform translates them at render time, with the providing extension's translations first.
 - SearchKit displays in `managed/*.mgd.php`: leave their texts bare (labels, descriptions, tooltips, empty values, button and link texts). `SearchDisplay.get` translates them on read with the managing extension's translations; `E::ts()` there runs when the record is reconciled and stores one locale's text in the database. Texts containing markup or Smarty, and the `rewrite` of an `html` column, aren't translated on read.
 
+## Deprecated code
+
+Do not propose any changes to functions or classes marked `@deprecated will be replaced by core extension <extension>` — instead look to solve blockers to using the core planned replacement.
+
 ## Commits
 
 - Lead the commit subject with `dev/core#NNNN` when the work traces to a GitLab issue (issues live at lab.civicrm.org/dev/core).
