@@ -298,22 +298,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // gross hack for joomla, we are in the backend and want to send a frontend url
     if ($frontend) {
-      // handle both joomla v1.5 and v1.6, CRM-7939
-      $url = str_replace('/administrator/index2.php', '/index.php', $url);
       $url = str_replace('/administrator/index.php', '/index.php', $url);
-
-      // CRM-8215
       $url = str_replace('/administrator/', '/index.php', $url);
     }
     elseif ($forceBackend) {
-      if (defined('JVERSION')) {
-        $joomlaVersion = JVERSION;
-      }
-      else {
-        $joomlaBase = self::getBasePath();
-        $joomlaVersion = $this->getJVersion($joomlaBase);
-      }
-
       $url = str_replace('/index.php', '/administrator/index.php', $url);
     }
     return $url;
@@ -988,17 +976,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // Get the framework.
-    if (file_exists($joomlaBase . '/libraries/import.legacy.php') && !file_exists($joomlaBase . '/libraries/bootstrap.php')) {
-      require_once $joomlaBase . '/libraries/import.legacy.php';
-    }
-
-    if (!file_exists($joomlaBase . '/libraries/bootstrap.php')) {
-      require_once $joomlaBase . '/libraries/cms.php';
-    }
-    else {
-      require_once $joomlaBase . '/libraries/bootstrap.php';
-      require_once $joomlaBase . '/includes/framework.php';
-    }
+    require_once $joomlaBase . '/includes/framework.php';
     self::getJVersion($joomlaBase);
 
     require_once $joomlaBase . '/configuration.php';
