@@ -69,7 +69,7 @@ class CRM_Campaign_BAO_Query {
     // Other modes need the untranslated data for export and other functions
     if (is_array($query->_select) && $query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
       foreach ($query->_select as $field => $queryString) {
-        if (substr($field, -11) == 'campaign_id') {
+        if (str_ends_with($field, 'campaign_id')) {
           $query->_pseudoConstantsSelect[$field] = [
             'pseudoField' => 'campaign_id',
             'idCol' => $field,

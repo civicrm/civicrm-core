@@ -87,7 +87,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         // 'skip' (see AdditionalParticipant::buildQuickForm()) - if that's
         // the button this participant page was submitted with, they've
         // opted out and their price selection must not be counted.
-        if (substr($this->controller->getButtonName($pageName), -4) !== 'skip') {
+        if (!str_ends_with($this->controller->getButtonName($pageName), 'skip')) {
           $allSubmittedValues[$pageName] = $this->controller->exportValues($pageName);
         }
       }

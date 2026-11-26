@@ -92,7 +92,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     foreach ($defaults as $key => $value) {
-      if (substr($key, -3) != '_id') {
+      if (!str_ends_with($key, '_id')) {
         $values[$key] = $value;
       }
     }

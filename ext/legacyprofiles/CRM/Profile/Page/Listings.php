@@ -165,7 +165,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         ));
         if (!empty($value) &&
           !((str_starts_with($value, '%')) &&
-            (substr($value, -1, 1) == '%')
+            (str_ends_with($value, '%'))
           )
         ) {
           $value = '%' . $value . '%';

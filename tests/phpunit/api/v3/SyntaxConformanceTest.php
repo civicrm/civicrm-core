@@ -1573,7 +1573,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     $actions = $this->callAPISuccess($entity, 'getactions', []);
     foreach ($actions['values'] as $action) {
-      if (substr($action, -7) == '_create' || substr($action, -4) == '_get' || substr($action, -7) == '_delete') {
+      if (str_ends_with($action, '_create') || str_ends_with($action, '_get') || str_ends_with($action, '_delete')) {
         //getactions can't distinguish between contribution_page.create & contribution_page.create
         continue;
       }

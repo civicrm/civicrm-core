@@ -121,7 +121,7 @@ namespace PathLoad\V0 {
         return ["$prefix@$major", $prefix, $suffix];
       }
       public static function parseFileType(string $file): array {
-        if (substr($file, -4) === '.php') {
+        if (str_ends_with($file, '.php')) {
           return ['php', substr(basename($file), 0, -4)];
         }
         elseif (substr($file, '-5') === '.phar') {

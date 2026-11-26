@@ -797,7 +797,7 @@ AND    u.status = 1
               $cleanedUrl = preg_replace('#^https?://#', '', $language->domain);
               // Backdrop function base_path() adds a "/" to the beginning and
               // end of the returned path.
-              if (substr($cleanedUrl, -1) == '/') {
+              if (str_ends_with($cleanedUrl, '/')) {
                 $cleanedUrl = substr($cleanedUrl, 0, -1);
               }
               $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $cleanedUrl . base_path();

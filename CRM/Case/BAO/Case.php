@@ -1763,7 +1763,7 @@ HERESQL;
     $managerRoleId = $xmlProcessor->getCaseManagerRoleId($caseType);
 
     if (!empty($managerRoleId)) {
-      if (substr($managerRoleId, -4) == '_a_b') {
+      if (str_ends_with($managerRoleId, '_a_b')) {
         $managerRoleQuery = "
           SELECT civicrm_contact.id as casemanager_id,
                  civicrm_contact.sort_name as casemanager,
@@ -1774,7 +1774,7 @@ HERESQL;
            LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
            WHERE civicrm_case.id = %2";
       }
-      if (substr($managerRoleId, -4) == '_b_a') {
+      if (str_ends_with($managerRoleId, '_b_a')) {
         $managerRoleQuery = "
           SELECT civicrm_contact.id as casemanager_id,
                  civicrm_contact.sort_name as casemanager,

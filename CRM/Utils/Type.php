@@ -557,7 +557,7 @@ class CRM_Utils_Type {
     $checkType = $isStrict ? $checkTypeStrict : $checkTypeRelaxed;
 
     foreach ($types as $type) {
-      $isTypedArray = substr($type, -2, 2) === '[]';
+      $isTypedArray = str_ends_with($type, '[]');
       if (!$isTypedArray && $checkType($type, $value)) {
         return TRUE;
       }

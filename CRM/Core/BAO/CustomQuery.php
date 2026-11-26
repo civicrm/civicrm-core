@@ -327,9 +327,9 @@ class CRM_Core_BAO_CustomQuery {
             break;
 
           case 'Date':
-            if (substr($name, -9, 9) !== '_relative'
-              && substr($name, -4, 4) !== '_low'
-              && substr($name, -5, 5) !== '_high') {
+            if (!str_ends_with($name, '_relative')
+              && !str_ends_with($name, '_low')
+              && !str_ends_with($name, '_high')) {
               // Relative dates are handled in the buildRelativeDateQuery function.
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
               [$qillOp, $qillVal] = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);

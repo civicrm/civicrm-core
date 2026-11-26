@@ -752,7 +752,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   public function getHeaderForRow($field) {
-    if (substr($field, -11) === 'campaign_id') {
+    if (str_ends_with($field, 'campaign_id')) {
       // @todo - set this correctly in the xml rather than here.
       // This will require a generalised handling cleanup
       return ts('Campaign ID');
@@ -1523,7 +1523,7 @@ class CRM_Export_BAO_ExportProcessor {
       }
     }
     else {
-      if (substr($fieldName, -3, 3) === '_id') {
+      if (str_ends_with($fieldName, '_id')) {
         return "`$fieldName` varchar(255)";
       }
       return "`$fieldName` text";

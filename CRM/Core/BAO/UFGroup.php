@@ -1839,7 +1839,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('text', $name, $title, $attributes, $required);
       if (!$contactId) {
         if ($usedFor) {
-          if (substr($name, -1) === ']') {
+          if (str_ends_with($name, ']')) {
             $providerName = substr($name, 0, -1) . '-provider_id]';
           }
           $form->add('select', $providerName, NULL,
@@ -2003,7 +2003,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addRule($name, ts('Enter a valid website address, such as https://example.org'), 'url');
     }
     // Note should be rendered as textarea
-    elseif (substr($fieldName, -4) == 'note') {
+    elseif (str_ends_with($fieldName, 'note')) {
       $form->add('textarea', $name, $title, $attributes, $required);
     }
     elseif (str_starts_with($fieldName, 'custom')) {
@@ -2113,7 +2113,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif ($fieldName == 'signature_text') {
       $form->add('textarea', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
     }
-    elseif (substr($fieldName, -11) == 'campaign_id') {
+    elseif (str_ends_with($fieldName, 'campaign_id')) {
       if (CRM_Core_Component::isEnabled('CiviCampaign')) {
         $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($form->_componentCampaigns[$contactId] ?? NULL, NULL, TRUE, FALSE);
         $form->add('select', $name, $title,

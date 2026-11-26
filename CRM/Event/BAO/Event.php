@@ -1296,7 +1296,7 @@ WHERE civicrm_event.is_active = 1
             $values[$index] = '';
           }
         }
-        elseif ('date' == substr($name, -4)) {
+        elseif (str_ends_with($name, 'date')) {
           $values[$index] = CRM_Utils_Date::customFormat(CRM_Utils_Date::processDate($params[$name]),
             $config->dateformatFull);
         }
@@ -1384,7 +1384,7 @@ WHERE civicrm_event.is_active = 1
           $status = CRM_Event_PseudoConstant::participantStatus();
           $values[$index] = $status[$params[$name]];
         }
-        elseif (substr($name, -11) == 'campaign_id') {
+        elseif (str_ends_with($name, 'campaign_id')) {
           $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($params[$name]);
           $values[$index] = $campaigns[$params[$name]] ?? NULL;
         }

@@ -1213,7 +1213,7 @@ class CRM_Contact_BAO_Query {
             }
 
             $this->_element["{$tName}_id"] = 1;
-            if (substr($tName, -15) == '-state_province') {
+            if (str_ends_with($tName, '-state_province')) {
               // FIXME: hack to fix CRM-1900
               $a = Civi::settings()->get('address_format');
 
@@ -1665,8 +1665,8 @@ class CRM_Contact_BAO_Query {
       }
       elseif (str_starts_with($id, 'custom_')
         &&  (
-          substr($id, -5, 5) === '_from'
-          || substr($id, -3, 3) === '_to'
+          str_ends_with($id, '_from')
+          || str_ends_with($id, '_to')
         )
       ) {
         self::convertCustomRelativeFields($formValues, $params, $values, $id);
@@ -3595,7 +3595,7 @@ WHERE  $smartGroupClause
     $n = trim($value);
     if ($n) {
       if (str_starts_with($n, '"') &&
-        substr($n, -1, 1) == '"'
+        str_ends_with($n, '"')
       ) {
         $n = substr($n, 1, -1);
         $value = CRM_Core_DAO::escapeString($n);
@@ -4195,7 +4195,7 @@ WHERE  $smartGroupClause
     if ($targetName) {
       $name = trim($targetName[2]);
       if (str_starts_with($name, '"') &&
-        substr($name, -1, 1) == '"'
+        str_ends_with($name, '"')
       ) {
         $name = substr($name, 1, -1);
         $name = CRM_Core_DAO::escapeString($name);
@@ -4738,13 +4738,13 @@ civicrm_relationship.start_date > {$today}
    * @return string
    */
   public static function getCustomFieldName($parameterName) {
-    if (substr($parameterName, -5, 5) == '_from') {
+    if (str_ends_with($parameterName, '_from')) {
       return substr($parameterName, 0, strpos($parameterName, '_from'));
     }
-    if (substr($parameterName, -9, 9) == '_relative') {
+    if (str_ends_with($parameterName, '_relative')) {
       return substr($parameterName, 0, strpos($parameterName, '_relative'));
     }
-    if (substr($parameterName, -3, 3) == '_to') {
+    if (str_ends_with($parameterName, '_to')) {
       return substr($parameterName, 0, strpos($parameterName, '_to'));
     }
   }
@@ -4771,7 +4771,7 @@ civicrm_relationship.start_date > {$today}
     }
     $customFieldName = self::getCustomFieldName($fieldName);
 
-    if (substr($fieldName, -9, 9) == '_relative') {
+    if (str_ends_with($fieldName, '_relative')) {
       [$from, $to] = CRM_Utils_Date::getFromTo($values, NULL, NULL);
     }
     else {
@@ -5980,7 +5980,7 @@ AND   displayRelType.is_active = 1
    */
   public static function parseSearchBuilderString($string, $dataType = 'Integer') {
     $string = trim($string);
-    if (!str_starts_with($string, '(') || substr($string, -1, 1) != ')') {
+    if (!str_starts_with($string, '(') || !str_ends_with($string, ')')) {
       return FALSE;
     }
 
@@ -6318,7 +6318,7 @@ AND   displayRelType.is_active = 1
       if (CRM_Core_Config::singleton()->includeWildCardInName && (!str_starts_with($value, '%'))) {
         $value = "%$value";
       }
-      if (substr($value, -1, 1) != '%') {
+      if (!str_ends_with($value, '%')) {
         $value = "$value%";
       }
     }
@@ -7024,7 +7024,7 @@ AND   displayRelType.is_active = 1
    * @return bool
    */
   protected function isARelativeDateField($fieldName) {
-    if (substr($fieldName, -9, 9) !== '_relative') {
+    if (!str_ends_with($fieldName, '_relative')) {
       return FALSE;
     }
     $realField = substr($fieldName, 0, strlen($fieldName) - 9);
@@ -7070,7 +7070,7 @@ AND   displayRelType.is_active = 1
    * @return bool
    */
   protected function isADateRangeField($fieldName) {
-    if (substr($fieldName, -4, 4) !== '_low' && substr($fieldName, -5, 5) !== '_high') {
+    if (!str_ends_with($fieldName, '_low') && !str_ends_with($fieldName, '_high')) {
       return FALSE;
     }
     $fieldSpec = $this->getFieldSpec($fieldName);

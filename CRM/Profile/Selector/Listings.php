@@ -587,7 +587,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             $result->contact_id
           );
         }
-        elseif (substr($name, -4) == '-url' &&
+        elseif (str_ends_with($name, '-url') &&
           !empty($result->$name)
         ) {
           $url = CRM_Utils_System::fixURL($result->$name);

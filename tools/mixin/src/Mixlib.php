@@ -268,7 +268,7 @@ class Mixlib {
         }
       }
       // For multi-line description.
-      elseif (count($info) === 1 && isset($info['description']) && substr($info['description'], -1) !== '.') {
+      elseif (count($info) === 1 && isset($info['description']) && !str_ends_with($info['description'], '.')) {
         $info['description'] .= ' ' . $line;
       }
       else {

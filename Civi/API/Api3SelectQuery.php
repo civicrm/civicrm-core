@@ -38,12 +38,12 @@ class Api3SelectQuery extends SelectQuery {
       // Legacy support for 'filter's construct.
       if ($key == 'filters') {
         foreach ($value as $filterKey => $filterValue) {
-          if (substr($filterKey, -4, 4) == 'high') {
+          if (str_ends_with($filterKey, 'high')) {
             $key = substr($filterKey, 0, -5);
             $value = ['<=' => $filterValue];
           }
 
-          if (substr($filterKey, -3, 3) == 'low') {
+          if (str_ends_with($filterKey, 'low')) {
             $key = substr($filterKey, 0, -4);
             $value = ['>=' => $filterValue];
           }

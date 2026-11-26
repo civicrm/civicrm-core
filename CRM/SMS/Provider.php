@@ -249,7 +249,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     while (str_contains($newphone, "xx")) {
       $newphone = str_replace("xx", "x", $newphone);
     }
-    while (substr($newphone, -1) == "x") {
+    while (str_ends_with($newphone, "x")) {
       $newphone = substr($newphone, 0, -1);
     }
     return (string) $newphone;
