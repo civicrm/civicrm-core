@@ -87,7 +87,6 @@ body.com_civicrm.layout-default .table tbody .dropdown-menu a:not(.badge, .btn, 
 body.com_civicrm #bootstrap-theme .bg-secondary {
   background-color: var(--crm-secondary-color) !important; /* vs !important bg colour in Atum theme */
 }
-body.com_civicrm.layout-default table .crm-sticky-header,
-body.com_civicrm.layout-default table.crm-sticky-header {
+body.crm-menubar-below-cms-menu table.crm-sticky-header {
   --crm-menubar-bottom: 0;
 }
