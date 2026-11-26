@@ -14,7 +14,25 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+
+use Civi\Core\Attribute\CiviEventListener;
+use CRM_OAuth_ExtensionUtil as E;
+
 class CRM_OAuth_BAO_OAuthClient extends CRM_OAuth_DAO_OAuthClient {
+
+  #[CiviEventListener(event: 'civi.api4.validate::OAuthClient')]
+  public static function onValidateProvider(\Civi\Api4\Event\ValidateValuesEvent $e) {
+    // Hrm, APIv4 doesn't validate <callback> PC's by default.
+    $ps = NULL;
+    foreach ($e->diffs as $r => $diff) {
+      if (isset($diff['new']['provider'])) {
+        $ps ??= \CRM_OAuth_BAO_OAuthClient::getProviders();
+        if (!isset($ps[$diff['new']['provider']])) {
+          $e->addError($r, 'provider', 'invalid_provider', "Invalid provider name: " . $diff['new']['provider']);
+        }
+      }
+    }
+  }
 
   /**
    * @return array
