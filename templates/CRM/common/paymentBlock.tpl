@@ -25,6 +25,11 @@
     // to be hidden (or removed) in which case it can go from this function.
     var billing_block = cj("div#billing-payment-block");
     if (isHide) {
+      var current_selection = cj('input[name="payment_processor_id"]:checked').val();
+      if (current_selection) {
+        billing_block.data('saved-ppid', current_selection);
+      }
+
       payment_options.hide();
       payment_processor.hide();
       payment_information.hide();
@@ -40,8 +45,16 @@
       payment_information.show();
       billing_block.show();
       cj('#billing-payment-block select.crm-select2').removeClass('crm-no-validate');
-      // also set selected payment methods
-      cj('input[name="payment_processor_id"][checked=checked]').prop('checked', true);
+
+      var saved_selection = billing_block.data('saved-ppid');
+      var restored_input = (saved_selection) ? cj('input[name="payment_processor_id"][value="' + saved_selection + '"]') : [];
+      if (restored_input.length) {
+        restored_input.prop('checked', true);
+        billing_block.removeData('saved-ppid');
+      }
+      else if (cj('input[name="payment_processor_id"]:checked').length === 0) {
+        cj('input[name="payment_processor_id"][checked=checked]').prop('checked', true);
+      }
     }
   }
 
