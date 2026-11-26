@@ -148,8 +148,9 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
         }
       }
     }
-    usort($tabs, static function ($a, $b) {
-      return (int) ((int) ($a['weight']) > (int) ($b['weight']));
+    // uasort, not usort: the tab keys (settings, amount, ...) are the tab ids.
+    uasort($tabs, static function ($a, $b) {
+      return (int) ($a['weight'] ?? 0) <=> (int) ($b['weight'] ?? 0);
     });
     return $tabs;
   }
