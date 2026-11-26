@@ -96,6 +96,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     // Ensure an action is assigned, even null - since this page is overloaded for other uses
     // we need to avoid e-notices.
     $this->assign('action');
+    $this->assign('isScheduledRemindersEnabled', CRM_Extension_System::singleton()->getMapper()->isActiveModule('scheduled_communications'));
     $membershipType = (array) MembershipType::get()
       ->addOrderBy('weight')
       ->addWhere('domain_id', '=', 'current_domain')

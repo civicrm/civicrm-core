@@ -690,6 +690,7 @@ class CRM_Core_ManagedEntities {
             $plan[$newKey]['managed_action'] = 'update';
             $plan[$newKey]['id'] = $plan[$oldKey]['id'];
             $plan[$newKey]['entity_id'] = $plan[$oldKey]['entity_id'];
+            $plan[$newKey]['entity_modified_date'] = $plan[$oldKey]['entity_modified_date'] ?? NULL;
             $plan[$newKey]['checksum'] = NULL;
           }
         }

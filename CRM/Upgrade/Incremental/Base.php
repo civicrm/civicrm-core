@@ -300,7 +300,7 @@ class CRM_Upgrade_Incremental_Base {
 
     // Execute the plan
     if ($toUpdate) {
-      $updateSql = 'UPDATE civicrm_extension SET is_active = 1 WHERE full_name IN ("' . implode('", "', array_keys($toUpdate)) . '")';
+      $updateSql = 'UPDATE civicrm_extension SET is_active = 1 WHERE full_name IN ("' . implode('", "', $toUpdate) . '")';
       CRM_Core_DAO::executeQuery($updateSql, [], TRUE, NULL, FALSE, FALSE);
     }
     if ($toInsert) {

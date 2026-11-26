@@ -1,5 +1,5 @@
 <?php
-use CRM_CivicrmAdminUi_ExtensionUtil as E;
+use CRM_ScheduledCommunications_ExtensionUtil as E;
 
 return [
   'type' => 'search',
