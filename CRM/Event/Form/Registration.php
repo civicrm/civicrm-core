@@ -2359,7 +2359,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             if ($values['is_default']) {
-              if (!in_array(get_class($this), ['CRM_Event_Form_Task_Register']) && !empty($values['is_full'])) {
+              // Front-end registration forms never preselect a full option.
+              if (!empty($values['is_full'])) {
                 continue;
               }
 
