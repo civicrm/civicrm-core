@@ -218,7 +218,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         'class' => __CLASS__,
         'schema' => ['contactId'],
       ]);
-      $tokenProcessor->addRow(['contactId' => $contactFields['id'] ?? 0, 'contact' => $formatted]);
+      $tokenProcessor->addRow(['contactId' => $formatted['id'], 'contact' => $formatted]);
       $tokenProcessor->addMessage('sort_name', Civi::settings()->get('sort_name_format'), 'text/plain');
       $tokenProcessor->addMessage('display_name', Civi::settings()->get('display_name_format'), 'text/plain');
       $tokenProcessor->evaluate();

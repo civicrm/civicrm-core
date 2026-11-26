@@ -211,4 +211,50 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
     $this->assertSame('Person, Existing Jr.', $formattedContact->sort_name);
   }
 
+  /**
+   * The token processor must receive the contact ID so that id-dependent
+   * tokens such as {contact.checksum} resolve against the correct contact.
+   *
+   * @dataProvider contactIdSources
+   */
+  public function testFormatDisplayNameChecksumTokenUsesContactId(bool $idOnContactObject): void {
+    $this->useTransaction();
+    $contact = \Civi\Api4\Contact::create(FALSE)
+      ->setValues([
+        'contact_type' => 'Individual',
+        'first_name' => 'Ben',
+        'last_name' => 'Lee',
+      ])
+      ->execute()
+      ->single();
+
+    \Civi::settings()->set('display_name_format', '{contact.checksum}');
+    $params = [
+      'contact_type' => 'Individual',
+      'id' => $contact['id'],
+      'first_name' => 'Ben',
+      'last_name' => 'Lee',
+    ];
+    $formattedContact = new CRM_Contact_DAO_Contact();
+    if ($idOnContactObject) {
+      $formattedContact->id = $contact['id'];
+    }
+
+    CRM_Contact_BAO_Individual::format($params, $formattedContact);
+
+    $this->assertStringStartsWith('cs=', $formattedContact->display_name);
+    $this->assertNotSame('cs=invalidChecksum', $formattedContact->display_name);
+    $this->assertTrue(CRM_Contact_BAO_Contact_Utils::validChecksum($contact['id'], substr($formattedContact->display_name, 3)));
+  }
+
+  /**
+   * The contact ID may come from the contact object or from the params.
+   */
+  public static function contactIdSources(): array {
+    return [
+      'id on contact object' => [TRUE],
+      'id in params only' => [FALSE],
+    ];
+  }
+
 }
