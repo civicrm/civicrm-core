@@ -61,7 +61,10 @@ class Run extends AbstractRunAction {
     // The CRM_Utils_AutoClean instance must be stored or it will be destoyed immediately.
     $autoClean = $this->applyTimeout();
 
-    $this->preprocessLinks();
+    // Row counts on an Afform can skip links.
+    if ($runMode !== 'row_count' || !$this->afform) {
+      $this->preprocessLinks();
+    }
     $this->augmentSelectClause();
     $this->applyFilters();
 

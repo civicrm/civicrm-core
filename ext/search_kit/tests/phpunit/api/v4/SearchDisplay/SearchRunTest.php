@@ -205,6 +205,55 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $count);
   }
 
+  /**
+   * A filter on a field that only a link adds to the SELECT clause must also apply to row counts.
+   */
+  public function testRowCountWithFilterAllowedByLink(): void {
+    $contactIds = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'One', 'middle_name' => 'Linked'],
+        ['first_name' => 'Two', 'middle_name' => 'Linked'],
+        ['first_name' => 'Three', 'middle_name' => 'Other'],
+      ],
+    ])->column('id');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'row_count',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'first_name'],
+          'where' => [['id', 'IN', $contactIds]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First Name',
+              'type' => 'field',
+              // middle_name is only in the SELECT clause because of this link
+              'link' => ['path' => 'civicrm/test?middle=[middle_name]'],
+            ],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $this->assertCount(3, civicrm_api4('SearchDisplay', 'run', $params));
+
+    $params['filters'] = ['middle_name' => 'Linked'];
+    $this->assertCount(2, civicrm_api4('SearchDisplay', 'run', $params));
+    $params['return'] = 'page:1';
+    $this->assertCount(2, civicrm_api4('SearchDisplay', 'run', $params));
+  }
+
   public function testDefaultDisplayLinks(): void {
     $group1 = $this->createTestRecord('Group', ['title' => uniqid('a')])['id'];
     $group2 = $this->createTestRecord('Group', ['title' => uniqid('b')])['id'];
