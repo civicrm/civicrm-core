@@ -51,17 +51,19 @@ class PriceOptionDefnInjector extends AutoService implements EventSubscriberInte
     if (!$restrictedIds) {
       return;
     }
-    // Restrict the walk to fields that are actually price fields, so we never
-    // mistake an unrelated field's option id for a PriceFieldValue id.
-    $priceFieldNames = self::getPriceFieldNames();
-    if (!$priceFieldNames) {
-      return;
-    }
     // Fast lookup sets.
     $restricted = array_fill_keys($restrictedIds, TRUE);
 
+    // Restrict to fields that are actually price fields, so we never
+    // mistake an unrelated field's option id for a PriceFieldValue id.
+    $priceFieldNames = NULL;
+
     $changeSet = \Civi\Angular\ChangeSet::create('priceOptionConditionals')
-      ->alterHtml(';\\.aff\\.html$;', function ($doc, $path) use ($priceFieldNames, $restricted) {
+      ->alterHtml(';\\.aff\\.html$;', function ($doc, $path) use (&$priceFieldNames, $restricted) {
+        $priceFieldNames ??= self::getPriceFieldNames();
+        if (!$priceFieldNames) {
+          return;
+        }
         foreach (pq('af-field', $doc) as $afField) {
           /** @var \DOMElement $afField */
           $name = $afField->getAttribute('name');
