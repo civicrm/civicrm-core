@@ -162,4 +162,16 @@ ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
     return TRUE;
   }
 
+  /**
+   * Add translation source
+   * @return bool
+   */
+  public function upgrade_1008(): bool {
+    $this->ctx->log->info('Applying update 1008 - adding SearchKit translation source.');
+    if (CRM_Core_I18n::isMultilingual()) {
+      \Civi\Search\Translator::initSourceTranslations();
+    }
+    return TRUE;
+  }
+
 }
