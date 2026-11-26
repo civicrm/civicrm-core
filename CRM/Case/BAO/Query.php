@@ -210,7 +210,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         continue;
       }
 
-      if (substr($query->_params[$id][0], 0, 5) == 'case_') {
+      if (str_starts_with($query->_params[$id][0], 'case_')) {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }

@@ -306,7 +306,7 @@ class CRM_Utils_Type {
           // so we just clumsily re-assemble it. Test cover exists.
           $fieldClauseStart = NULL;
           foreach ($parts as $index => &$part) {
-            if (substr($part, 0, 6) === 'field(') {
+            if (str_starts_with($part, 'field(')) {
               // Looking to escape a string like 'field(contribution_status_id,3,4,5) asc'
               // to 'field(`contribution_status_id`,3,4,5) asc'
               $fieldClauseStart = $index;

@@ -566,7 +566,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     }
     else {
       foreach ($fields['fields'] as $fld_id => $value) {
-        if (!($fld_id == 'total_amount1') && !($fld_id == 'total_amount2') && !(substr($fld_id, 0, 7) === "custom_")) {
+        if (!($fld_id == 'total_amount1') && !($fld_id == 'total_amount2') && !(str_starts_with($fld_id, "custom_"))) {
           $found = FALSE;
           $invlidGroups = [];
           foreach ($fields['group_bys'] as $grp_id => $val) {

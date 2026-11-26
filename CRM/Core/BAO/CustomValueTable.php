@@ -715,7 +715,7 @@ class CRM_Core_BAO_CustomValueTable {
     $fieldIDs = [];
     foreach ($params as $n => $v) {
       $key = $idx = NULL;
-      if (substr($n, 0, 7) == 'custom_') {
+      if (str_starts_with($n, 'custom_')) {
         $idx = substr($n, 7);
         if (CRM_Utils_Type::escape($idx, 'Integer', FALSE) === NULL) {
           return CRM_Core_Error::createAPIError(ts('field ID needs to be of type Integer for index %1',

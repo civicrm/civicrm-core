@@ -246,7 +246,7 @@ trait DAOActionTrait {
   protected function resolveFKValues(array &$record): void {
     // Resolve domain id first
     uksort($record, function($a, $b) {
-      return substr($a, 0, 9) == 'domain_id' ? -1 : 1;
+      return str_starts_with($a, 'domain_id') ? -1 : 1;
     });
     foreach ($record as $key => $value) {
       if (!$value || substr_count($key, '.') !== 1) {

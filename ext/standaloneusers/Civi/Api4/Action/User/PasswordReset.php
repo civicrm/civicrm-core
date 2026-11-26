@@ -111,7 +111,7 @@ class PasswordReset extends AbstractAction {
       return NULL;
     }
 
-    if (empty($decodedToken['sub']) || substr($decodedToken['sub'], 0, 4) !== 'uid:') {
+    if (empty($decodedToken['sub']) || !str_starts_with($decodedToken['sub'], 'uid:')) {
       Civi::log()->warning('Missing uid in JWT sub field');
       return NULL;
     }

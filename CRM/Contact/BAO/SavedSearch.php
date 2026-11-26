@@ -140,7 +140,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
       }
       // We should only set the relative key for custom date fields if it is not already set in the array.
       $realField = str_replace(['_relative', '_low', '_high', '_to', '_high'], '', $element);
-      if (substr($element, 0, 7) == 'custom_' && CRM_Contact_BAO_Query::isCustomDateField($realField)) {
+      if (str_starts_with($element, 'custom_') && CRM_Contact_BAO_Query::isCustomDateField($realField)) {
         if (!isset($result[$realField . '_relative'])) {
           $result[$realField . '_relative'] = 0;
         }

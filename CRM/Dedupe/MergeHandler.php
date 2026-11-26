@@ -164,7 +164,7 @@ class CRM_Dedupe_MergeHandler {
   public function getLocationBlocksToMerge(): array {
     $locBlocks = [];
     foreach ($this->getMigrationInfo() as $key => $value) {
-      $isLocationField = (substr($key, 0, 14) === 'move_location_' and $value != NULL);
+      $isLocationField = (str_starts_with($key, 'move_location_') and $value != NULL);
       if (!$isLocationField) {
         continue;
       }

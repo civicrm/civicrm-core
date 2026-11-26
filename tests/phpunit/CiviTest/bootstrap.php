@@ -36,7 +36,7 @@ eval(cv('php:boot --level=settings', 'phpcode'));
 spl_autoload_register(function($class) {
   _phpunit_mockoloader('api\\v4\\', "tests/phpunit/api/v4/", $class);
   _phpunit_mockoloader('Civi\\Api4\\', "tests/phpunit/api/v4/Mock/Api4/", $class);
-  if (substr($class, 0, 13) === 'CRM_Fake_DAO_') {
+  if (str_starts_with($class, 'CRM_Fake_DAO_')) {
     // phpcs:disable
     eval('namespace { class ' . $class . ' extends \CRM_Core_DAO { public static function &fields() { $r = []; return $r; }}}');
     // phpcs:enable
@@ -101,7 +101,7 @@ function cv($cmd, $decode = 'json') {
 
     case 'phpcode':
       // If the last output is /*PHPCODE*/, then we managed to complete execution.
-      if (substr(trim($result), 0, 12) !== "/*BEGINPHP*/" || substr(trim($result), -10) !== "/*ENDPHP*/") {
+      if (!str_starts_with(trim($result), "/*BEGINPHP*/") || substr(trim($result), -10) !== "/*ENDPHP*/") {
         throw new \RuntimeException("Command failed ($cmd):\n$result");
       }
       return $result;

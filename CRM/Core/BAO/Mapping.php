@@ -445,10 +445,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
           $value = $params['value'][$key][$k];
 
-          if ($v[0] == 'Contribution' && substr($fldName, 0, 7) != 'custom_'
-            && substr($fldName, 0, 10) != 'financial_'
-            && substr($fldName, 0, 8) != 'payment_') {
-            if (substr($fldName, 0, 13) != 'contribution_') {
+          if ($v[0] == 'Contribution' && !str_starts_with($fldName, 'custom_')
+            && !str_starts_with($fldName, 'financial_')
+            && !str_starts_with($fldName, 'payment_')) {
+            if (!str_starts_with($fldName, 'contribution_')) {
               $fldName = 'contribution_' . $fldName;
             }
           }

@@ -27,7 +27,7 @@ class Api3SelectQuery extends SelectQuery {
       $table_name = NULL;
       $column_name = NULL;
 
-      if (substr($key, 0, 7) == 'filter.') {
+      if (str_starts_with($key, 'filter.')) {
         // Legacy support for old filter syntax per the test contract.
         // (Convert the style to the later one & then deal with them).
         $filterArray = explode('.', $key);

@@ -1288,7 +1288,7 @@ WHERE civicrm_event.is_active = 1
           $values[$index] = $params[$name];
         }
 
-        if ('state_province' == substr($name, 0, 14)) {
+        if (str_starts_with($name, 'state_province')) {
           if ($params[$name]) {
             $values[$index] = CRM_Core_PseudoConstant::stateProvince($params[$name]);
           }
@@ -1300,7 +1300,7 @@ WHERE civicrm_event.is_active = 1
           $values[$index] = CRM_Utils_Date::customFormat(CRM_Utils_Date::processDate($params[$name]),
             $config->dateformatFull);
         }
-        elseif ('country' == substr($name, 0, 7)) {
+        elseif (str_starts_with($name, 'country')) {
           if ($params[$name]) {
             $values[$index] = CRM_Core_PseudoConstant::country($params[$name]);
           }
@@ -1308,7 +1308,7 @@ WHERE civicrm_event.is_active = 1
             $values[$index] = '';
           }
         }
-        elseif ('county' == substr($name, 0, 6)) {
+        elseif (str_starts_with($name, 'county')) {
           if ($params[$name]) {
             $values[$index] = CRM_Core_PseudoConstant::county($params[$name]);
           }
@@ -1427,7 +1427,7 @@ WHERE civicrm_event.is_active = 1
           }
         }
         else {
-          if (substr($name, 0, 7) === 'do_not_' or substr($name, 0, 3) === 'is_') {
+          if (str_starts_with($name, 'do_not_') or str_starts_with($name, 'is_')) {
             if ($params[$name]) {
               $values[$index] = '[ x ]';
             }

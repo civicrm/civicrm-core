@@ -285,7 +285,7 @@ namespace PathLoad\V0 {
         }
         $file = DIRECTORY_SEPARATOR . str_replace(['_', '\\'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $class) . '.php';
         foreach ($this->paths[$bucket] as $prefix => $paths) {
-          if ($prefix === substr($class, 0, strlen($prefix))) {
+          if (str_starts_with($class, $prefix)) {
             foreach ($paths as $path) {
               $fullFile = $path . $file;
               if (file_exists($fullFile)) {

@@ -146,7 +146,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
    */
   public function noCustomTables(&$logTableSpec): void {
     foreach (array_keys($logTableSpec) as $index) {
-      if (substr($index, 0, 14) === 'civicrm_value_') {
+      if (str_starts_with($index, 'civicrm_value_')) {
         unset($logTableSpec[$index]);
       }
     }

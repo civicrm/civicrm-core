@@ -216,7 +216,7 @@ class CRM_Core_StateMachine {
      * We need a cleaner way of doing this going forward
      */
     foreach ($this->_states as $n => $s) {
-      if (substr($name, 0, strlen($n)) == $n) {
+      if (str_starts_with($name, $n)) {
         return $s;
       }
     }

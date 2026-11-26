@@ -745,16 +745,16 @@ class CRM_Contact_BAO_Query {
       // @todo remove these & handle using metadata - only obscure fields
       // that are hack-added should need to be excluded from the main loop.
       if (
-        (substr($name, 0, 12) === 'participant_') ||
-        (substr($name, 0, 7) === 'pledge_') ||
-        (substr($name, 0, 5) === 'case_')
+        (str_starts_with($name, 'participant_')) ||
+        (str_starts_with($name, 'pledge_')) ||
+        (str_starts_with($name, 'case_'))
       ) {
         continue;
       }
 
       // redirect to activity select clause
       if (
-        (substr($name, 0, 9) === 'activity_') ||
+        (str_starts_with($name, 'activity_')) ||
         ($name === 'parent_id')
       ) {
         CRM_Activity_BAO_Query::select($this);
@@ -1096,7 +1096,7 @@ class CRM_Contact_BAO_Query {
         $index++;
         $elementName = $elementCmpName = $elementFullName;
 
-        if (substr($elementCmpName, 0, 5) == 'phone') {
+        if (str_starts_with($elementCmpName, 'phone')) {
           $elementCmpName = 'phone';
         }
 
@@ -1234,7 +1234,7 @@ class CRM_Contact_BAO_Query {
               }
             }
             else {
-              if (substr($elementFullName, 0, 2) == 'im') {
+              if (str_starts_with($elementFullName, 'im')) {
                 $provider = "{$name}-{$elementFullName}-provider_id";
                 $this->_select[$provider] = "`$tName`.provider_id as `{$name}-{$elementFullName}-provider_id`";
                 $this->_element[$provider] = 1;
@@ -1663,7 +1663,7 @@ class CRM_Contact_BAO_Query {
           }
         }
       }
-      elseif (substr($id, 0, 7) === 'custom_'
+      elseif (str_starts_with($id, 'custom_')
         &&  (
           substr($id, -5, 5) === '_from'
           || substr($id, -3, 3) === '_to'
@@ -1749,16 +1749,16 @@ class CRM_Contact_BAO_Query {
     }
 
     if (in_array($id, $skipWhere) ||
-      substr($id, 0, 4) == '_qf_' ||
-      substr($id, 0, 7) == 'hidden_'
+      str_starts_with($id, '_qf_') ||
+      str_starts_with($id, 'hidden_')
     ) {
       return $result;
     }
 
     if ($apiEntity &&
-      (substr($id, 0, strlen($apiEntity)) != $apiEntity) &&
-      (substr($id, 0, 10) != 'financial_' && substr($id, 0, 8) != 'payment_') &&
-      (substr($id, 0, 7) != 'custom_')
+      (!str_starts_with($id, $apiEntity)) &&
+      (!str_starts_with($id, 'financial_') && !str_starts_with($id, 'payment_')) &&
+      (!str_starts_with($id, 'custom_'))
     ) {
       $id = $apiEntity . '_' . $id;
     }
@@ -1809,16 +1809,16 @@ class CRM_Contact_BAO_Query {
     // do not process custom fields or prefixed contact ids or component params
     if (CRM_Core_BAO_CustomField::getKeyID($values[0]) ||
       (substr($values[0], 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) ||
-      (substr($values[0], 0, 13) === 'contribution_') ||
-      (substr($values[0], 0, 6) === 'event_') ||
-      (substr($values[0], 0, 12) === 'participant_') ||
-      (substr($values[0], 0, 7) === 'member_') ||
-      (substr($values[0], 0, 6) === 'grant_') ||
-      (substr($values[0], 0, 7) === 'pledge_') ||
-      (substr($values[0], 0, 5) === 'case_') ||
-      (substr($values[0], 0, 10) === 'financial_') ||
-      (substr($values[0], 0, 8) === 'payment_') ||
-      (substr($values[0], 0, 11) === 'membership_')
+      (str_starts_with($values[0], 'contribution_')) ||
+      (str_starts_with($values[0], 'event_')) ||
+      (str_starts_with($values[0], 'participant_')) ||
+      (str_starts_with($values[0], 'member_')) ||
+      (str_starts_with($values[0], 'grant_')) ||
+      (str_starts_with($values[0], 'pledge_')) ||
+      (str_starts_with($values[0], 'case_')) ||
+      (str_starts_with($values[0], 'financial_')) ||
+      (str_starts_with($values[0], 'payment_')) ||
+      (str_starts_with($values[0], 'membership_'))
       // temporary fix for regression https://lab.civicrm.org/dev/core/issues/1551
       //  ideally the metadata would allow  this field to be parsed below & the special handling would not
       // be needed.
@@ -2186,7 +2186,7 @@ class CRM_Contact_BAO_Query {
       $field['title'] .= " ($lType)";
     }
 
-    if (substr($name, 0, 14) === 'state_province') {
+    if (str_starts_with($name, 'state_province')) {
       if (isset($locType[1]) && is_numeric($locType[1])) {
         $setTables = FALSE;
         $aName = "{$lType}-address";
@@ -2215,8 +2215,8 @@ class CRM_Contact_BAO_Query {
         self::$_openedPanes[ts('Demographics')] = TRUE;
       }
     }
-    elseif (substr($name, 0, 7) === 'country' || substr($name, 0, 6) === 'county') {
-      $name = (substr($name, 0, 7) === 'country') ? "country_id" : "county_id";
+    elseif (str_starts_with($name, 'country') || str_starts_with($name, 'county')) {
+      $name = (str_starts_with($name, 'country')) ? "country_id" : "county_id";
       if (isset($locType[1]) && is_numeric($locType[1])) {
         $setTables = FALSE;
         $aName = "{$lType}-address";
@@ -2283,7 +2283,7 @@ class CRM_Contact_BAO_Query {
       $this->_where[$grouping][] = $ceWhereClause;
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
-    elseif (substr($name, 0, 4) === 'url-') {
+    elseif (str_starts_with($name, 'url-')) {
       $tName = 'civicrm_website';
       $this->_whereTables[$tName] = $this->_tables[$tName] = "\nLEFT JOIN civicrm_website ON ( civicrm_website.contact_id = contact_a.id )";
       $value = CRM_Core_DAO::escapeString($value);
@@ -3594,7 +3594,7 @@ WHERE  $smartGroupClause
     // Is this ever hit now? Ideally ensure always an array & handle above.
     $n = trim($value);
     if ($n) {
-      if (substr($n, 0, 1) == '"' &&
+      if (str_starts_with($n, '"') &&
         substr($n, -1, 1) == '"'
       ) {
         $n = substr($n, 1, -1);
@@ -4194,7 +4194,7 @@ WHERE  $smartGroupClause
     $nameClause = $name = NULL;
     if ($targetName) {
       $name = trim($targetName[2]);
-      if (substr($name, 0, 1) == '"' &&
+      if (str_starts_with($name, '"') &&
         substr($name, -1, 1) == '"'
       ) {
         $name = substr($name, 1, -1);
@@ -5890,7 +5890,7 @@ AND   displayRelType.is_active = 1
    */
   public static function componentPresent(&$returnProperties, $prefix) {
     foreach ($returnProperties as $name => $dontCare) {
-      if (substr($name, 0, strlen($prefix)) == $prefix) {
+      if (str_starts_with($name, $prefix)) {
         return TRUE;
       }
     }
@@ -5980,7 +5980,7 @@ AND   displayRelType.is_active = 1
    */
   public static function parseSearchBuilderString($string, $dataType = 'Integer') {
     $string = trim($string);
-    if (substr($string, 0, 1) != '(' || substr($string, -1, 1) != ')') {
+    if (!str_starts_with($string, '(') || substr($string, -1, 1) != ')') {
       return FALSE;
     }
 
@@ -6315,7 +6315,7 @@ AND   displayRelType.is_active = 1
    */
   public static function getWildCardedValue($wildcard, $op, $value) {
     if ($wildcard && $op === 'LIKE') {
-      if (CRM_Core_Config::singleton()->includeWildCardInName && (substr($value, 0, 1) != '%')) {
+      if (CRM_Core_Config::singleton()->includeWildCardInName && (!str_starts_with($value, '%'))) {
         $value = "%$value";
       }
       if (substr($value, -1, 1) != '%') {
@@ -6434,7 +6434,7 @@ AND   displayRelType.is_active = 1
       // This is a hacky add-in for primary address joins. Feel free to iterate as it is unit tested.
       // @todo much more cleanup on location handling in addHierarchical elements. Potentially
       // add keys to $this->fields to represent the actual keys for locations.
-      if (empty($fieldSpec) && substr($field, 0, 2) === '1-') {
+      if (empty($fieldSpec) && str_starts_with($field, '1-')) {
         $fieldSpec = $this->getMetadataForField(substr($field, 2));
         $this->addAddressTable('1-' . str_replace('civicrm_', '', $fieldSpec['table_name']), 'is_primary = 1');
       }

@@ -200,7 +200,7 @@ return function ($mixInfo, $bootCache) {
       if (!isset($item['attributes']['url'])) {
         return NULL;
       }
-      return strpos($item['attributes']['url'], $about->getPath()) === 0 ? 'found' : NULL;
+      return str_starts_with($item['attributes']['url'], $about->getPath()) ? 'found' : NULL;
     });
     if ($found) {
       return;

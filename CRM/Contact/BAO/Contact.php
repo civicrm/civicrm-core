@@ -1683,7 +1683,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
               $returnProperties['location'][$locationTypeName][$fieldName] = 1;
             }
           }
-          elseif (substr($fieldName, 0, 14) === 'address_custom') {
+          elseif (str_starts_with($fieldName, 'address_custom')) {
             $returnProperties['location'][$locationTypeName][substr($fieldName, 8)] = 1;
           }
           else {
@@ -2104,7 +2104,7 @@ ORDER BY civicrm_email.is_primary DESC";
 
       if (is_numeric($locTypeId) &&
         !in_array($fieldName, $multiplFields) &&
-        substr($fieldName, 0, 7) != 'custom_'
+        !str_starts_with($fieldName, 'custom_')
       ) {
         $index = $locTypeId;
 
@@ -2221,7 +2221,7 @@ ORDER BY civicrm_email.is_primary DESC";
           elseif ($fieldName == 'address_name') {
             $data['address'][$loc]['name'] = $value;
           }
-          elseif (substr($fieldName, 0, 14) === 'address_custom') {
+          elseif (str_starts_with($fieldName, 'address_custom')) {
             $data['address'][$loc][substr($fieldName, 8)] = $value;
           }
           else {
@@ -2230,7 +2230,7 @@ ORDER BY civicrm_email.is_primary DESC";
         }
       }
       else {
-        if (substr($key, 0, 4) === 'url-') {
+        if (str_starts_with($key, 'url-')) {
           $websiteField = explode('-', $key);
           $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
           $data['website'][$websiteField[1]]['url'] = $value;

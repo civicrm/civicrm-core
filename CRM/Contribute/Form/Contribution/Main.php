@@ -1912,7 +1912,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // remove component related fields
     foreach ($this->_fields as $name => $fieldInfo) {
       //don't set custom data Used for Contribution (CRM-1344)
-      if (substr($name, 0, 7) === 'custom_') {
+      if (str_starts_with($name, 'custom_')) {
         $id = substr($name, 7);
         if (!CRM_Core_BAO_CustomGroup::checkCustomField($id, [
           'Contribution',
@@ -1922,7 +1922,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
         // ignore component fields
       }
-      elseif (array_key_exists($name, $contribFields) || (substr($name, 0, 11) === 'membership_') || (substr($name, 0, 13) == 'contribution_')) {
+      elseif (array_key_exists($name, $contribFields) || (str_starts_with($name, 'membership_')) || (str_starts_with($name, 'contribution_'))) {
         continue;
       }
       $fields[$name] = $fieldInfo;

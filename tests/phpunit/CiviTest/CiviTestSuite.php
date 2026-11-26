@@ -148,7 +148,7 @@ class CiviTestSuite extends PHPUnit\Framework\TestSuite {
     //echo "start Pass 2 on {$dirInfo->getRealPath()}\n";
     foreach ($dir as $fileInfo) {
       if ($fileInfo->isDir()
-        && (substr($fileInfo->getFilename(), 0, 1) != '.')
+        && (!str_starts_with($fileInfo->getFilename(), '.'))
       ) {
         //  This is a directory that may contain tests so scan it
         $addAllTests[] = clone $fileInfo;

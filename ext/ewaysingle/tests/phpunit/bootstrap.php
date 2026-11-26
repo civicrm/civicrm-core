@@ -48,7 +48,7 @@ function cv($cmd, $decode = 'json') {
 
     case 'phpcode':
       // If the last output is /*PHPCODE*/, then we managed to complete execution.
-      if (substr(trim($result), 0, 12) !== "/*BEGINPHP*/" || substr(trim($result), -10) !== "/*ENDPHP*/") {
+      if (!str_starts_with(trim($result), "/*BEGINPHP*/") || substr(trim($result), -10) !== "/*ENDPHP*/") {
         throw new \RuntimeException("Command failed ($cmd):\n$result");
       }
       return $result;

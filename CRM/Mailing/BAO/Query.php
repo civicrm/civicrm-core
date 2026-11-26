@@ -137,7 +137,7 @@ class CRM_Mailing_BAO_Query {
       if (empty($query->_params[$id][0])) {
         continue;
       }
-      if (substr($query->_params[$id][0], 0, 8) == 'mailing_') {
+      if (str_starts_with($query->_params[$id][0], 'mailing_')) {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }

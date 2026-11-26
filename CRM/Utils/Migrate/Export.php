@@ -519,7 +519,7 @@ class CRM_Utils_Migrate_Export {
         $value = $object->$name;
         if ($name == 'field_name') {
           // hack for profile field_name
-          if (substr($value, 0, 7) == 'custom_') {
+          if (str_starts_with($value, 'custom_')) {
             $cfID = substr($value, 7);
             [$tableName, $columnName, $groupID] = CRM_Core_BAO_CustomField::getTableColumnGroup($cfID);
             $value = "custom.{$tableName}.{$columnName}";

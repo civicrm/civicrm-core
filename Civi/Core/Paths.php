@@ -249,7 +249,7 @@ class Paths {
     }
 
     $isDot = $value === '.';
-    if (substr($value, 0, 5) === 'http:' || substr($value, 0, 6) === 'https:') {
+    if (str_starts_with($value, 'http:') || str_starts_with($value, 'https:')) {
       return $value;
     }
 

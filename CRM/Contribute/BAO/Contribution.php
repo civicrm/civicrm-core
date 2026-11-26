@@ -547,7 +547,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     [$hasBillingField, $addressParams] = self::getBillingAddressParams($params, $billingLocationTypeID);
     foreach ($addressParams as $name => $field) {
-      if (substr($name, 0, 8) == 'billing_') {
+      if (str_starts_with($name, 'billing_')) {
         $addressParams[substr($name, 9)] = $addressParams[$field];
       }
     }

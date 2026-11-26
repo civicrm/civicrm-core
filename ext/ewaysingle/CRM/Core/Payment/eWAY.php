@@ -321,7 +321,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     if (self::isError($eWAYResponse)) {
       $eWayTrxnError = $eWAYResponse->Error();
       CRM_Core_Error::debug_var('eWay Error', $eWayTrxnError, TRUE, TRUE);
-      if (substr($eWayTrxnError, 0, 6) === 'Error:') {
+      if (str_starts_with($eWayTrxnError, 'Error:')) {
         throw new PaymentProcessorException($eWayTrxnError, 9008);
       }
       $eWayErrorCode = substr($eWayTrxnError, 0, 2);

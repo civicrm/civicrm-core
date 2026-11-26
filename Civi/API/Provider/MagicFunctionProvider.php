@@ -79,7 +79,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
         // see https://lab.civicrm.org/dev/core/issues/643
         // testCreateBAODefaults fails without this.
         foreach ($apiRequest['params'] as $key => $param) {
-          if ($key !== 'api.has_parent' && substr($key, 0, 4) === 'api.' || substr($key, 0, 4) === 'api_') {
+          if ($key !== 'api.has_parent' && str_starts_with($key, 'api.') || str_starts_with($key, 'api_')) {
             unset($apiRequest['params'][$key]);
           }
         }

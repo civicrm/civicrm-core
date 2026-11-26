@@ -225,7 +225,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     foreach ($fields as $name => $dontCare) {
       if (isset($contact[$name])) {
         $defaults[$name] = $contact[$name];
-        if (substr($name, 0, 7) == 'custom_') {
+        if (str_starts_with($name, 'custom_')) {
           $timeField = "{$name}_time";
           if (isset($contact[$timeField])) {
             $defaults[$timeField] = $contact[$timeField];

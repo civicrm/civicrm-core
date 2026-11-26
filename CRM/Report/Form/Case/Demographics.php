@@ -285,8 +285,8 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
         ";
 
     foreach ($this->_columns as $t => $c) {
-      if (substr($t, 0, 13) == 'civicrm_value' ||
-        substr($t, 0, 12) == 'custom_value'
+      if (str_starts_with($t, 'civicrm_value') ||
+        str_starts_with($t, 'custom_value')
       ) {
         $this->_from .= " LEFT JOIN $t {$this->_aliases[$t]} ON {$this->_aliases[$t]}.entity_id = ";
         $this->_from .= ($c['ext'] ==
@@ -396,8 +396,8 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
 
       // handle custom fields
       foreach ($row as $k => $r) {
-        if (substr($k, 0, 13) == 'civicrm_value' ||
-          substr($k, 0, 12) == 'custom_value'
+        if (str_starts_with($k, 'civicrm_value') ||
+          str_starts_with($k, 'custom_value')
         ) {
           if ($r || $r == '0') {
             if ($newval = $this->getCustomFieldLabel($k, $r)) {

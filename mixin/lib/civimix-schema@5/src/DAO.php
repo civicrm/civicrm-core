@@ -134,7 +134,7 @@ return new class() extends \CRM_Core_DAO {
       if (!empty($fieldSpec['required'])) {
         $field['required'] = TRUE;
       }
-      if (strpos($fieldSpec['sql_type'], 'decimal(') === 0) {
+      if (str_starts_with($fieldSpec['sql_type'], 'decimal(')) {
         $precision = self::getFieldLength($fieldSpec['sql_type']);
         $field['precision'] = array_map('intval', explode(',', $precision));
       }

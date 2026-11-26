@@ -135,7 +135,7 @@ class DbUtil {
       $hostParts = explode(':', $host);
       if (count($hostParts) > 1 && strrpos($host, ']') !== strlen($host) - 1) {
         $portOrSocket = array_pop($hostParts);
-        if (substr($portOrSocket, /*start*/ 0, /*length*/ 1) == '/') {
+        if (str_starts_with($portOrSocket, '/')) {
           $socket = $portOrSocket;
         }
         else {

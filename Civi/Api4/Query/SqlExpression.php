@@ -270,7 +270,7 @@ abstract class SqlExpression {
       $this->fields = array_merge($this->fields, $expr->getFields());
       $captured[] = $expr;
       // Keep going if we have a comma indicating another expression follows
-      if (count($captured) < $max && substr($arg, 0, 1) === ',') {
+      if (count($captured) < $max && str_starts_with($arg, ',')) {
         $arg = ltrim(substr($arg, 1));
       }
       else {

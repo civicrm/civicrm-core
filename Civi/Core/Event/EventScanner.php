@@ -99,7 +99,7 @@ class EventScanner {
      *   Ex: 'civi.foo.bar', 'hook_civicrm_foo'
      */
     $toEventName = function ($underscore) {
-      if (substr($underscore, 0, 5) === 'hook_') {
+      if (str_starts_with($underscore, 'hook_')) {
         return $underscore;
       }
       else {

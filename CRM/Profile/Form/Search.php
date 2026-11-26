@@ -41,7 +41,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
     // we need to figure out the type, so we can either set an array element
     // or a scalar -- FIX ME sometime please
     foreach ($_GET as $key => $value) {
-      if (substr($key, 0, 7) == 'custom_' || $key == "preferred_communication_method") {
+      if (str_starts_with($key, 'custom_') || $key == "preferred_communication_method") {
         if (str_contains($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
           $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
           $value = [];

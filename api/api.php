@@ -224,15 +224,15 @@ function _civicrm_api_get_camel_name($entity) {
  */
 function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '.') {
   foreach ($params as $field => &$value) {
-    if (substr($field, 0, 4) == 'api.') {
+    if (str_starts_with($field, 'api.')) {
       // CRM-21246 - Leave nested calls alone.
       continue;
     }
-    if (is_string($value) && substr($value, 0, 6) == '$value') {
+    if (is_string($value) && str_starts_with($value, '$value')) {
       $value = _civicrm_api_replace_variable($value, $parentResult, $separator);
     }
     // Handle the operator syntax: array('OP' => $val)
-    elseif (is_array($value) && is_string(reset($value)) && substr(reset($value), 0, 6) == '$value') {
+    elseif (is_array($value) && is_string(reset($value)) && str_starts_with(reset($value), '$value')) {
       $key = key($value);
       $value[$key] = _civicrm_api_replace_variable($value[$key], $parentResult, $separator);
       // A null value with an operator will cause an error, so remove it.

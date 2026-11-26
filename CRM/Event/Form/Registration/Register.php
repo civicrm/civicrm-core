@@ -593,7 +593,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $errors = [];
     $email = '';
     foreach ($fields as $fieldname => $fieldvalue) {
-      if (substr($fieldname, 0, 6) == 'email-' && $fieldvalue) {
+      if (str_starts_with($fieldname, 'email-') && $fieldvalue) {
         $email = $fieldvalue;
       }
     }

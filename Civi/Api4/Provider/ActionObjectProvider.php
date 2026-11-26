@@ -140,7 +140,7 @@ class ActionObjectProvider extends AutoService implements ProviderInterface {
         $this->resolveChainLinks($v, $result);
       }
     }
-    elseif (is_string($val) && strlen($val) > 1 && substr($val, 0, 1) === '$') {
+    elseif (is_string($val) && strlen($val) > 1 && str_starts_with($val, '$')) {
       $key = substr($val, 1);
       $val = $result[$key] ?? \CRM_Utils_Array::pathGet($result, explode('.', $key)) ?? $val;
     }

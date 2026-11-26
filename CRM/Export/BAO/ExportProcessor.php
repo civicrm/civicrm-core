@@ -1340,7 +1340,7 @@ class CRM_Export_BAO_ExportProcessor {
     ];
 
     foreach ($fields as $key => $var) {
-      if ($key && (substr($key, 0, 6) != 'custom') && !in_array($key, $skippedFields)) {
+      if ($key && (!str_starts_with($key, 'custom')) && !in_array($key, $skippedFields)) {
         $returnProperties[$key] = 1;
       }
     }

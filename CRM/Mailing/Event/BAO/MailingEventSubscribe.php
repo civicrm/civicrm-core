@@ -47,7 +47,7 @@ class CRM_Mailing_Event_BAO_MailingEventSubscribe extends CRM_Mailing_Event_DAO_
     $success = NULL;
 
     $bao = CRM_Contact_BAO_Group::retrieve($params, $defaults);
-    if ($bao && substr($bao->visibility, 0, 6) != 'Public' && $context != 'profile') {
+    if ($bao && !str_starts_with($bao->visibility, 'Public') && $context != 'profile') {
       return $success;
     }
 

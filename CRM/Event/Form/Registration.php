@@ -928,7 +928,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
       else {
         foreach ($participantRecord as $name => $dontCare) {
-          if (substr($name, 0, 5) == 'email') {
+          if (str_starts_with($name, 'email')) {
             $mail = $name;
             break;
           }
@@ -1584,7 +1584,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_eventId) {
       $templateName = $this->_name;
-      if (substr($templateName, 0, 12) == 'Participant_') {
+      if (str_starts_with($templateName, 'Participant_')) {
         $templateName = 'AdditionalParticipant';
       }
 
@@ -2175,7 +2175,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           // get an email if one exists for the participant
           $participantEmail = '';
           foreach (array_keys($value) as $valueName) {
-            if (substr($valueName, 0, 6) == 'email-') {
+            if (str_starts_with($valueName, 'email-')) {
               $participantEmail = $value[$valueName];
             }
           }

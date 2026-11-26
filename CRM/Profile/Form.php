@@ -497,7 +497,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       ) {
         $emailField = FALSE;
         foreach ($this->_fields as $name => $values) {
-          if (substr($name, 0, 6) == 'email-') {
+          if (str_starts_with($name, 'email-')) {
             $emailField = TRUE;
           }
         }
@@ -845,7 +845,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
       // since the CMS manages the email field, suppress the email display if in
       // register mode which occur within the CMS form
-      if ($this->_mode == self::MODE_REGISTER && substr($name, 0, 5) == 'email') {
+      if ($this->_mode == self::MODE_REGISTER && str_starts_with($name, 'email')) {
         unset($this->_fields[$name]);
         continue;
       }
@@ -1154,7 +1154,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     $result = NULL;
     foreach ($params as $name => $values) {
-      if (substr($name, 0, 6) == 'email-') {
+      if (str_starts_with($name, 'email-')) {
         $result['email'] = $values;
       }
     }

@@ -391,7 +391,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
   $returns = $options['return'];
   foreach ($params as $n => $v) {
     // @todo - the per-parsing on options should have already done this.
-    if (substr($n, 0, 7) == 'return.') {
+    if (str_starts_with($n, 'return.')) {
       $returnkey = substr($n, 7);
       $returns[$returnkey] = $v;
     }
@@ -463,7 +463,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
         break;
 
       default:
-        if (substr($n, 0, 6) == 'custom') {
+        if (str_starts_with($n, 'custom')) {
           $returnProperties[$n] = $v;
         }
     }
