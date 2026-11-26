@@ -246,8 +246,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *   The row number to start from.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string $sort
-   *   The sql string that describes the sort order.
+   * @param string|CRM_Utils_Sort|null $sort
+   *   The sort order string or object.
    * @param string $output
    *   What should the result set include (web/email/csv).
    *
@@ -350,7 +350,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param CRM_Utils_Sort $sort
+   * @param string|CRM_Utils_Sort|null $sort
    *
    * @return string
    * @throws \CRM_Core_Exception
@@ -407,7 +407,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param CRM_Utils_Sort $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param string $cacheKey
    * @param int $start
    * @param int $end

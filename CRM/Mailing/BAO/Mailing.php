@@ -1719,8 +1719,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *   The row number to start from.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string $sort
-   *   The sql string that describes the sort order.
+   * @param CRM_Utils_Sort|null $sort
+   *   The sort object.
    *
    * @param null $additionalClause
    * @param array $additionalParams

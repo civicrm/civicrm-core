@@ -233,7 +233,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param string $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *
@@ -669,7 +669,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param string $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $returnSQL
    *
    * @return string

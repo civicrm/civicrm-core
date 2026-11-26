@@ -236,8 +236,8 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
    *   Offset.
    * @param int $rowCount
    *   Number of rows.
-   * @param array $sort
-   *   Sort array.
+   * @param string|CRM_Utils_Sort|null $sort
+   *   Sort order string or object.
    * @param int $contact_id
    *   Optional contact ID.
    *

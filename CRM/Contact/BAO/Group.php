@@ -194,7 +194,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $returnProperties
    *   Which properties should be included in the returned group objects.
    *   (member_count should be last element.)
-   * @param string $sort
+   * @param string|null $sort
    * @param int $offset
    * @param int $rowCount
    *

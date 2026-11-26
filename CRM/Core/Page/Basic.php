@@ -365,7 +365,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   }
 
   /**
-   * @param $sort
+   * @param string|null $sort
    * @param $action
    * @param array $links
    *

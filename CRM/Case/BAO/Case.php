@@ -1546,7 +1546,7 @@ HERESQL;
 
   /**
    * @param array $groupInfo
-   * @param null $sort
+   * @param string|null $sort
    * @param bool $showLinks
    * @param bool $returnOnlyCount
    * @param int $offset

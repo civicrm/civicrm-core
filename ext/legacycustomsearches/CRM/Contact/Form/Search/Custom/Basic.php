@@ -98,7 +98,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   /**
    * @param int $offset
    * @param int $rowCount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *

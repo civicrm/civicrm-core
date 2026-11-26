@@ -317,8 +317,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    *   The row number to start from.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string $sort
-   *   The sql string that describes the sort order.
+   * @param string|CRM_Utils_Sort|null $sort
+   *   The sort order string or object.
    * @param string $output
    *   What should the result set include (web/email/csv).
    *

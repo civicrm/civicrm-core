@@ -121,8 +121,8 @@ class CRM_Mailing_Event_BAO_MailingEventDelivered extends CRM_Mailing_Event_DAO_
    *   Offset.
    * @param int $rowCount
    *   Number of rows.
-   * @param array $sort
-   *   Sort array.
+   * @param string|CRM_Utils_Sort|null $sort
+   *   Sort order string or object.
    *
    * @param int $is_test
    *

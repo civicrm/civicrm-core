@@ -234,8 +234,8 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *   The row number to start from.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string $sort
-   *   The sql string that describes the sort order.
+   * @param string|CRM_Utils_Sort|null $sort
+   *   The sort order string or object.
    * @param string $output
    *   What should the result set include (web/email/csv).
    *
@@ -274,7 +274,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   }
 
   /**
-   * @param $sort
+   * @param string|CRM_Utils_Sort|null $sort
    */
   private function buildPrevNextCache($sort) {
     //for prev/next pagination

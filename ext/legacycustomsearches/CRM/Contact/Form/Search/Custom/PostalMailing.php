@@ -64,7 +64,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $returnSQL
    *
    * @return string
@@ -76,7 +76,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *

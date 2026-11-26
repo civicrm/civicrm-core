@@ -113,7 +113,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
@@ -125,7 +125,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *
