@@ -1895,7 +1895,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $className != 'CRM_Event_Form_Task_SMS'
     ) {
       $form->add('wysiwyg', 'html_message',
-        strstr($className, 'PDF') ? ts('Document Body') : ts('HTML Format'),
+        str_contains($className, 'PDF') ? ts('Document Body') : ts('HTML Format'),
         [
           'cols' => '80',
           'rows' => '8',

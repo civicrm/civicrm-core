@@ -531,7 +531,7 @@ class Givi {
     if (!$newBranchNames) {
       return $this->returnError("Missing <branch>[:<branch>]\n");
     }
-    if (FALSE !== strpos($newBranchNames, ':')) {
+    if (str_contains($newBranchNames, ':')) {
       list ($newBranchFromName, $newBranchToName) = explode(':', $newBranchNames);
       foreach ($this->repos as $repo => $relPath) {
         $filteredFromName = $this->filterBranchName($repo, $newBranchFromName);

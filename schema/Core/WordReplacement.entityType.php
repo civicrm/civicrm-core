@@ -1,7 +1,7 @@
 <?php
 
 // Nothing is created yet at the time we're called, so do the same thing as the civimix SqlGenerator
-$bin_collation = strpos(CRM_Core_BAO_SchemaHandler::DEFAULT_COLLATION, 'utf8mb4') !== FALSE ? 'utf8mb4_bin' : 'utf8_bin';
+$bin_collation = str_contains(CRM_Core_BAO_SchemaHandler::DEFAULT_COLLATION, 'utf8mb4') ? 'utf8mb4_bin' : 'utf8_bin';
 
 return [
   'name' => 'WordReplacement',

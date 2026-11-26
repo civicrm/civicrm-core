@@ -192,7 +192,7 @@ class FormattingUtil {
       }
       return date($format, $timestamp);
     }
-    if (isset($index) && !strstr($operator, 'BETWEEN')) {
+    if (isset($index) && !str_contains($operator, 'BETWEEN')) {
       throw new \CRM_Core_Exception("Relative dates cannot be in an array using the $operator operator.");
     }
     [$dateFrom, $dateTo] = \CRM_Utils_Date::getFromTo($value);

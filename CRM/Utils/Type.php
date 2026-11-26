@@ -316,7 +316,7 @@ class CRM_Utils_Type {
               // this is part of the list of field options. Concatenate it back on.
               $parts[$fieldClauseStart] .= ',' . $part;
               unset($parts[$index]);
-              if (!strstr($parts[$fieldClauseStart], ')')) {
+              if (!str_contains($parts[$fieldClauseStart], ')')) {
                 // we have not reached the end of the list.
                 continue;
               }

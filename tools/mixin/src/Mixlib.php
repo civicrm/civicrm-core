@@ -214,7 +214,7 @@ class Mixlib {
     $info = [];
     $param = NULL;
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $comment) as $num => $line) {
-      if (!$num || strpos($line, '*/') !== FALSE) {
+      if (!$num || str_contains($line, '*/')) {
         continue;
       }
       $line = ltrim(trim($line), '*');

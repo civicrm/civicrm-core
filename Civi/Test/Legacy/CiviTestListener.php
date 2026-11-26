@@ -254,7 +254,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     foreach ($byInterface['HeadlessInterface'] as $className => $nonce) {
       $clazz = new \ReflectionClass($className);
       $docComment = str_replace("\r\n", "\n", $clazz->getDocComment());
-      if (strpos($docComment, "@group headless\n") === FALSE) {
+      if (!str_contains($docComment, "@group headless\n")) {
         echo "WARNING: Class $className implements HeadlessInterface. It should declare \"@group headless\".\n";
       }
       if (str_contains($docComment, "@group e2e\n")) {
@@ -264,7 +264,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     foreach ($byInterface['EndToEndInterface'] as $className => $nonce) {
       $clazz = new \ReflectionClass($className);
       $docComment = str_replace("\r\n", "\n", $clazz->getDocComment());
-      if (strpos($docComment, "@group e2e\n") === FALSE) {
+      if (!str_contains($docComment, "@group e2e\n")) {
         echo "WARNING: Class $className implements EndToEndInterface. It should declare \"@group e2e\".\n";
       }
       if (str_contains($docComment, "@group headless\n")) {

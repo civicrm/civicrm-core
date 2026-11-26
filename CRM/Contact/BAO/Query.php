@@ -5405,7 +5405,7 @@ civicrm_relationship.start_date > {$today}
         $date = "('" . implode("','", $value) . "')";
         $format = implode(', ', $format);
       }
-      elseif ($value && (!strstr($op, 'NULL') && !strstr($op, 'EMPTY'))) {
+      elseif ($value && (!str_contains($op, 'NULL') && !str_contains($op, 'EMPTY'))) {
         $date = CRM_Utils_Date::processDate($value, NULL, FALSE, $dateFormat);
         if (!$appendTimeStamp) {
           $date = substr($date, 0, 8);
@@ -6353,7 +6353,7 @@ AND   displayRelType.is_active = 1
         }
         elseif (!in_array($element, $nullableFields)) {
           // if wildcard is already present return searchString as it is OR append and/or prepend with wildcard
-          $isWilcard = strstr($value, '%') ? FALSE : CRM_Core_Config::singleton()->includeWildCardInName;
+          $isWilcard = str_contains($value, '%') ? FALSE : CRM_Core_Config::singleton()->includeWildCardInName;
           $formValues[$element] = ['LIKE' => self::getWildCardedValue($isWilcard, 'LIKE', $value)];
         }
       }

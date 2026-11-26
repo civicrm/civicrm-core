@@ -112,7 +112,7 @@ namespace PathLoad\V0 {
        *   Ex: 'foobar@1', 'foobar', '1.2.3'
        */
       public static function parseExpr(string $package): array {
-        if (strpos($package, '@') === FALSE) {
+        if (!str_contains($package, '@')) {
           throw new \RuntimeException("Malformed package name: $package");
         }
         [$prefix, $suffix] = explode('@', $package, 2);
@@ -531,10 +531,10 @@ namespace PathLoad\V0 {
         return $this;
       }
       public function loadClass(string $class) {
-        if (strpos($class, '\\') !== FALSE) {
+        if (str_contains($class, '\\')) {
           $this->loadPackagesByNamespace('\\', explode('\\', $class));
         }
-        elseif (strpos($class, '_') !== FALSE) {
+        elseif (str_contains($class, '_')) {
           $this->loadPackagesByNamespace('_', explode('_', $class));
         }
         return $this->psr4->loadClass($class) || $this->psr0->loadClass($class);

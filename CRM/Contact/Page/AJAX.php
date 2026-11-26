@@ -337,7 +337,7 @@ class CRM_Contact_Page_AJAX {
     foreach ($mappings as $key => $dbName) {
       if (!empty($searchParams[$key])) {
         // CRM-18694.
-        $wildcard = strstr($key, 'postcode') ? '' : '%';
+        $wildcard = str_contains($key, 'postcode') ? '' : '%';
         $queryParams[$nextParamKey] = [$wildcard . $searchParams[$key] . '%', 'String'];
         $where[] = $dbName . " LIKE %{$nextParamKey} ";
         $nextParamKey++;

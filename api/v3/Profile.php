@@ -629,7 +629,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
     $entityGetFieldsResult = _civicrm_api3_profile_appendaliases($result['values'], $entity);
     foreach ($entityFields as $entityfield => $realName) {
       $fieldName = strtolower($entityfield);
-      if (!strstr($fieldName, '-')) {
+      if (!str_contains($fieldName, '-')) {
         if (strtolower($realName) != $fieldName) {
           // we want to keep the '-' pattern for locations but otherwise
           // we are going to make the api-standard field the main / preferred name but support the db name

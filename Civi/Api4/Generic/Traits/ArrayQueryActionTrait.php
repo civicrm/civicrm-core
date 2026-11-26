@@ -262,7 +262,7 @@ trait ArrayQueryActionTrait {
 
         if (is_string($value) || is_numeric($value)) {
           // Lowercase check if string contains string
-          return strpos(strtolower((string) $value), strtolower((string) $expected)) !== FALSE;
+          return str_contains(strtolower((string) $value), strtolower((string) $expected));
         }
         return $value == $expected;
 
