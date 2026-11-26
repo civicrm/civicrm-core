@@ -441,7 +441,16 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       else {
         $formName = CRM_Utils_String::getClassName($name);
       }
-
+      // TODO: Remove this legacy extension support in 6.26
+      if (is_string($className) && preg_match('/\A[a-zA-Z0-9_\\\\]+\z/', $className) && !class_exists($className)) {
+        $ext = CRM_Extension_System::singleton()->getMapper();
+        if ($ext->isExtensionClass($className)) {
+          $classFile = $ext->getLegacyExtensionPath($ext->classToKey($className), 'report');
+          if ($classFile !== NULL) {
+            require_once $classFile;
+          }
+        }
+      }
       $$stateName = new $className($stateMachine->find($className), $action, 'post', $formName);
       if ($title) {
         $$stateName->setTitle($title);

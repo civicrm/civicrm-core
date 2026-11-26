@@ -1293,6 +1293,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return string
    */
   public function getTemplateFileName() {
+    // TODO: Remove this legacy extension support in 6.26
+    $className = get_class($this);
+    if (!str_starts_with($className, 'CRM_') && !str_contains($className, '\\')) {
+      $ext = CRM_Extension_System::singleton()->getMapper();
+      if ($ext->isExtensionClass($className) && $ext->getLegacyExtensionPath($ext->classToKey($className), 'report') !== NULL) {
+        return $ext->getTemplatePath($className) . DIRECTORY_SEPARATOR . $ext->getTemplateName($className);
+      }
+    }
     return CRM_Utils_System::getTemplateForClass($this);
   }
 

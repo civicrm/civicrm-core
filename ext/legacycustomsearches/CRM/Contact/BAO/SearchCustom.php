@@ -62,7 +62,14 @@ class CRM_Contact_BAO_SearchCustom {
     $ext = CRM_Extension_System::singleton()->getMapper();
 
     if ($ext->isExtensionKey($customSearchClass)) {
-      $customSearchClass = $ext->keyToClass($customSearchClass);
+      $customSearchKey = $customSearchClass;
+      $customSearchClass = $ext->keyToClass($customSearchKey);
+      if (!class_exists($customSearchClass)) {
+        $customSearchFile = $ext->getLegacyExtensionPath($customSearchKey, 'search');
+        if ($customSearchFile !== NULL) {
+          include_once $customSearchFile;
+        }
+      }
     }
 
     if (!class_exists($customSearchClass)) {
