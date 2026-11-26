@@ -73,34 +73,356 @@
     return result;
   }
 
-  // https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
-  CRM.api4 = function(entity, action, params, index) {
-    return new Promise(function(resolve, reject) {
-      if (typeof entity === 'string') {
-        $.post(CRM.url('civicrm/ajax/api4/' + entity + '/' + action), {
-          params: JSON.stringify(params),
-          index: index
-        })
-          .done(function (data) {
-            resolve(arrayObject(data));
-          })
-          .fail(function (data) {
-            reject(data.responseJSON);
-          });
-      } else {
+  // Valid keys for the 4th `config` argument to CRM.api4
+  const api4ConfigKeys = new Set(['index', 'delay', 'cache', 'signal']);
+  // Calls waiting to be sent in a background batch
+  const backgroundQueue = [];
+  // In-flight cacheable calls keyed by serialized [entity, action, params(, index)]
+  const inFlightCache = new Map();
+  // Completed TTL-cached calls keyed by serialized [entity, action, params(, index)] -> {result, expires}
+  const responseCache = new Map();
+  let cacheGeneration = 0;
+  let backgroundTimer = null;
+  let backgroundDeadline = Infinity;
+
+  function clearApi4Cache() {
+    cacheGeneration++;
+    inFlightCache.clear();
+    responseCache.clear();
+  }
+
+  $(window).on('crmPopupFormSuccess crmFormSuccess', clearApi4Cache);
+
+  function isGetAction(entity, action, params) {
+    const isReadOnly = action === 'autocomplete' || action === 'checkAccess' ||
+      (entity === 'SearchDisplay' && action === 'run') ||
+      /^get([A-Z]|$)/.test(action);
+    if (!isReadOnly) {
+      return false;
+    }
+    if (params?.chain && typeof params.chain === 'object') {
+      return Object.values(params.chain).every((chained) =>
+        Array.isArray(chained) && isGetAction(chained[0], chained[1], chained[2])
+      );
+    }
+    return true;
+  }
+
+  function normalizeApi4Config(config) {
+    if (config === undefined || config === null) {
+      return {};
+    }
+    if (!$.isPlainObject(config)) {
+      return {index: config};
+    }
+    if (Object.keys(config).some((key) => !api4ConfigKeys.has(key))) {
+      console.warn('Unrecognized config key(s) passed to CRM.api4; treating as index param:', config);
+      return {index: config};
+    }
+    return config;
+  }
+
+  // Returns false (disabled), 0 (in-flight dedupe only), or positive ms TTL
+  function resolveCacheTtl(cacheOption, readOnly) {
+    const val = cacheOption ?? (readOnly ? 0 : false);
+    if (val === true) {
+      return 60000;
+    }
+    return typeof val === 'number' && val >= 0 ? val : false;
+  }
+
+  function getAbortReason(signal) {
+    return signal.reason || new window.DOMException('Aborted', 'AbortError');
+  }
+
+  function buildApi4Call(entity, action, params, index) {
+    return index !== undefined ? [entity, action, params, index] : [entity, action, params];
+  }
+
+  function getCachedResponse(key) {
+    const cached = responseCache.get(key);
+    if (!cached) {
+      return undefined;
+    }
+    if (cached.expires > Date.now()) {
+      return cached.result;
+    }
+    responseCache.delete(key);
+    return undefined;
+  }
+
+  function attachAbortHandler(item) {
+    if (!item.signal) {
+      return;
+    }
+    const onAbort = () => {
+      item.cleanup = null;
+      const reason = getAbortReason(item.signal);
+      const queuePos = backgroundQueue.indexOf(item);
+      if (queuePos >= 0) {
+        backgroundQueue.splice(queuePos, 1);
+        if (!backgroundQueue.length) {
+          clearTimeout(backgroundTimer);
+          backgroundTimer = null;
+          backgroundDeadline = Infinity;
+        }
+        item.reject(reason);
+        return;
+      }
+      if (item.owner) {
+        const subPos = item.owner.subscribers.indexOf(item);
+        if (subPos >= 0) {
+          item.owner.subscribers.splice(subPos, 1);
+          if (item.owner.jqXHR && !item.owner.subscribers.length) {
+            if (item.owner.cacheKey && inFlightCache.get(item.owner.cacheKey) === item.owner) {
+              inFlightCache.delete(item.owner.cacheKey);
+            }
+            item.owner.jqXHR.abort();
+          }
+          item.reject(reason);
+        }
+      }
+    };
+    item.signal.addEventListener('abort', onAbort, {once: true});
+    item.cleanup = () => {
+      item.signal.removeEventListener('abort', onAbort);
+      item.cleanup = null;
+    };
+  }
+
+  function sendBackgroundQueue() {
+    clearTimeout(backgroundTimer);
+    backgroundTimer = null;
+    backgroundDeadline = Infinity;
+    const toSend = [];
+
+    backgroundQueue.splice(0).forEach((item) => {
+      let resolvedParams;
+      try {
+        // Params given as a function are evaluated now, so they reflect the state at send time
+        resolvedParams = (typeof item.params === 'function' ? item.params() : item.params) || {};
+      }
+      catch (error) {
+        item.cleanup?.();
+        item.reject(error);
+        return;
+      }
+
+      const call = buildApi4Call(item.entity, item.action, resolvedParams, item.index);
+      const readOnly = isGetAction(item.entity, item.action, resolvedParams);
+      if (!readOnly) {
+        clearApi4Cache();
+      }
+
+      const ttl = resolveCacheTtl(item.cache, readOnly);
+      if (ttl !== false) {
+        const key = JSON.stringify(call);
+        if (ttl > 0) {
+          const cached = getCachedResponse(key);
+          if (cached !== undefined) {
+            item.cleanup?.();
+            item.resolve(cached);
+            return;
+          }
+        }
+        const existing = inFlightCache.get(key);
+        if (existing) {
+          // Deduplicate against an already in-flight or earlier queued call
+          existing.subscribers.push(item);
+          existing.ttl = Math.max(existing.ttl, ttl);
+          item.owner = existing;
+          return;
+        }
+        item.cacheKey = key;
+        item.ttl = ttl;
+        inFlightCache.set(key, item);
+      }
+
+      item.call = call;
+      item.generation = cacheGeneration;
+      item.subscribers = [item];
+      item.owner = item;
+      toSend.push(item);
+    });
+
+    if (!toSend.length) {
+      return;
+    }
+
+    CRM.api4(toSend.map((item) => item.call))
+      .then((results) => toSend.forEach((item, index) => {
+        if (item.cacheKey && inFlightCache.get(item.cacheKey) === item) {
+          inFlightCache.delete(item.cacheKey);
+        }
+        const result = results[index];
+        const isError = !result || 'error_code' in result;
+        if (!isError && item.cacheKey && item.ttl > 0 && item.generation === cacheGeneration) {
+          responseCache.set(item.cacheKey, {result, expires: Date.now() + item.ttl});
+        }
+        const method = isError ? 'reject' : 'resolve';
+        item.subscribers.splice(0).forEach((sub) => {
+          sub.cleanup?.();
+          sub[method](result);
+        });
+      }), (error) => toSend.forEach((item) => {
+        if (item.cacheKey && inFlightCache.get(item.cacheKey) === item) {
+          inFlightCache.delete(item.cacheKey);
+        }
+        item.subscribers.splice(0).forEach((sub) => {
+          sub.cleanup?.();
+          sub.reject(error);
+        });
+      }));
+  }
+
+  /**
+   * AJAX APIv4 client
+   * @link https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
+   *
+   * Single call: CRM.api4(entity, action, params, config)
+   * Multi-call:  CRM.api4(calls)
+   *
+   * @param {string|Array|Object} entity
+   *   Entity name for a single call, or an array/object of `[entity, action, params, index]` calls.
+   * @param {string} [action]
+   * @param {Object|Function} [params]
+   *   Api params, or a function returning them (evaluated at send time; can cancel by throwing).
+   * @param {Object|string|number|Array} [config]
+   *   Config object for single calls (non-plain-object values, or objects with unrecognized keys, are treated as `index`):
+   *   - index {string|number|Array|Object}: APIv4 result index
+   *   - delay {boolean|number}: delay & batch with other delayed calls (`true` = 800ms, number = max wait in ms, `false` = immediate)
+   *   - cache {boolean|number}: `false` = disabled (default for writes), `0` = in-flight deduplication only (default for get-like calls),
+   *     `true` = 60000ms (1 minute), or positive number = ms to cache in memory (cleared on writes and form success)
+   *   - signal {AbortSignal}: cancels a queued or in-flight request
+   * @return {Promise}
+   */
+  CRM.api4 = function(entity, action, params, config) {
+    if (typeof entity !== 'string') {
+      const hasWrite = Object.values(entity).some((call) =>
+        !Array.isArray(call) || !isGetAction(call[0], call[1], call[2])
+      );
+      if (hasWrite) {
+        clearApi4Cache();
+      }
+      return new Promise((resolve, reject) => {
         $.post(CRM.url('civicrm/ajax/api4'), {
           calls: JSON.stringify(entity)
         })
-          .done(function(data) {
+          .done((data) => {
             Object.entries(data).forEach(([key, item]) => {
               data[key] = arrayObject(item);
             });
             resolve(data);
           })
-          .fail(function (data) {
+          .fail((data) => {
             reject(data.responseJSON);
           });
+      });
+    }
+
+    const opts = normalizeApi4Config(config);
+    const signal = opts.signal;
+    if (signal?.aborted) {
+      return Promise.reject(getAbortReason(signal));
+    }
+
+    const maxWait = opts.delay === true ? 800 :
+      (typeof opts.delay === 'number' && opts.delay >= 0 ? opts.delay : null);
+
+    if (maxWait !== null) {
+      if (typeof params !== 'function') {
+        const resolvedParams = params || {};
+        const ttl = resolveCacheTtl(opts.cache, isGetAction(entity, action, resolvedParams));
+        if (ttl > 0) {
+          const key = JSON.stringify(buildApi4Call(entity, action, resolvedParams, opts.index));
+          const cached = getCachedResponse(key);
+          if (cached !== undefined) {
+            return Promise.resolve(cached);
+          }
+        }
       }
+      return new Promise((resolve, reject) => {
+        const item = {entity, action, params, index: opts.index, cache: opts.cache, ttl: 0, signal, owner: null, resolve, reject};
+        attachAbortHandler(item);
+        backgroundQueue.push(item);
+        const deadline = Date.now() + maxWait;
+        if (deadline < backgroundDeadline) {
+          backgroundDeadline = deadline;
+          clearTimeout(backgroundTimer);
+          backgroundTimer = setTimeout(sendBackgroundQueue, maxWait);
+        }
+      });
+    }
+
+    let resolvedParams;
+    try {
+      resolvedParams = typeof params === 'function' ? params() : params;
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+
+    const readOnly = isGetAction(entity, action, resolvedParams);
+    if (!readOnly) {
+      clearApi4Cache();
+    }
+
+    const ttl = resolveCacheTtl(opts.cache, readOnly);
+    const key = ttl !== false ? JSON.stringify(buildApi4Call(entity, action, resolvedParams || {}, opts.index)) : null;
+
+    if (key && ttl > 0) {
+      const cached = getCachedResponse(key);
+      if (cached !== undefined) {
+        return Promise.resolve(cached);
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      const sub = {ttl: ttl || 0, signal, owner: null, resolve, reject};
+      attachAbortHandler(sub);
+
+      if (key) {
+        const existing = inFlightCache.get(key);
+        if (existing) {
+          existing.subscribers.push(sub);
+          existing.ttl = Math.max(existing.ttl, sub.ttl);
+          sub.owner = existing;
+          return;
+        }
+      }
+
+      const owner = {cacheKey: key, ttl: ttl || 0, generation: cacheGeneration, subscribers: [sub], jqXHR: null};
+      sub.owner = owner;
+      if (key) {
+        inFlightCache.set(key, owner);
+      }
+
+      owner.jqXHR = $.post(CRM.url('civicrm/ajax/api4/' + entity + '/' + action), {
+        params: JSON.stringify(resolvedParams),
+        index: opts.index
+      })
+        .done((data) => {
+          if (owner.cacheKey && inFlightCache.get(owner.cacheKey) === owner) {
+            inFlightCache.delete(owner.cacheKey);
+          }
+          const result = arrayObject(data);
+          if (owner.cacheKey && owner.ttl > 0 && owner.generation === cacheGeneration) {
+            responseCache.set(owner.cacheKey, {result, expires: Date.now() + owner.ttl});
+          }
+          owner.subscribers.splice(0).forEach((s) => {
+            s.cleanup?.();
+            s.resolve(result);
+          });
+        })
+        .fail((data) => {
+          if (owner.cacheKey && inFlightCache.get(owner.cacheKey) === owner) {
+            inFlightCache.delete(owner.cacheKey);
+          }
+          owner.subscribers.splice(0).forEach((s) => {
+            s.cleanup?.();
+            s.reject(data.responseJSON);
+          });
+        });
     });
   };
 

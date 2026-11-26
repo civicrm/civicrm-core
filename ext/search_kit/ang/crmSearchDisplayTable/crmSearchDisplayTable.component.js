@@ -35,7 +35,7 @@
             ctrl.tally = null;
             if (status === 'success' && tallyParams) {
               tallyParams.return = 'tally';
-              crmApi4('SearchDisplay', 'run', tallyParams).then(function (result) {
+              crmApi4('SearchDisplay', 'run', tallyParams, {delay: 100}).then(function (result) {
                 ctrl.tally = result[0];
               });
             }

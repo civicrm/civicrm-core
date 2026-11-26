@@ -1,19 +1,16 @@
 (function(angular, $) {
 
   angular.module('api4').factory('crmApi4', function($q) {
-    var crmApi4 = function(entity, action, params, index) {
+    var crmApi4 = function(entity, action, params, config) {
       // JSON serialization in CRM.api4 is not aware of Angular metadata like $$hash, so use angular.toJson()
       var deferred = $q.defer();
       var p;
       var backend = crmApi4.backend || CRM.api4;
       if (angular.isObject(entity)) {
-        // eval content is locally generated.
-        /*jshint -W061 */
-        p = backend(eval('('+angular.toJson(entity)+')'), action);
+        p = backend(angular.fromJson(angular.toJson(entity)), action);
       } else {
-        // eval content is locally generated.
-        /*jshint -W061 */
-        p = backend(entity, action, eval('('+angular.toJson(params)+')'), index);
+        const cleanParams = typeof params === 'function' ? () => angular.fromJson(angular.toJson(params())) : angular.fromJson(angular.toJson(params));
+        p = backend(entity, action, cleanParams, config);
       }
       p.then(
         function(result) {

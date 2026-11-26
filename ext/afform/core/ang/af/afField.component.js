@@ -195,7 +195,7 @@
                 joinEntity: ctrl.afJoin ? ctrl.afJoin.entity : null,
                 values: $scope.dataProvider.getFieldData()
               };
-              crmApi4('Afform', 'getOptions', params)
+              crmApi4('Afform', 'getOptions', params, {delay: 100})
                 .then((data) => {
                   $('input[crm-ui-select]', $element)
                     .removeClass('loading')
@@ -476,7 +476,7 @@
             ctrl._entityLabels[ids.join()] = null;
             const params = ctrl.getAutocompleteParams();
             params.ids = ids;
-            crmApi4(ctrl.fkEntity, 'autocomplete', params)
+            crmApi4(ctrl.fkEntity, 'autocomplete', params, {delay: 100})
               .then((result) => {
                 // Join all labels
                 ctrl._entityLabels[ids.join()] = result.map((item) => item.label).join(', ');
