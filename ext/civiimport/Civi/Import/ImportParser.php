@@ -19,6 +19,7 @@ use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Phone;
+use Civi\Api4\StateProvince;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
@@ -538,7 +539,56 @@ abstract class ImportParser extends \CRM_Import_Parser {
       }
       $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
     }
+
+    // Some option-values (notably state/province abbreviations like "ON") can be ambiguous
+    // until we know the country. Resolve these using the primary address country where possible.
+    $this->resolvePrimaryAddressStateProvince($params);
+
     return $this->removeEmptyValues($params);
+  }
+
+  /**
+   * Resolve Contact-like `address_primary.state_province_id` values using `address_primary.country_id`.
+   *
+   * The base parser may return the raw string for ambiguous values (e.g. "ON").
+   * Contact Import has a later disambiguation pass once the country is known; we do a similar thing here.
+   */
+  protected function resolvePrimaryAddressStateProvince(array &$params): void {
+    foreach (array_keys($params) as $entityName) {
+      if (!is_array($params[$entityName])) {
+        continue;
+      }
+      if (!array_key_exists('address_primary.state_province_id', $params[$entityName])) {
+        continue;
+      }
+
+      $state = $params[$entityName]['address_primary.state_province_id'];
+      if ($state === NULL || $state === '' || is_numeric($state) || $state === 'invalid_import_value') {
+        continue;
+      }
+      $state = trim((string) $state);
+      if ($state === '') {
+        continue;
+      }
+      $countryID = $params[$entityName]['address_primary.country_id'] ?? NULL;
+      if (!is_numeric($countryID)) {
+        continue;
+      }
+
+      // Try looking up first by abbreviation, then by full province/state name.
+      foreach (['abbreviation', 'name'] as $field) {
+        $match = StateProvince::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('country_id', '=', (int) $countryID)
+          ->addWhere($field, '=', $state)
+          ->setLimit(2)
+          ->execute();
+        if (count($match) === 1) {
+          $params[$entityName]['address_primary.state_province_id'] = (int) $match->first()['id'];
+          break;
+        }
+      }
+    }
   }
 
   /**
