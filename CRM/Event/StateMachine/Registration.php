@@ -24,14 +24,26 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
+    // The ThankYou route (`_qf_ThankYou_display=1`) does not include ?id=...
+    // When users refresh that page, the controller/state machine is rebuilt.
+    // Requiring `id` here causes a fatal "Missing Event ID".
+    $onThankYouDisplay = (bool) CRM_Utils_Request::retrieve('_qf_ThankYou_display', 'Boolean', $controller, FALSE);
+    $requireId = !$onThankYouDisplay;
     try {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $controller, TRUE);
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $controller, $requireId);
     }
     catch (CRM_Core_Exception $e) {
       CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Event ID'));
     }
-    $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_monetary');
-    $is_confirm_enabled = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_confirm_enabled');
+
+    // Only look up event flags when we have a valid $id. On a ThankYou refresh
+    // (no id present) we skip these — we are not rebuilding billing/confirm pages.
+    $is_monetary = NULL;
+    $is_confirm_enabled = TRUE; // default to keep Confirm page if we don't know
+    if ($id) {
+      $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_monetary');
+      $is_confirm_enabled = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_confirm_enabled');
+    }
 
     $pages = ['CRM_Event_Form_Registration_Register' => NULL];
 
