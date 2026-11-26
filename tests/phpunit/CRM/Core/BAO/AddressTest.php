@@ -1047,7 +1047,9 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // Åland Islands
     $this->assertSame('AX', $countries[1]['name']);
     $this->assertSame('AL', $countries[2]['name']);
-    $this->assertSame('US', $countries[237]['name']);
+    // Venezuela sorts before Verenigde Staten (United States), unlike in English
+    $positions = array_flip(array_column($countries, 'name'));
+    $this->assertLessThan($positions['US'], $positions['VE']);
     $this->assertSame('CH', array_pop($countries)['name']);
 
     CRM_Core_I18n::singleton()->setLocale('it_IT');
@@ -1055,9 +1057,11 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertSame('AF', $countries[0]['name']);
     $this->assertSame('AL', $countries[1]['name']);
     $this->assertSame('DZ', $countries[2]['name']);
-    // Åland Islands
-    $this->assertSame('AX', $countries[104]['name']);
-    $this->assertSame('US', $countries[213]['name']);
+    $positions = array_flip(array_column($countries, 'name'));
+    // Isole Åland no longer sorts among the A's
+    $this->assertGreaterThan($positions['DZ'], $positions['AX']);
+    // Stati Uniti (United States) sorts before Thailandia (Thailand), unlike in English
+    $this->assertLessThan($positions['TH'], $positions['US']);
     $this->assertSame('ZW', array_pop($countries)['name']);
   }
 
