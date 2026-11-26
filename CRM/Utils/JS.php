@@ -104,7 +104,23 @@ class CRM_Utils_JS {
    * Get Afform content selectors
    */
   public static function getContentSelectors() {
-    return ['.af-title', 'p.af-text', 'div.af-markup', 'button'];
+    return [
+      '.af-title',
+      'div.af-markup',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'legend',
+      'p',
+      'div.help:not(.af-container)',
+      'th',
+      'label',
+      'button',
+      'a',
+    ];
   }
 
   /**
