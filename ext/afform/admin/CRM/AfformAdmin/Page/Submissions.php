@@ -7,7 +7,7 @@ use CRM_AfformAdmin_ExtensionUtil as E;
 class CRM_AfformAdmin_Page_Submissions extends CRM_Core_Page {
 
   public function run() {
-    $afformName = CRM_Utils_Request::retrieve('name', 'String', $this, TRUE, NULL, 'GET');
+    $afformName = CRM_Utils_Request::retrieve('name', 'String', NULL, TRUE, NULL, 'GET');
 
     $afform = \Civi\Api4\Afform::get(TRUE)
       ->addWhere('name', '=', $afformName)
