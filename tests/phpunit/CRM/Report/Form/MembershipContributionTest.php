@@ -60,6 +60,7 @@ class CRM_Report_Form_MembershipContributionTest extends CiviReportTestCase {
    * Legacy payment records with no matching line item still count.
    */
   public function testMemberSummaryIncludesLegacyPaymentRecords(): void {
+    Civi::settings()->set('member_use_civicrm_membership_payment_table', TRUE);
     $legacyContributionID = $this->contributionCreate([
       'contact_id' => $this->individualCreate(),
       'financial_type_id' => 'Member Dues',

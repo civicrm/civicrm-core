@@ -24,6 +24,7 @@ class CRM_Price_BAO_LineItemTest extends CiviUnitTestCase {
    * A membership payment record with no matching line item should be detected.
    */
   public function testSiteHasMembershipPaymentRecordsNotReflectedInLineItems(): void {
+    Civi::settings()->set('member_use_civicrm_membership_payment_table', TRUE);
     $this->assertFalse(CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems());
 
     $contactID = $this->individualCreate();

@@ -31,6 +31,25 @@ class CRM_Upgrade_Incremental_php_SixTwentyTwo extends CRM_Upgrade_Incremental_B
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Set "group_multiple_parents" setting if used', 'setMultipleGroupParents');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_mailing_recipients.index_mailing_id_contact_id']), 'addIndex', 'civicrm_mailing_recipients', [['mailing_id', 'contact_id']], 'index');
+    $this->addTask('Keep "member_use_civicrm_membership_payment_table" enabled on existing sites', 'keepMembershipPaymentTableEnabled');
+  }
+
+  /**
+   * Keep the membership payment table in use on sites upgrading to 6.22.
+   *
+   * The setting now defaults to disabled, but extensions may still read the table, so only new installs start without it. Domains that set it explicitly are left alone.
+   *
+   * @return bool
+   */
+  public static function keepMembershipPaymentTableEnabled(): bool {
+    $domainIDs = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_domain')->fetchMap('id', 'id');
+    foreach ($domainIDs as $domainID) {
+      $settings = Civi::settings((int) $domainID);
+      if (!$settings->hasExplicit('member_use_civicrm_membership_payment_table')) {
+        $settings->set('member_use_civicrm_membership_payment_table', TRUE);
+      }
+    }
+    return TRUE;
   }
 
   /**
