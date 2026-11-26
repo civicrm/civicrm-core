@@ -402,6 +402,12 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
   display: flex;
   list-style: none;
 }
+.crm-previous-action {
+  order: 3;
+}
+.crm-next-action {
+  order: 4;
+}
 .crm-search-col-type-field span.ng-scope a {
   display: flex;
   gap: var(--crm-btn-icon-spacing);
@@ -412,9 +418,6 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
 @media (max-width: 991px) {
   .crm-container div.contact_panel {
     grid-template-columns: 100%;
-  }
-  .crm-container .contact_panel.crm-contact-summary-layout-row {
-    flex-direction: column;
   }
   .contactCardRight .crm-inline-edit.form,
   .contactCardRight {

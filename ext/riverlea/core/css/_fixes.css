@@ -737,22 +737,6 @@ details + .crm-content-block:has(.dataTables_wrapper) {
     COMMON EXTENSIONS
 *******************/
 
-/* Style rules for Contact Layout Editor extension */
-
-#contact-summary .crm-contact-summary-layout-col {
-  flex: 1 1 250px;
-  padding: 0;
-}
-.crm-previous-action {
-  order: 3;
-}
-.crm-next-action {
-  order: 4;
-}
-#contactLayoutEditor .panel-heading .btn {
-  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
-}
-
 /* Mosaico (all importants vs the extension css) */
 
 .crm-mosaico-wizard .crm_wizard__title .panel-body {
