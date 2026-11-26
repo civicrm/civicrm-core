@@ -917,8 +917,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @param int $id
    * @param string $name
    * @param bool $viewOnly
-   * @param null $profileContactType
-   * @param array $fieldTypes
+   * @param string|null $profileContactType
+   * @param string[]|null $fieldTypes
    */
   public function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
     if ($id) {
