@@ -180,7 +180,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   /**
    * @param null $args
    * @param null $pageArgs
-   * @param null $sort
+   * @param string|null $sort
    *
    * @throws Exception
    */

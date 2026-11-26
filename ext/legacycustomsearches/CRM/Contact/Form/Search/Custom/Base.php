@@ -78,7 +78,7 @@ class CRM_Contact_Form_Search_Custom_Base {
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $returnSQL
    *   Deprecated parameter
    *
@@ -102,7 +102,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param $selectClause
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $includeContactIDs
    * @param null $groupBy
    *
@@ -172,7 +172,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param $sql
    * @param $offset
    * @param $rowcount
-   * @param $sort
+   * @param string|CRM_Utils_Sort|null $sort
    */
   public function addSortOffset(&$sql, $offset, $rowcount, $sort) {
     if (!empty($sort)) {
@@ -271,6 +271,11 @@ class CRM_Contact_Form_Search_Custom_Base {
 
   /**
    * Fill the prevNextCache with the found contacts
+   *
+   * @param string $cacheKey
+   * @param int $start
+   * @param int $end
+   * @param string|CRM_Utils_Sort|null $sort
    *
    * @return bool TRUE if the search was able to process it.
    */

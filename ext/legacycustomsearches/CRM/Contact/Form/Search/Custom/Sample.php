@@ -82,7 +82,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param string|null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $returnSQL
    *
    * @return string
@@ -94,7 +94,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param string|null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *

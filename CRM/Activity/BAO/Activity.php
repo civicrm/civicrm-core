@@ -568,7 +568,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *    - contact_id  int            contact_id whose activities we want to retrieve
    *    - offset      int            which row to start from ?
    *    - rowCount    int            how many rows to fetch
-   *    - sort        object|array   object or array describing sort order for sql query.
+   *    - sort        string|CRM_Utils_Sort|null  sort order string or object for the sql query.
    *    - admin       boolean        if contact is admin
    *    - caseId      int            case ID
    *    - context     string         page on which selector is build

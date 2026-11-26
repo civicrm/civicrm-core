@@ -126,7 +126,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $returnSQL
    *
    * @return string
@@ -138,7 +138,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *

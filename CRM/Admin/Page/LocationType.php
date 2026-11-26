@@ -65,7 +65,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
   }
 
   /**
-   * @param $sort
+   * @param string|null $sort
    * @param $action
    * @param array $links
    *

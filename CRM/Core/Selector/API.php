@@ -87,8 +87,8 @@ interface CRM_Core_Selector_API {
    *   The row number to start from.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string $sort
-   *   The sql string that describes the sort order.
+   * @param string|CRM_Utils_Sort|null $sort
+   *   The sort order string or object.
    * @param string $type
    *   What should the result set include (web/email/csv).
    *

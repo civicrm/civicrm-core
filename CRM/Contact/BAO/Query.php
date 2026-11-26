@@ -4614,7 +4614,7 @@ civicrm_relationship.start_date > {$today}
    * @param array $params
    * @param array $returnProperties
    * @param null $fields
-   * @param string $sort
+   * @param string|null $sort
    * @param int $offset
    * @param int $row_count
    * @param bool $smartGroupCache
@@ -4986,7 +4986,7 @@ civicrm_relationship.start_date > {$today}
    *   The offset for the query.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string|CRM_Utils_Sort $sort
+   * @param string|CRM_Utils_Sort|null $sort
    *   The order by string.
    * @param bool $count
    *   Is this a count only query ?.
@@ -6133,7 +6133,8 @@ AND   displayRelType.is_active = 1
 
   /**
    * Include pseudo fields LEFT JOIN.
-   * @param string|array $sort can be a object or string
+   * @param string|CRM_Utils_Sort|null $sort
+   *   The order by string, or a sort object.
    *
    * @return array|NULL
    */
@@ -6368,7 +6369,7 @@ AND   displayRelType.is_active = 1
    * At time of writing, this code is deeply flawed and should be rewritten. For the moment,
    * it's been extracted to a standalone function.
    *
-   * @param string|CRM_Utils_Sort $sort
+   * @param string|CRM_Utils_Sort|null $sort
    *   The order by string.
    * @param string|null $sortOrder
    *   ASC or DESC
@@ -6747,7 +6748,7 @@ AND   displayRelType.is_active = 1
    *   The offset for the query.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string|CRM_Utils_Sort $sort
+   * @param string|CRM_Utils_Sort|null $sort
    *   The order by string.
    * @param bool $count
    *   Is this a count only query ?.
@@ -6785,7 +6786,7 @@ AND   displayRelType.is_active = 1
    *   The offset for the query.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string|CRM_Utils_Sort $sort
+   * @param string|CRM_Utils_Sort|null $sort
    *   The order by string.
    * @param bool $count
    *   Is this a count only query ?.

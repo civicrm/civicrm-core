@@ -439,7 +439,7 @@ WHERE      t.table_name = 'Activity' AND
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $returnSQL
    *
    * @return null|string
@@ -452,7 +452,7 @@ WHERE      t.table_name = 'Activity' AND
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|CRM_Utils_Sort|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *

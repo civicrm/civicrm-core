@@ -298,8 +298,8 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    *   Offset.
    * @param int $rowCount
    *   Number of rows.
-   * @param array $sort
-   *   Sort array.
+   * @param string|CRM_Utils_Sort|null $sort
+   *   Sort order string or object.
    *
    * @return array
    *   Result set

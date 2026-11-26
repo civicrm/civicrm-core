@@ -217,8 +217,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
    *   The row number to start from.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string $sort
-   *   The sql string that describes the sort order.
+   * @param CRM_Utils_Sort|null $sort
+   *   The sort object.
    * @param string $output
    *   What should the result set include (web/email/csv).
    *

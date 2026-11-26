@@ -463,8 +463,8 @@ WHERE  email = %2
    *   Offset.
    * @param int $rowCount
    *   Number of rows.
-   * @param array $sort
-   *   Sort array.
+   * @param string|CRM_Utils_Sort|null $sort
+   *   Sort order string or object.
    *
    * @param null $org_unsubscribe
    * @return array
