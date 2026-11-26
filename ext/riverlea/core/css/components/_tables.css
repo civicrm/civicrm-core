@@ -81,10 +81,12 @@
 }
 
 /* Sticky header */
-table.crm-sticky-header > thead > tr {
-  position: sticky !important;
-  top: var(--crm-menubar-bottom, 0);
-  z-index: 2;
+@media (min-width: 768px) {
+  table.crm-sticky-header > thead > tr {
+    position: sticky !important;
+    top: var(--crm-menubar-bottom, 0);
+    z-index: 2;
+  }
 }
 
 /* Data Tables */
