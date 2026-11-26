@@ -692,10 +692,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           $activities[$id]['target_contact_name'] = [$displayedTarget[0]['contact_id'] => $displayedTarget[0]['contact_id.sort_name']];
         }
       }
-      if ($activities[$id]['activity_type_name'] === 'Bulk Email') {
-        $bulkActivities[] = $id;
+      if (!$bulkActivityTypeID || $bulkActivityTypeID == $activity['activity_type_id']) {
         // Get the total without permissions being passed but only display names after permissioning.
         $activities[$id]['recipients'] = ts('(%1 recipients)', [1 => $activities[$id]['target_contact_count']]);
+        $activities[$id]['mailingId'] = $accessCiviMail &&
+          ($mailingIDs === TRUE || in_array($activity['source_record_id'], $mailingIDs));
       }
     }
 
@@ -703,23 +704,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     // the moment as the bulk activity stuff needs unravelling & test coverage.
     $caseIds = [];
     foreach ($result as $id => $activity) {
-      $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID === $activity['activity_type_id']));
+      $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID == $activity['activity_type_id']));
       foreach ($mappingParams as $apiKey => $expectedName) {
-        if (in_array($apiKey, ['target_contact_name'])) {
-
-          if ($isBulkActivity) {
-            // @todo  - how is this used? Couldn't we use 'is_bulk' or something clearer?
-            // or the calling function could handle
-            $activities[$id]['mailingId'] = FALSE;
-            if ($accessCiviMail &&
-              ($mailingIDs === TRUE || in_array($activity['source_record_id'], $mailingIDs))
-            ) {
-              $activities[$id]['mailingId'] = TRUE;
-            }
-          }
-        }
         // case related fields
-        elseif ($apiKey == 'case_id' && !$isBulkActivity) {
+        if ($apiKey == 'case_id' && !$isBulkActivity) {
           $activities[$id][$expectedName] = $activity[$apiKey] ?? NULL;
 
           // fetch case subject for case ID found
