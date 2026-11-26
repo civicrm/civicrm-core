@@ -29,17 +29,17 @@ class ChromeObserverTest extends MinkBase {
   public function testReportsPageErrors(): void {
     $missing = rtrim((string) \Civi::url('[cms.root]', 'a'), '/') . '/civicrm-chrome-observer-missing.png?token=secret';
     $this->visitHtml(<<<HTML
-      <img src="$missing">
+      <img src="$missing" onerror="window.imageFailed = true">
       <script>
         console.error('console error', 42);
         console.warn('console warning');
         Promise.reject(new Error('rejected promise'));
-        fetch('http://chrome-observer.invalid/').catch(() => {});
-        setTimeout(() => { throw new Error('uncaught error'); });
+        fetch('http://chrome-observer.invalid/').catch(() => { window.fetchFailed = true; });
+        setTimeout(() => { window.timerRan = true; throw new Error('uncaught error'); });
         document.createElement('form').submit();
       </script>
       HTML);
-    usleep(1000000);
+    $this->assertTrue($this->mink->getSession()->wait(10000, 'window.fetchFailed && window.imageFailed && window.timerRan'), 'The page did not finish its requests.');
 
     $report = $this->report();
     $this->assertStringContainsString("HTTP errors (1):\n  404 Image http", $report);
