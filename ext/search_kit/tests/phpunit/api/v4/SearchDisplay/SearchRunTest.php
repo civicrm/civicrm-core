@@ -4681,4 +4681,189 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEmpty($aggLinkPage[0]['columns'][2]['links']);
   }
 
+  public function testFacetCounts(): void {
+    // Really long custom group name - testing to see if tally works with > 64 character column keys
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Individual',
+      'name' => 'Facets',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'Facets',
+      'label' => 'Favourite color',
+      'name' => 'color',
+      'html_type' => 'Select',
+      'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'],
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'Facets',
+      'label' => 'Field of study',
+      'name' => 'field',
+      'html_type' => 'Radio',
+      'option_values' => [1 => 'Geometry', 2 => 'Algebra', 3 => 'Calculus'],
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'Facets',
+      'label' => 'Favourite primes',
+      'name' => 'primes',
+      'html_type' => 'CheckBox',
+      'serialize' => \CRM_Core_DAO::SERIALIZE_JSON,
+      'option_values' => [2 => 'Two', 3 => 'Three', 5 => 'Five', 7 => 'Seven'],
+    ]);
+
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'Alicia', 'last_name' => 'A', 'do_not_mail' => TRUE, 'do_not_phone' => TRUE, 'Facets.color' => 'r', 'Facets.field' => 1, 'Facets.primes' => [2, 3]],
+        ['first_name' => 'Alice', 'last_name' => 'A', 'do_not_mail' => TRUE, 'Facets.color' => 'r', 'Facets.field' => 2, 'Facets.primes' => [3]],
+        ['first_name' => 'Alex', 'last_name' => 'A', 'do_not_mail' => FALSE, 'Facets.color' => 'r', 'Facets.field' => 3, 'Facets.primes' => [5, 7]],
+        ['first_name' => 'Arnold', 'last_name' => 'A', 'do_not_mail' => FALSE, 'Facets.color' => 'g', 'Facets.field' => 1, 'Facets.primes' => [5]],
+        ['first_name' => 'Ali', 'last_name' => 'A', 'do_not_mail' => FALSE, 'Facets.color' => 'g', 'Facets.field' => 2, 'Facets.primes' => [5]],
+        // should be ignored based on SavedSearch filter
+        ['first_name' => 'Alec', 'last_name' => 'A', 'do_not_trade' => TRUE, 'Facets.color' => 'b', 'Facets.field' => 2, 'Facets.primes' => [5]],
+      ],
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'facetTestSearch',
+      'label' => 'facetTestSearch',
+      'api_entity' => 'Individual',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'first_name',
+        ],
+        'where' => [
+          ['id', 'IN', $contacts->column('id')],
+          ['do_not_trade', '=', FALSE],
+        ],
+      ],
+    ]);
+    $this->createTestRecord('SearchDisplay', [
+      'name' => 'facetTestDisplay',
+      'label' => 'facetTestDisplay',
+      'saved_search_id.name' => 'facetTestSearch',
+      'type' => 'table',
+      'settings' => [
+        'description' => NULL,
+        // facets should not be trimmed by limit
+        'limit' => 3,
+        'pager' => [],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'first_name',
+            'label' => 'First Name',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'MIN',
+            ],
+          ],
+        ],
+      ],
+    ]);
+    // cannot create with test record because Afform.delete does not
+    // exist?
+    \Civi\Api4\Afform::save(FALSE)
+      ->setRecords([
+        [
+          'name' => 'afformFacetSearch',
+          'type' => 'search',
+          'layout' => <<<HTML
+            <div af-fieldset>
+              <af-field name="first_name"></af-field>
+              <af-field name="do_not_phone" ></af-field>
+              <af-field name="do_not_mail" defn="{show_counts: true}"></af-field>
+              <af-field name="Facets.color" defn="{show_counts: true}"></af-field>
+              <af-field name="Facets.field" defn="{show_counts: true}"></af-field>
+              <af-field name="Facets.primes" defn="{show_counts: true}"></af-field>
+
+              <crm-search-display-table search-name="facetTestSearch" display-name="facetTestDisplay"></crm-search-display-table>
+            </af-fieldset>
+          HTML,
+        ],
+      ])->execute();
+
+    $runFacetCountWithFilters = fn ($filters) =>  (array) SearchDisplay::run(FALSE)
+      ->setReturn('facet_counts')
+      ->setAfform('afformFacetSearch')
+      ->setSavedSearch('facetTestSearch')
+      ->setDisplay('facetTestDisplay')
+      ->setFilters($filters)
+      ->execute();
+
+    // with no other filters
+    $counts = $runFacetCountWithFilters([]);
+
+    $this->assertSame($counts['do_not_mail']['true'], 2);
+    $this->assertSame($counts['do_not_mail']['false'], 3);
+    $this->assertSame($counts['Facets.color']['"r"'], 3);
+    $this->assertSame($counts['Facets.color']['"g"'], 2);
+    // no rows => not in the result
+    $this->assertFalse(isset($counts['Facets.color']['"b"']));
+
+    $this->assertSame($counts['Facets.field']['"1"'], 2);
+    $this->assertSame($counts['Facets.field']['"2"'], 2);
+    $this->assertSame($counts['Facets.field']['"3"'], 1);
+
+    // counts work for serialized field
+    $this->assertSame($counts['Facets.primes']['"2"'], 1);
+    $this->assertSame($counts['Facets.primes']['"3"'], 2);
+    $this->assertSame($counts['Facets.primes']['"5"'], 3);
+    $this->assertSame($counts['Facets.primes']['"7"'], 1);
+
+    // enter value in a text filter - Arnold no longer matches
+    $counts = $runFacetCountWithFilters(['first_name' => 'Al']);
+    $this->assertSame($counts['do_not_mail']['true'], 2);
+    $this->assertSame($counts['do_not_mail']['false'], 2);
+    $this->assertSame($counts['Facets.primes']['"5"'], 2);
+    $this->assertSame($counts['Facets.primes']['"7"'], 1);
+
+    // select a non-facet option, Alicia no longer matches
+    $counts = $runFacetCountWithFilters(['do_not_phone' => FALSE]);
+    $this->assertSame($counts['do_not_mail']['true'], 1);
+    $this->assertSame($counts['do_not_mail']['false'], 3);
+    $this->assertFalse(isset($counts['Facets.primes']['"2"']));
+    $this->assertSame($counts['Facets.primes']['"5"'], 3);
+
+    // select an options on a facet field
+    $counts = $runFacetCountWithFilters(['Facets.field' => 1]);
+    // for the selected facet field, the filter is ignored (or all options
+    // except selected would be null - so these numbers match the first test)
+    $this->assertSame($counts['Facets.field']['"1"'], 2);
+    $this->assertSame($counts['Facets.field']['"2"'], 2);
+    $this->assertSame($counts['Facets.field']['"3"'], 1);
+    // calcs must work differently under the hood on other facets
+    $this->assertSame($counts['do_not_mail']['true'], 1);
+    $this->assertSame($counts['do_not_mail']['false'], 1);
+    $this->assertSame($counts['Facets.primes']['"2"'], 1);
+    $this->assertSame($counts['Facets.primes']['"3"'], 1);
+    $this->assertSame($counts['Facets.primes']['"5"'], 1);
+
+    // select multiple options on facet field -
+    $counts = $runFacetCountWithFilters(['Facets.field' => [1, 2]]);
+    // for the selected facet field still ignored
+    $this->assertSame($counts['Facets.field']['"1"'], 2);
+    $this->assertSame($counts['Facets.field']['"2"'], 2);
+    $this->assertSame($counts['Facets.field']['"3"'], 1);
+    // calcs must work differently under the hood on other facets
+    $this->assertSame($counts['do_not_mail']['true'], 2);
+    $this->assertSame($counts['do_not_mail']['false'], 2);
+    $this->assertSame($counts['Facets.primes']['"2"'], 1);
+    $this->assertSame($counts['Facets.primes']['"3"'], 2);
+    $this->assertSame($counts['Facets.primes']['"5"'], 2);
+
+    // select options on a serialized field
+    $counts = $runFacetCountWithFilters(['Facets.primes' => [5, 7]]);
+    // selected field ignored
+    $this->assertSame($counts['Facets.primes']['"2"'], 1);
+    $this->assertSame($counts['Facets.primes']['"3"'], 2);
+    $this->assertSame($counts['Facets.primes']['"5"'], 3);
+    $this->assertSame($counts['Facets.primes']['"7"'], 1);
+    // calculating other facets still works
+    $this->assertFalse(isset($counts['do_not_mail']['true']));
+    $this->assertSame($counts['do_not_mail']['false'], 3);
+    $this->assertSame($counts['Facets.color']['"r"'], 1);
+    $this->assertSame($counts['Facets.color']['"g"'], 2);
+  }
+
 }

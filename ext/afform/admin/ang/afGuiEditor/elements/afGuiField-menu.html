@@ -225,6 +225,12 @@
     {{:: ts('Customize options') }}
   </a>
 </li>
+<li ng-if="$ctrl.canBeFacet()">
+  <a href ng-click="toggleAttr('show_counts'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show option counts') }}">
+    <i class="crm-i fa-{{ getProp('show_counts') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
+    {{:: ts('Show option counts') }}
+  </a>
+</li>
 
 <li role="separator" class="divider"></li>
 <li>
