@@ -936,12 +936,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return bool
    */
   protected function checkLinkConditions(array $link, array $data, ?int $rowCount = NULL): bool {
-    foreach ($link['conditions'] ?? [] as $condition) {
-      if (!$this->checkLinkCondition($condition, $data, $rowCount)) {
-        return FALSE;
-      }
+    if (empty($link['conditions'])) {
+      return TRUE;
     }
-    return TRUE;
+    $conditions = in_array($link['conditions'][0] ?? NULL, ['AND', 'OR', 'NOT'], TRUE) ? $link['conditions'] : ['AND', $link['conditions']];
+    return $this->walkFilters($data, $conditions, function($row, $condition) use ($rowCount) {
+      return $this->checkLinkCondition($condition, $row, $rowCount);
+    });
   }
 
   /**
@@ -1122,10 +1123,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $link['key'] = $task['idField'] ?? ($link['prefix'] . $idKey);
     }
     // Add join prefix to predefined conditions
-    foreach ($link['conditions'] as &$condition) {
-      if (!empty($condition[0]) && $condition[0] !== 'check user permission') {
+    if ($link['prefix']) {
+      $this->walkConditionLeaves($link['conditions'], function(array &$condition) use ($link) {
         $condition[0] = $link['prefix'] . $condition[0];
-      }
+      });
     }
     // Backward-compat: search displays created prior to 6.4 only supported 1 condition
     if (!empty($link['condition'])) {
@@ -1149,12 +1150,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!$link['path'] && !empty($link['task'])) {
       $tokens[] = !empty($link['key']) ? $link['key'] : ($link['prefix'] . $this->getIdKeyName($link['entity']));
     }
-    foreach ($link['conditions'] ?? [] as $condition) {
-      if (!empty($condition[0]) && $condition[0] !== 'check user permission') {
-        $tokens[] = $condition[0];
+    $conditions = $link['conditions'] ?? [];
+    $this->walkConditionLeaves($conditions, function(array $condition) use (&$tokens) {
+      $tokens[] = $condition[0];
+    });
+    return array_merge($tokens, $this->getTokens($link['path'] . $link['text'] . $link['title']));
+  }
+
+  /**
+   * Recursively visit each leaf clause in a link's conditions tree.
+   *
+   * @param array $conditions
+   * @param callable $fn
+   */
+  private function walkConditionLeaves(array &$conditions, callable $fn): void {
+    foreach ($conditions as &$condition) {
+      if (in_array($condition[0] ?? NULL, ['AND', 'OR', 'NOT'], TRUE) && is_array($condition[1] ?? NULL)) {
+        $this->walkConditionLeaves($condition[1], $fn);
+      }
+      elseif (!empty($condition[0]) && $condition[0] !== 'check user permission') {
+        $fn($condition);
       }
     }
-    return array_merge($tokens, $this->getTokens($link['path'] . $link['text'] . $link['title']));
   }
 
   /**

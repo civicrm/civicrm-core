@@ -17,7 +17,7 @@ use Civi\Api4\Utils\CoreUtil;
  * @package Civi\API
  */
 class Request {
-  private static $nextId = 1;
+  private static int $nextId = 1;
 
   /**
    * Create a formatted/normalized request object.
@@ -89,7 +89,7 @@ class Request {
     return strtolower(\CRM_Utils_String::munge($action));
   }
 
-  public static function getNextId() {
+  public static function getNextId(): int {
     return self::$nextId++;
   }
 

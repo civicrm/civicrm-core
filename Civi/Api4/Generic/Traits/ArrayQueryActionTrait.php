@@ -74,16 +74,17 @@ trait ArrayQueryActionTrait {
   /**
    * @param array $row
    * @param array $filters
+   * @param callable|null $compare
    * @return bool
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  private function walkFilters($row, $filters) {
+  private function walkFilters($row, $filters, ?callable $compare = NULL) {
     switch ($filters[0]) {
       case 'AND':
       case 'NOT':
         $result = TRUE;
         foreach ($filters[1] as $filter) {
-          if (!$this->walkFilters($row, $filter)) {
+          if (!$this->walkFilters($row, $filter, $compare)) {
             $result = FALSE;
             break;
           }
@@ -93,14 +94,14 @@ trait ArrayQueryActionTrait {
       case 'OR':
         $result = !count($filters[1]);
         foreach ($filters[1] as $filter) {
-          if ($this->walkFilters($row, $filter)) {
+          if ($this->walkFilters($row, $filter, $compare)) {
             return TRUE;
           }
         }
         return $result;
 
       default:
-        return self::filterCompare($row, $filters);
+        return $compare ? $compare($row, $filters) : self::filterCompare($row, $filters);
     }
   }
 

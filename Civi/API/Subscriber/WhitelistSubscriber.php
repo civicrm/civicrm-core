@@ -82,7 +82,7 @@ class WhitelistSubscriber implements EventSubscriberInterface {
     }
     foreach ($this->rules as $rule) {
       if (TRUE === $rule->matches($apiRequest)) {
-        $this->activeRules[$apiRequest['id']] = $rule;
+        $this->activeRules[$event->getRequestId()] = $rule;
         return;
       }
     }
@@ -94,10 +94,9 @@ class WhitelistSubscriber implements EventSubscriberInterface {
    * @param \Civi\API\Event\RespondEvent $event
    */
   public function onApiRespond(RespondEvent $event) {
-    $apiRequest = $event->getApiRequest();
-    $id = $apiRequest['id'];
+    $id = $event->getRequestId();
     if (isset($this->activeRules[$id])) {
-      $event->setResponse($this->activeRules[$id]->filter($apiRequest, $event->getResponse()));
+      $event->setResponse($this->activeRules[$id]->filter($event->getApiRequest(), $event->getResponse()));
       unset($this->activeRules[$id]);
     }
   }
