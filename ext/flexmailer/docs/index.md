@@ -1,8 +1,5 @@
-FlexMailer (`org.civicrm.flexmailer`) is an email delivery engine for CiviCRM v4.7+.  It replaces the internal guts of CiviMail.  It is a
-drop-in replacement which enables *other* extensions to provide richer email features.
-
-By default, FlexMailer supports the same user interfaces, delivery algorithms, and use-cases as CiviMail.  After activating FlexMailer, an
-administrator does not need to take any special actions.
+FlexMailer (`org.civicrm.flexmailer`) is CiviMail's email delivery engine. It ships with CiviCRM and is always enabled. It provides
+events which enable *other* extensions to provide richer email features.
 
 The distinguishing improvement here is under-the-hood: it provides better APIs and events for extension-developers.  For example,
 other extensions might:

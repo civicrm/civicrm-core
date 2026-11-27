@@ -10,6 +10,8 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\IsActiveTrait;
+
 /**
  * @deprecated
  *   As of Feb 2024, still used by Mosaico releases. Need at least a year to phase-out.

@@ -3,7 +3,7 @@
 The [headless unit tests](https://docs.civicrm.org/dev/en/latest/testing/#headless) are based on PHPUnit and `cv`. Simply run:
 
 ```
-$ phpunit5
+$ phpunit9
 ```
 
 ## Events
@@ -66,8 +66,8 @@ $ cv debug:event-dispatcher /flexmail/
 ```
 
 The above listing shows the default set of listeners at time of writing. (Run the command yourself to see how they appear on your system.)
-The default listeners behave in basically the same way as CiviMail's traditional BAO-based delivery system (respecting `mailerJobSize`,
-`mailThrottleTime`, `mailing_backend`, `hook_civicrm_alterMailParams`, etal).
+The default listeners respect CiviMail's settings and hooks (`mailerJobSize`, `mailThrottleTime`, `civimail_sync_interval`,
+`mailing_backend`, `hook_civicrm_alterMailParams`, etal).
 
 There are a few tricks for manipulating the pipeline:
 
@@ -133,4 +133,4 @@ For more detailed information about how to manipulate a service, consult its doc
 * Other services
      * `civi_flexmailer_html_click_tracker` (`HtmlClickTracker.php`): Add click-tracking codes (for HTML messages)
      * `civi_flexmailer_text_click_tracker` (`TextClickTracker.php`): Add click-tracking codes (for plain-text messages)
-     * `civi_flexmailer_api_overrides` (`Services.php.php`): Alter the `Mailing` APIs
+     * `civi_flexmailer_api_overrides` (`Services.php`): Alter the `Mailing` APIs
