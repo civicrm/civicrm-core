@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\UFJoin;
+
 /**
  * Test ContributionPage translation features.
  *
@@ -16,6 +18,8 @@
  * @group locale
  */
 class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCase {
+
+  protected $_apiversion = 4;
 
   public function setUp(): void {
     parent::setUp();
@@ -76,12 +80,13 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
     $form = $this->getFormObject('CRM_Contribute_Form_ContributionPage_Settings', $params);
     $form->postProcess();
 
-    $uf = $this->callAPISuccess('UFJoin', 'getsingle', [
-      'entity_id' => $contributionPage->id,
-      'module' => 'soft_credit',
-    ]);
+    $moduleData = UFJoin::get(FALSE)
+      ->addSelect('module_data')
+      ->addWhere('entity_id', '=', $contributionPage->id)
+      ->addWhere('module', '=', 'soft_credit')
+      ->execute()->single()['module_data'];
 
-    $json = json_decode($uf['module_data'], TRUE);
+    $json = json_decode($moduleData, TRUE);
 
     $this->assertSame('In Honor Title EN', $json['soft_credit']['en_US']['honor_block_title']);
     $this->assertSame('In Honor Text EN', $json['soft_credit']['en_US']['honor_block_text']);

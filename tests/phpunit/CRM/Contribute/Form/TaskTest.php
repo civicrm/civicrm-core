@@ -9,10 +9,14 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Payment;
+
 /**
  * Class CRM_Contribute_Form_TaskTest
  */
 class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
+
+  protected $_apiversion = 4;
 
   protected $_individualId;
 
@@ -45,18 +49,19 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
     $this->_individualId = $this->individualCreate();
 
     for ($i = 0; $i < 3; $i++) {
-      $contributionParams = [
+      $contribution = $this->createTestEntity('Contribution', [
         'contact_id' => $this->_individualId,
         'total_amount' => 100,
         'source' => $source[$i],
-        'financial_type_id' => $financialTypes[$i],
-        'contribution_status_id' => $status[$i],
-      ];
+        'financial_type_id:name' => $financialTypes[$i],
+        'contribution_status_id:name' => $status[$i] === 'Partially paid' ? 'Pending' : $status[$i],
+      ], $source[$i]);
       if ($status[$i] === 'Partially paid') {
-        $contributionParams['contribution_status_id'] = 'Pending';
-        $contributionParams['api.Payment.create'] = ['total_amount' => 50];
+        Payment::create(FALSE)->setValues([
+          'contribution_id' => $contribution['id'],
+          'total_amount' => 50,
+        ])->execute();
       }
-      $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
       $contributionIds[] = $contribution['id'];
     }
 
