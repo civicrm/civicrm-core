@@ -15,8 +15,14 @@ class CRM_MessageAdmin_Settings {
         ->execute()
         ->count();
 
+    $usageOptions = [];
+    foreach (CRM_Core_BAO_MessageTemplate::getTokenEntityOptions() as $entity => $title) {
+      $usageOptions[] = ['id' => $entity, 'text' => $title];
+    }
+
     return self::getTaskSettings() + [
       'sendTestEnabled' => $sendTestEnabled,
+      'usageOptions' => $usageOptions,
     ];
   }
 
