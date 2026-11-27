@@ -60,8 +60,7 @@
 }
 .crm-container .help a:not(.btn),
 .crm-container .messages a:not(.btn),
-.crm-container .alert a:not(.btn),
-.crm-container table tr.crm-row-selected a:not(.btn) {
+.crm-container .alert a:not(.btn) {
   color: inherit;
 }
 .crm-container .help a,
