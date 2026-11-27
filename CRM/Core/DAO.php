@@ -325,7 +325,9 @@ class CRM_Core_DAO extends DB_DataObject {
     if (defined('CIVICRM_DAO_DEBUG')) {
       self::DebugLevel(CIVICRM_DAO_DEBUG);
     }
-    CRM_Core_DAO::executeQuery('SET NAMES utf8mb4');
+    // MySQL's default GROUP_CONCAT limit of 1024 bytes is raised to MariaDB's default of 1 MB.
+    // Without the CAST, MySQL types GREATEST() of an unsigned variable and a signed literal as DECIMAL and rejects it.
+    CRM_Core_DAO::executeQuery('SET NAMES utf8mb4, SESSION group_concat_max_len = GREATEST(@@SESSION.group_concat_max_len, CAST(1048576 AS UNSIGNED))');
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', [1 => [CRM_Utils_Request::id(), 'String']]);
   }
 
