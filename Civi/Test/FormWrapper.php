@@ -423,6 +423,10 @@ class FormWrapper {
         $this->form->controller = new \CRM_Pledge_Controller_Search();
         break;
 
+      case $class === 'CRM_Case_Form_Search':
+        $this->form->controller = new \CRM_Case_Controller_Search();
+        break;
+
       case str_contains($class, 'Search'):
         $this->form->controller = new \CRM_Contact_Controller_Search();
         if ($class === 'CRM_Contact_Form_Search_Basic') {

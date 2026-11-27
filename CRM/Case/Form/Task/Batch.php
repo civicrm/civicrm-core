@@ -31,6 +31,14 @@ class CRM_Case_Form_Task_Batch extends CRM_Core_Form_Task_Batch {
   public static $entityShortname = 'case';
 
   /**
+   * The selected case ids, set by CRM_Core_Form_Task::preProcessCommon().
+   *
+   * @var array
+   * @deprecated Use $this->_entityIds.
+   */
+  public $_caseIds;
+
+  /**
    * Get the name of the table for the relevant entity.
    *
    * @return string

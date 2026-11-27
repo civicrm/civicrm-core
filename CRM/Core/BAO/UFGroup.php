@@ -687,7 +687,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     // Fixme: why this hardcoded list? If we truly want all fields we should use CRM_Core_BAO_CustomGroup::getAll().
     $components = ['Contribution', 'Participant', 'Membership', 'Activity', 'Case'];
     foreach ($components as $value) {
-      $extraFields = CRM_Core_BAO_CustomField::getFieldsForImport($value, FALSE, FALSE, FALSE, $checkPermission);
+      // Case profiles may hold multi-record ("Tab with table") case fields.
+      $withMultiple = $value === 'Case';
+      $extraFields = CRM_Core_BAO_CustomField::getFieldsForImport($value, FALSE, FALSE, FALSE, $checkPermission, $withMultiple);
       $customFields = array_merge($customFields, $extraFields);
     }
     $addressCustomFields = CRM_Core_BAO_CustomField::getFieldsForImport('Address', FALSE, FALSE, FALSE, $checkPermission);

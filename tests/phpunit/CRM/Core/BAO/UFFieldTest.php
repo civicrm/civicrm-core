@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\CustomGroup;
 use Civi\Api4\UFGroup;
 
 /**
@@ -12,7 +13,38 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     if (isset($this->ids['UFGroup']['test'])) {
       UFGroup::delete(FALSE)->addWhere('id', '=', $this->ids['UFGroup']['test'])->execute();
     }
+    if ($this->getTestEntityID('CustomGroup', 'case_records')) {
+      CustomGroup::delete(FALSE)
+        ->addWhere('id', '=', $this->getTestEntityID('CustomGroup', 'case_records'))
+        ->execute();
+    }
+    unset(Civi::$statics['UFFieldsFlat']);
     parent::tearDown();
+  }
+
+  /**
+   * Multi-record ("Tab with table") case fields can be added to profiles.
+   */
+  public function testGetAvailableFlatIncludesMultiRecordCaseFields(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->createTestEntity('CustomGroup', [
+      'title' => 'Case records',
+      'extends' => 'Case',
+      'is_multiple' => TRUE,
+      'style' => 'Tab with table',
+    ], 'case_records');
+    $field = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $this->getTestEntityID('CustomGroup', 'case_records'),
+      'label' => 'Record title',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+    unset(Civi::$statics['UFFieldsFlat']);
+
+    $fields = CRM_Core_BAO_UFField::getAvailableFieldsFlat();
+
+    $this->assertSame('Case', $fields['custom_' . $field['id']]['field_type']);
+    $this->assertTrue(CRM_Core_BAO_UFField::isValidFieldName('custom_' . $field['id']));
   }
 
   /**
