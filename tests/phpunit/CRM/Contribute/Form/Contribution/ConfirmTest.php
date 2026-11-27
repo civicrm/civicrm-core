@@ -440,6 +440,76 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * An anonymous submitter, with no permissioned relationship to the
+   * organization, renews the organization's membership.
+   *
+   * The organization is matched by dedupe on the details entered, and its
+   * existing membership must be renewed (or upgraded to another type of the
+   * same member-of organization) rather than a second membership created.
+   *
+   * @dataProvider getRenewalMembershipTypes
+   */
+  public function testOnBehalfAnonymousRenewsExistingOrganizationMembership(string $renewalMembershipType): void {
+    $mainLocationTypeID = $this->getLocationTypeID('Main');
+    $this->restoreMembershipTypes();
+    foreach (\CRM_Member_BAO_MembershipType::getAllMembershipTypes() as $membershipType) {
+      $this->ids['MembershipType'][strtolower($membershipType['name'])] = $membershipType['id'];
+    }
+    $organizationID = $this->organizationCreate([
+      'organization_name' => 'Renewing Org',
+      'email_primary.email' => 'renewing-org@example.org',
+    ]);
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, FALSE, FALSE);
+    $year = (int) (CRM_Utils_Time::date('Y')) - 1;
+    $existingMembership = $this->createTestEntity('Membership', [
+      'contact_id' => $organizationID,
+      'membership_type_id:name' => 'Student',
+      'join_date' => $year . '-01-01',
+      'start_date' => $year . '-01-01',
+      'end_date' => $year . '-12-31',
+    ], 'organization_membership');
+
+    $this->createTestEntity('UFJoin', [
+      'module' => 'on_behalf',
+      'uf_group_id.name' => 'on_behalf_organization',
+      'entity_id' => $this->getContributionPageID('QuickConfig'),
+      'entity_table' => 'civicrm_contribution_page',
+      'weight' => 1,
+      'is_active' => 1,
+      'module_data' => ['on_behalf' => ['is_for_organization' => 2, 'default' => ['for_organization' => 'Organization']]],
+    ], 'on_behalf');
+
+    $this->submitOnlineContributionForm($this->getBillingSubmitValues() + [
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_' . strtolower($renewalMembershipType)],
+      'onbehalf' => [
+        'organization_name' => 'Renewing Org',
+        "email-$mainLocationTypeID" => 'renewing-org@example.org',
+      ],
+    ], $this->getContributionPageID('QuickConfig'));
+
+    $membership = Membership::get(FALSE)
+      ->addSelect('id', 'end_date', 'membership_type_id:name')
+      ->addWhere('contact_id', '=', $organizationID)
+      ->execute()->single();
+    $this->assertSame($existingMembership['id'], $membership['id']);
+    $this->assertSame($renewalMembershipType, $membership['membership_type_id:name']);
+    $this->assertGreaterThan($year . '-12-31', $membership['end_date']);
+
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id.contact_id', '=', $organizationID)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->execute()->single();
+    $this->assertSame($existingMembership['id'], $lineItem['entity_id']);
+  }
+
+  public static function getRenewalMembershipTypes(): array {
+    return [
+      'same type' => ['Student'],
+      'upgrade' => ['General'],
+    ];
+  }
+
+  /**
    * Test that submitting other amount works with non-english currency formatting.
    *
    * @dataProvider getThousandSeparators

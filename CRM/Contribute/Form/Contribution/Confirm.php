@@ -238,9 +238,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * That dropdown value is also meaningless when the contact instead chose
    * 'Enter a new organization' (`org_option`) - the browser submits it
-   * either way, but it wasn't a real choice, so in that case this returns
-   * whichever organization `processOnBehalfOrganization()` resolved or
-   * created instead.
+   * either way, but it wasn't a real choice.
+   *
+   * Once `processOnBehalfOrganization()` has resolved the organization -
+   * matched by dedupe or newly created - that is the answer. This covers
+   * anonymous and unpermissioned submitters, who get no dropdown at all.
    *
    * @return int|null
    */
@@ -253,7 +255,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!$isForOrganization) {
       return NULL;
     }
-    if ($this->getSubmittedValue('org_option')) {
+    if ($this->onBehalfOrganizationID || $this->getSubmittedValue('org_option')) {
       return $this->onBehalfOrganizationID;
     }
     return $this->getSubmittedValue('onbehalfof_id');
