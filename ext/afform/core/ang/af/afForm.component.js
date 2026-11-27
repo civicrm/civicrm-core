@@ -259,6 +259,9 @@
         return compareValues(this.getTokenValue(conditions[0]), conditions[1], conditions[2]);
       };
 
+      // PHP's (bool) cast: unlike JS, '0' and [] are false.
+      const isPhpTruthy = (val) => !(val === undefined || val === null || val === false || val === 0 || val === '' || val === '0' || (Array.isArray(val) && !val.length));
+
       /**
        * Clientside implementation of ArrayQueryActionTrait::compareValues
        *
@@ -275,6 +278,10 @@
           case '=':
           // Legacy operator, changed to '=', but may still exist on older forms.
           case '==':
+            // Like PHP, compare against a boolean as booleans, so an untouched checkbox ('') equals false as it does on the server
+            if (typeof value === 'boolean' || typeof expected === 'boolean') {
+              return isPhpTruthy(value) === isPhpTruthy(expected);
+            }
             // Case-insensitive string comparisons
             if (typeof value === 'string') {
               value = value.toLowerCase();
