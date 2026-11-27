@@ -123,6 +123,15 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * Search for groups.
    */
   public function search() {
+    if ($this->_action & CRM_Core_Action::RENEW) {
+      $form = new CRM_Core_Controller_Simple('CRM_Group_Form_Edit', ts('Convert Groups'), CRM_Core_Action::RENEW);
+      $form->setEmbedded(TRUE);
+      $form->setParent($this);
+      $form->process();
+      $form->run();
+      return;
+    }
+
     if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE

@@ -31,6 +31,74 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
+   * convert the group to regular group
+   *
+   * @param int $groupID Group id.
+   */
+  public static function convertToRegularGroup($groupID) {
+    // Ensure the group exists and is a smart group.
+    $group = \Civi\Api4\Group::get(FALSE)
+      ->addSelect('id', 'saved_search_id')
+      ->addWhere('id', '=', $groupID)
+      ->execute()
+      ->first();
+
+    if (empty($group['saved_search_id'])) {
+      throw new CRM_Core_Exception(
+        "Group ID $groupID does not exist or is not a smart group."
+      );
+    }
+
+    //delete saved search associated with the group
+    self::deleteSavedSearch($groupID)
+      
+    //recalculate cache to get updated results
+    CRM_Contact_BAO_GroupContactCache::add($groupID);
+
+    //load all the smart group members as static group members
+    $insertSql = "INSERT IGNORE INTO civicrm_group_contact (contact_id, group_id, status)
+       (SELECT DISTINCT contact_id, group_id, 'Added' FROM civicrm_group_contact_cache WHERE group_id = %1 )";
+
+    CRM_Core_DAO::executeQuery($insertSql, [
+      1 => [$groupID, 'Positive'],
+    ]);
+
+    //subscription history should reflect the date
+    $insertSql = "INSERT IGNORE INTO civicrm_subscription_history(contact_id, group_id, date, method, status)
+ (SELECT contact_id, group_id, now(), 'Admin', 'Added' FROM civicrm_group_contact WHERE group_id = %1 )";
+    CRM_Core_DAO::executeQuery($insertSql, [
+      1 => [$groupID, 'Positive'],
+    ]);
+
+    //update the smart to regular group, unset the saved search criteria
+    //of which the smart search is based on
+    $updateSql = "UPDATE civicrm_group SET saved_search_id = NULL, cache_date = NULL, cache_fill_took = NULL WHERE id = %1;";
+    CRM_Core_DAO::executeQuery($updateSql, [
+      1 => [$groupID, 'Positive'],
+    ]);
+    CRM_Core_PseudoConstant::flush();
+  }
+
+  /**
+   * delete the saved search associated with the group.
+   *
+   * @param int $id
+   */
+  public static function deleteSavedSearch($id) {
+    //check whether this group contains any saved searches and check if that saved search is appropriate to delete.
+    $groupDetails = Group::get(FALSE)->addWhere('id', '=', $id)->execute();
+    if (!empty($groupDetails[0]['saved_search_id'])) {
+      $savedSearch = new CRM_Contact_DAO_SavedSearch();
+      $savedSearch->id = $groupDetails[0]['saved_search_id'];
+      $savedSearch->find(TRUE);
+      // If it is a traditional saved search i.e has form values and there is no linked api_entity then delete the saved search as well.
+      if (!empty($savedSearch->form_values) && empty($savedSearch->api_entity) && empty($savedSearch->api_params)) {
+        $savedSearch->delete();
+      }
+    }
+  }
+
+  /**
    * Delete the group and all the object that connect to this group.
    *
    * Incredibly destructive.
@@ -80,19 +148,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     $query = "DELETE FROM civicrm_acl_entity_role where entity_table = 'civicrm_group' AND entity_id = %1";
     CRM_Core_DAO::executeQuery($query, $params);
-
-    //check whether this group contains  any saved searches and check if that saved search is appropriate to delete.
-    $groupDetails = Group::get(FALSE)->addWhere('id', '=', $id)->execute();
-    if (!empty($groupDetails[0]['saved_search_id'])) {
-      $savedSearch = new CRM_Contact_DAO_SavedSearch();
-      $savedSearch->id = $groupDetails[0]['saved_search_id'];
-      $savedSearch->find(TRUE);
-      // If it is a traditional saved search i.e has form values and there is no linked api_entity then delete the saved search as well.
-      if (!empty($savedSearch->form_values) && empty($savedSearch->api_entity) && empty($savedSearch->api_params)) {
-        $savedSearch->delete();
-      }
-    }
-
+    //delete saved search associated with the group
+    self::deleteSavedSearch($id)
+      
     // delete from group table
     $group = new CRM_Contact_DAO_Group();
     $group->id = $id;
@@ -732,6 +790,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
 
       $action = array_sum(array_keys($newLinks));
+      if (!$object->saved_search_id) {
+        $action -= CRM_Core_Action::RENEW;
+      }
 
       // CRM-9936
       if (property_exists($object, 'is_reserved')) {
@@ -1154,6 +1215,13 @@ WHERE {$whereClause}";
         'qs' => 'reset=1&action=delete&id=%%id%%',
         'title' => ts('Delete Group'),
         'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
+      ],
+      CRM_Core_Action::RENEW => [
+        'name' => ts('Convert'),
+        'url' => 'civicrm/group',
+        'qs' => 'reset=1&action=renew&id=%%id%%',
+        'title' => ts('Convert to Regular Group'),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::RENEW),
       ],
     ];
   }
