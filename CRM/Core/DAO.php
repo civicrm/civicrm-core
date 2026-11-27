@@ -255,9 +255,7 @@ class CRM_Core_DAO extends DB_DataObject {
         'exception' => $e,
       ]);
     }
-    finally {
-      return $originalTimeLimit;
-    }
+    return $originalTimeLimit;
   }
 
   /**
