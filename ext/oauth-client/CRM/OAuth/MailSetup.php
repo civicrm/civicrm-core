@@ -51,7 +51,7 @@ class CRM_OAuth_MailSetup {
     $authCode = Civi\Api4\OAuthClient::authorizationCode(0)
       ->addWhere('id', '=', $setupAction['oauth_client_id'])
       ->setStorage('OAuthSysToken')
-      ->setTag('MailSettings:setup')
+      ->setTag(\Civi\OAuth\OAuthMailSettingsTag::SETUP_TAG)
       ->setPrompt($setupAction['prompt'] ?? 'select_account')
       ->execute()
       ->single();
@@ -78,7 +78,68 @@ class CRM_OAuth_MailSetup {
    * @param string $nextUrl
    */
   public static function onReturn($token, &$nextUrl) {
-    if ($token['tag'] !== 'MailSettings:setup') {
+    /** @var \Civi\OAuth\OAuthMailSettingsTag $mailTag */
+    $mailTag = Civi::service('oauth_client.mail_settings_tag');
+
+    // Re-connecting an existing account: it is already tagged with the record id, so there is
+    // nothing to create. alterMailStore() refreshes every token with this tag, so a stale one
+    // left behind would fail its refresh and break mail polling.
+    $mailSettingsId = $mailTag->checkTokenTag($token['tag'] ?? '');
+    if ($mailSettingsId) {
+      // A provider may skip the refresh token for an account it has already authorised (Google
+      // does unless asked for consent). Swapping a refreshable token for that would stop
+      // polling once the access token expires.
+      if (empty($token['refresh_token'])) {
+        $refreshable = \Civi\Api4\OAuthSysToken::get(FALSE)
+          ->selectRowCount()
+          ->addWhere('tag', '=', $token['tag'])
+          ->addWhere('id', '!=', $token['id'])
+          ->addWhere('refresh_token', 'IS NOT EMPTY')
+          ->execute()
+          ->countMatched();
+        if ($refreshable) {
+          \Civi\Api4\OAuthSysToken::delete(FALSE)->addWhere('id', '=', $token['id'])->execute();
+          CRM_Core_Session::setStatus(
+            ts('The provider did not issue a refresh token, so the new connection would stop working within the hour. The existing connection has been kept.'),
+            ts('Not reconnected'),
+            'error'
+          );
+          return;
+        }
+      }
+      \Civi\Api4\OAuthSysToken::delete(FALSE)
+        ->addWhere('tag', '=', $token['tag'])
+        ->addWhere('id', '!=', $token['id'])
+        ->execute();
+
+      // Only a warning: a shared mailbox can legitimately log in as itself with another user's token.
+      $signedInAs = self::getUsernameForToken($token);
+      $username = \Civi\Api4\MailSettings::get(FALSE)
+        ->addSelect('username')
+        ->addWhere('id', '=', $mailSettingsId)
+        ->execute()
+        ->first()['username'] ?? NULL;
+      if ($signedInAs && $username && strcasecmp($signedInAs, $username) !== 0) {
+        CRM_Core_Session::setStatus(
+          ts('The connection was renewed by signing in as %1, but this account logs in to the mailbox as %2. Mail will not be collected unless %1 can access that mailbox: re-connect as %2, or change the username.', [
+            1 => $signedInAs,
+            2 => $username,
+          ]),
+          ts('Reconnected as a different user'),
+          'alert'
+        );
+        return;
+      }
+
+      CRM_Core_Session::setStatus(
+        ts('The connection for this account has been renewed.'),
+        ts('Reconnected'),
+        'success'
+      );
+      return;
+    }
+
+    if ($token['tag'] !== \Civi\OAuth\OAuthMailSettingsTag::SETUP_TAG) {
       return;
     }
 
@@ -103,9 +164,38 @@ class CRM_OAuth_MailSetup {
       'info'
     );
 
-    $nextUrl = CRM_Utils_System::url('civicrm/admin/mailSettings/edit', [
+    $nextUrl = self::getEditUrl($mailSettings['id']);
+  }
+
+  /**
+   * The mailbox username this token signs in as, per the provider's mailSettingsTemplate.
+   *
+   * @param array $token
+   * @return string|null
+   *   NULL if the provider or token does not say.
+   */
+  private static function getUsernameForToken(array $token): ?string {
+    if (empty($token['resource_owner'])) {
+      return NULL;
+    }
+    $client = \Civi\Api4\OAuthClient::get(FALSE)->addWhere('id', '=', $token['client_id'])->execute()->first();
+    $provider = \Civi\Api4\OAuthProvider::get(FALSE)->addWhere('name', '=', $client['provider'] ?? '')->execute()->first();
+    $template = $provider['mailSettingsTemplate']['username'] ?? NULL;
+    if (!$template) {
+      return NULL;
+    }
+    $vars = ['token' => $token, 'client' => $client, 'provider' => $provider];
+    return self::evalArrayTemplate(['username' => $template], $vars)['username'] ?: NULL;
+  }
+
+  /**
+   * @param int $mailSettingsId
+   * @return string
+   */
+  private static function getEditUrl($mailSettingsId): string {
+    return CRM_Utils_System::url('civicrm/admin/mailSettings/edit', [
       'action' => 'update',
-      'id' => $mailSettings['id'],
+      'id' => $mailSettingsId,
       'reset' => 1,
     ], TRUE, NULL, FALSE);
   }
