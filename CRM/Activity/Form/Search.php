@@ -217,7 +217,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     $status = CRM_Utils_Request::retrieve('status', 'String', $this);
     if ($status) {
       $this->_formValues['activity_status_id'] = $status;
-      $this->_defaults['activity_status_id'] = $status;
+      // The user dashboard passes ['IN' => [1, 7]]; a select default must be a
+      // flat list of values, or rendering warns "Array to string conversion".
+      $this->_defaults['activity_status_id'] = $status['IN'] ?? $status;
     }
 
     $survey = CRM_Utils_Request::retrieve('survey', 'Positive');

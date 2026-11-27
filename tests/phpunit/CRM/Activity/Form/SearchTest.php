@@ -94,6 +94,24 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test a forced search with the status passed as an IN array.
+   *
+   * The user dashboard passes ['IN' => [1, 7]]. The search filters on it as
+   * is, but the default of the status select must be a flat list of values.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testForcedSearchStatusDefault(): void {
+    $form = new CRM_Activity_Form_Search();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Activity_Controller_Search();
+    $form->controller->set('status', ['IN' => [1, 7]]);
+    $form->controller->set('force', 1);
+    $form->preProcess();
+    $this->assertEquals([1, 7], $form->_defaults['activity_status_id']);
+  }
+
+  /**
    * Test the Qill for activity Date time.
    */
   public function testQill(): void {
