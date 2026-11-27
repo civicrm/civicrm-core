@@ -127,14 +127,9 @@
         return encoded;
       }
 
-      // Convert javascript notation to value
-      function decode(encoded) {
-        // Single-quoted string
-        if (encoded.startsWith("'") && encoded.charAt(encoded.length - 1) === "'") {
-          return encoded.substring(1, encoded.length - 1);
-        }
-        // Anything else
-        return JSON.parse(encoded);
+      // A name usable bare in an AngularJS expression, as a key or after a dot
+      function isIdentifier(text) {
+        return /^[A-Za-z_$][\w$]*$/.test(text);
       }
 
       function getEntity(entityName) {
@@ -398,11 +393,11 @@
           }
           const output = filters.map((filter) => {
             const keyVal = [
-              // Enclose the key in quotes unless it is purely alphanumeric
-              filter.name.match(/\W/) ? encode(filter.name) : filter.name,
+              // Enclose the key in quotes unless AngularJS can read it bare
+              isIdentifier(filter.name) ? filter.name : encode(filter.name),
             ];
             // Object dot notation
-            if (filter.mode !== 'val' && !filter.value.match(/\W/)) {
+            if (filter.mode !== 'val' && isIdentifier(filter.value)) {
               keyVal.push(filter.mode + '.' + filter.value);
             }
             // Object bracket notation
@@ -418,49 +413,30 @@
           return '{' + output.join(', ') + '}';
         },
 
-        // Convert search display filter string to array
+        // Convert search display filter string to array, reading it as AngularJS does at runtime
         parseDisplayFilters: function(filterString) {
           if (!filterString || filterString === '{}') {
             return [];
           }
-          // Split contents by commas, ignoring commas inside quotes
-          const rawValues = filterString.replace(/^[{}]+|[{}]+$/g, '').split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
-          return rawValues.map((raw) => {
-            raw = raw.trim();
-            let split;
-            if (raw.charAt(0) === '"') {
-              split = raw.slice(1).split(/"[ ]*:/);
-            } else if (raw.charAt(0) === "'") {
-              split = raw.slice(1).split(/'[ ]*:/);
-            } else {
-              split = raw.split(':');
+          class Reference {
+            constructor(mode, value) {
+              this.mode = mode;
+              this.value = value;
             }
-            const key = split[0].trim();
-            const value = (split[1] || '').trim();
-            let mode = 'val';
-            if (value.startsWith('routeParams')) {
-              mode = 'routeParams';
-            } else if (value.startsWith('options')) {
-              mode = 'options';
+          }
+          const references = {};
+          ['routeParams', 'options'].forEach((mode) => {
+            references[mode] = new Proxy({}, {get: (target, value) => new Reference(mode, value)});
+          });
+          return Object.entries($parse(filterString)(references)).map(([name, value]) => {
+            if (value instanceof Reference) {
+              return {name, mode: value.mode, value: value.value};
             }
-            let info = {
-              name: key,
-              mode: mode
-            };
-            // Object dot notation
-            if (mode !== 'val' && value.startsWith(mode + '.')) {
-              info.value = value.replace(mode + '.', '');
+            if (value === undefined) {
+              throw new Error('Unsupported display filter: ' + name);
             }
-            // Object bracket notation
-            else if (mode !== 'val') {
-              info.value = decode(value.substring(value.indexOf('[') + 1, value.lastIndexOf(']')));
-            }
-            // Literal value
-            else {
-              info.value = decode(value);
-            }
-            return info;
-          }, []);
+            return {name, mode: 'val', value};
+          });
         },
 
         pickIcon: function() {
