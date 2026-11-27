@@ -185,6 +185,15 @@ EOHTML;
     $this->assertEquals($lastName . ', A', $result[0]['label']);
     $this->assertEquals($lastName . ', B', $result[1]['label']);
 
+    // Contact C can be displayed as a current value even though it isn't in the group
+    $result = Contact::autocomplete()
+      ->setFormName('afform:' . $this->formName)
+      ->setFieldName('Individual1:test_af_fields.contact_ref')
+      ->setIds([$contacts['C']])
+      ->setCurrentValues(TRUE)
+      ->execute();
+    $this->assertEquals([$contacts['C']], $result->column('id'));
+
     // Ensure form validates submission, restricting it to contacts A & B
     $values = [
       'Individual1' => [
@@ -220,6 +229,19 @@ EOHTML;
       ->addWhere('test_af_fields.contact_ref', '=', $contacts['B'])
       ->selectRowCount()->execute();
     $this->assertCount(1, $check);
+
+    // Without permission checks (FBAC mode), the filter still applies to current values
+    $this->useValues([
+      'layout' => str_replace('<af-field name="test_af_fields.contact_ref" />', '<af-field name="test_af_fields.contact_ref" defn="{security: \'FBAC\'}" />', $layout),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $result = Contact::autocomplete()
+      ->setFormName('afform:' . $this->formName)
+      ->setFieldName('Individual1:test_af_fields.contact_ref')
+      ->setIds([$contacts['A'], $contacts['C']])
+      ->setCurrentValues(TRUE)
+      ->execute();
+    $this->assertEquals([$contacts['A']], $result->column('id'));
   }
 
   /**
