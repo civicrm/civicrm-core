@@ -15,8 +15,10 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Role;
+use Civi\Api4\User;
+use Civi\Api4\UserRole;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Permissions class for Standalone.
@@ -123,6 +125,69 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
         ->execute()->count();
     }
     return FALSE;
+  }
+
+  /**
+   * Get all the contact emails for users that have a specific permission.
+   *
+   * @param string $permissionName
+   *   Name of the permission we are interested in.
+   *
+   * @return string
+   *   a comma separated list of email addresses
+   */
+  public function permissionEmails($permissionName) {
+    if (isset(\Civi::$statics[__CLASS__][__FUNCTION__][$permissionName])) {
+      return \Civi::$statics[__CLASS__][__FUNCTION__][$permissionName];
+    }
+    if ($permissionName === CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
+      return \Civi::$statics[__CLASS__][__FUNCTION__][$permissionName] = '';
+    }
+
+    if (!CoreUtil::entityExists('User') || !CoreUtil::entityExists('Role') || !CoreUtil::entityExists('UserRole')) {
+      return \Civi::$statics[__CLASS__][__FUNCTION__][$permissionName] = '';
+    }
+
+    $permissions = array_merge([$permissionName], CRM_Core_Permission::basicPermissions(TRUE, TRUE)[$permissionName]['implied_by'] ?? []);
+
+    $roles = Role::get(FALSE)
+      ->addSelect('id', 'name', 'permissions')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('name', '!=', 'everyone')
+      ->execute();
+
+    $roleIds = [];
+    foreach ($roles as $role) {
+      if ($role['name'] === 'admin' || in_array('all CiviCRM permissions and ACLs', $role['permissions'], TRUE) || array_intersect($permissions, $role['permissions'])) {
+        $roleIds[] = $role['id'];
+      }
+    }
+
+    if (!$roleIds) {
+      return \Civi::$statics[__CLASS__][__FUNCTION__][$permissionName] = '';
+    }
+
+    $userIds = UserRole::get(FALSE)
+      ->addSelect('user_id')
+      ->addWhere('role_id', 'IN', $roleIds)
+      ->execute()
+      ->column('user_id');
+
+    if (!$userIds) {
+      return \Civi::$statics[__CLASS__][__FUNCTION__][$permissionName] = '';
+    }
+
+    $emails = User::get(FALSE)
+      ->addSelect('contact_id.email_primary.email')
+      ->addWhere('id', 'IN', array_unique($userIds))
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('contact_id.is_deleted', '=', FALSE)
+      ->addWhere('contact_id.is_deceased', '=', FALSE)
+      ->addWhere('contact_id.email_primary.email', 'IS NOT EMPTY')
+      ->execute()
+      ->column('contact_id.email_primary.email');
+
+    return \Civi::$statics[__CLASS__][__FUNCTION__][$permissionName] = implode(', ', array_unique($emails));
   }
 
 }
