@@ -36,9 +36,9 @@
     </a>
   </div>
   <div class="form-inline">
-    <label>{{:: ts('Width') }}</label>
+    <label>{{:: ts('Width (px)') }}</label>
     <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.width">
-    <label>{{:: ts('Height') }}</label>
+    <label>{{:: ts('Height (px)') }}</label>
     <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.height">
   </div>
 
@@ -47,11 +47,11 @@
 
     <div class="form-inline">
       <label>
-        {{:: ts('Inner') }}
+        {{:: ts('Inner (px)') }}
       </label>
       <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.inner" />
       <label>
-        {{:: ts('Outer') }}
+        {{:: ts('Outer (px)') }}
       </label>
       <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.outer" />
     </div>
@@ -59,23 +59,23 @@
 
     <div ng-if="$ctrl.chartType.hasCoordinateGrid()" class="form-inline">
       <label>
-        {{:: ts('Top') }}
+        {{:: ts('Top (px)') }}
       </label>
       <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.top" />
       <label>
-        {{:: ts('Bottom') }}
+        {{:: ts('Bottom (px)') }}
       </label>
       <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.bottom" />
       <label>
-        {{:: ts('Left') }}
+        {{:: ts('Left (px)') }}
       </label>
       <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.left" />
       <label>
-        {{:: ts('Right') }}
+        {{:: ts('Right (px)') }}
       </label>
       <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.right" />
       <label>
-        {{:: ts('Clipping') }}
+        {{:: ts('Clipping (px)') }}
       </label>
       <!-- todo: not needed? used to allow data labels to spill over the edges of the chart area, but can maybe be set automatically -->
       <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.clip" />
