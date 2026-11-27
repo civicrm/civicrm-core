@@ -127,6 +127,8 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
     $fields = [];
     $entityProvider = static::getEntityProvider();
     $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class);
+    // Legacy `contactType` metadata for Contact fields which belong to one contact type, e.g. first_name
+    $contactTypeFields = $entityProvider->getMeta('name') === 'Contact' ? CRM_Contact_BAO_ContactType::getTypeSpecificFields() : [];
 
     foreach ($entityProvider->getFields() as $fieldName => $fieldSpec) {
       $field = [
@@ -171,8 +173,8 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
       if ($field['usage']['export'] || (!$field['usage']['export'] && $field['usage']['import'])) {
         $field['export'] = $field['usage']['export'];
       }
-      if (!empty($fieldSpec['contact_type'])) {
-        $field['contactType'] = $fieldSpec['contact_type'];
+      if (isset($contactTypeFields[$fieldName])) {
+        $field['contactType'] = $contactTypeFields[$fieldName];
       }
       if (!empty($fieldSpec['permission'])) {
         $field['permission'] = $fieldSpec['permission'];

@@ -34,6 +34,7 @@ class DAOSaveAction extends AbstractSaveAction {
       $this->formatWriteValues($record);
       $matched += $this->matchExisting($record);
       if (empty($record[$idField])) {
+        $this->addPresetValues($record);
         $this->fillDefaults($record);
       }
     }

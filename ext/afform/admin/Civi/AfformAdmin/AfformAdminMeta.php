@@ -77,6 +77,11 @@ class AfformAdminMeta {
       'label' => $info['title'],
       'icon' => $info['icon'] ?? NULL,
     ];
+    // e.g. 'Contact' and [contact_type => Individual] for Individual
+    if (!empty($info['facade_of'])) {
+      $meta['facade_of'] = $info['facade_of'];
+      $meta['where'] = $info['where'];
+    }
     // Custom entities are always type 'join'
     if (in_array('CustomValue', $info['type'], TRUE)) {
       $meta['type'] = 'join';

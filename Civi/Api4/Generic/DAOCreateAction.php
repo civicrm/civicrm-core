@@ -28,6 +28,7 @@ class DAOCreateAction extends AbstractCreateAction {
    */
   public function _run(Result $result) {
     $this->formatWriteValues($this->values);
+    $this->addPresetValues($this->values);
     $this->fillDefaults($this->values);
     $this->validateValues();
 

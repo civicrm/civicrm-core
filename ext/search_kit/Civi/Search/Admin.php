@@ -157,7 +157,7 @@ class Admin {
   public static function getSchema(): array {
     $schema = [];
     $entities = Entity::get()
-      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'parent_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
+      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'parent_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by', 'facade_of')
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
       ->setChain([
@@ -476,10 +476,12 @@ class Admin {
         }
       }
     }
-    // Add contact joins to the contactType pseudo-entities
-    foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
-      $joins += [$contactType => []];
-      $joins[$contactType] = array_merge($joins[$contactType], $joins['Contact']);
+    // Facades (e.g. Individual) share the joins of their parent entity (e.g. Contact)
+    foreach ($allowedEntities as $entity) {
+      if (!empty($entity['facade_of']) && isset($joins[$entity['facade_of']])) {
+        $joins += [$entity['name'] => []];
+        $joins[$entity['name']] = array_merge($joins[$entity['name']], $joins[$entity['facade_of']]);
+      }
     }
 
     \Civi::dispatcher()->dispatch('civi.searchkit.joins', \Civi\Core\Event\GenericHookEvent::create([

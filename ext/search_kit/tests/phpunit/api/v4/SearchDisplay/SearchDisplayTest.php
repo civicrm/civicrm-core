@@ -14,6 +14,11 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   private ?\Civi\Core\Locale $previousLocale = NULL;
 
+  /**
+   * @var callable|null
+   */
+  private $tasksListener;
+
   public function setUpHeadless() {
     return \Civi\Test::headless()
       ->installMe(__DIR__)
@@ -22,6 +27,9 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   public function tearDown(): void {
     $this->previousLocale?->apply();
+    if ($this->tasksListener) {
+      \Civi::dispatcher()->removeListener('hook_civicrm_searchKitTasks', $this->tasksListener);
+    }
     parent::tearDown();
   }
 
@@ -125,6 +133,29 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertSame('Register participants for event', $task['title']);
     $this->assertSame('fa-calendar-plus-o', $task['icon']);
     $this->assertSame("'civicrm/task/register-participants'", $task['crmPopup']['path']);
+  }
+
+  public function testGetSearchTasksForFacadeIncludesParentTasks(): void {
+    $this->tasksListener = function ($e) {
+      $e->tasks['Contact']['testContactTask'] = ['title' => 'Test Contact Task'];
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_searchKitTasks', $this->tasksListener);
+    $getTasks = fn(array $settings) => SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch([
+        'api_entity' => 'Individual',
+        'api_params' => ['version' => 4, 'select' => ['id']],
+      ])
+      ->setDisplay(['type' => 'table', 'label' => __FUNCTION__, 'settings' => $settings])
+      ->execute()->indexBy('name');
+
+    $tasks = $getTasks(['actions' => TRUE]);
+    $this->assertArrayHasKey('testContactTask', (array) $tasks);
+    $this->assertSame('Individual', $tasks['testContactTask']['entity']);
+    $this->assertArrayHasKey('tag', (array) $tasks);
+
+    // Parent tasks are filtered by the display's enabled actions
+    $tasks = $getTasks(['actions' => ['tag']]);
+    $this->assertSame(['tag'], array_keys((array) $tasks));
   }
 
   public function testAutoFormatName() {

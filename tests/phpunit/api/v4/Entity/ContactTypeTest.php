@@ -23,10 +23,12 @@ use Civi\Api4\Contact;
 use api\v4\Api4TestBase;
 use Civi\Api4\ContactType;
 use Civi\Api4\Email;
+use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Individual;
 use Civi\Api4\Navigation;
 use Civi\Api4\Organization;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Schema\EntityRepository;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -34,8 +36,141 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
 
+  /**
+   * Set by tests which change contact types, so cached metadata is cleared afterwards.
+   *
+   * @var bool
+   */
+  private bool $clearCaches = FALSE;
+
+  public function tearDown(): void {
+    parent::tearDown();
+    if ($this->clearCaches) {
+      \Civi::cache('contactTypes')->clear();
+      \Civi::cache('metadata')->clear();
+    }
+  }
+
   public function testMetadata(): void {
     $this->assertSame('parent_id', CoreUtil::getInfoItem('ContactType', 'parent_field'));
+  }
+
+  public function testEntityFieldsEventDispatchedForIndividual(): void {
+    unset(\Civi::$statics['civi.entity.fields']);
+    $contactListenerCalled = FALSE;
+    $individualListenerCalled = FALSE;
+    $genericListenerEntities = [];
+
+    $dispatcher = \Civi::dispatcher();
+    $contactListener = function($e) use (&$contactListenerCalled) {
+      $contactListenerCalled = TRUE;
+    };
+    $individualListener = function($e) use (&$individualListenerCalled) {
+      $individualListenerCalled = TRUE;
+    };
+    $genericListener = function($e) use (&$genericListenerEntities) {
+      $genericListenerEntities[] = $e->entity;
+    };
+
+    $dispatcher->addListener('civi.entity.fields::Contact', $contactListener);
+    $dispatcher->addListener('civi.entity.fields::Individual', $individualListener);
+    $dispatcher->addListener('civi.entity.fields', $genericListener);
+
+    try {
+      \Civi::entity('Individual')->getFields();
+
+      // Parent listeners are called because Individual loads its parent's fields first
+      $this->assertTrue($contactListenerCalled);
+      $this->assertContains('Contact', $genericListenerEntities);
+
+      // Facade-specific listeners are called too
+      $this->assertTrue($individualListenerCalled);
+      $this->assertContains('Individual', $genericListenerEntities);
+    }
+    finally {
+      $dispatcher->removeListener('civi.entity.fields::Contact', $contactListener);
+      $dispatcher->removeListener('civi.entity.fields::Individual', $individualListener);
+      $dispatcher->removeListener('civi.entity.fields', $genericListener);
+      unset(\Civi::$statics['civi.entity.fields']);
+    }
+  }
+
+  /**
+   * The contact-type facades' title, description and icon follow the editable contact type.
+   */
+  public function testFacadeInfoFollowsContactType(): void {
+    $this->clearCaches = TRUE;
+    ContactType::update(FALSE)
+      ->addWhere('name', '=', 'Individual')
+      ->addValue('label', 'Person')
+      ->addValue('icon', 'fa-child')
+      ->execute();
+    \Civi::cache('metadata')->clear();
+
+    $this->assertSame('Person', CoreUtil::getInfoItem('Individual', 'title'));
+    // There's no plural label, so the plural is still the (translatable) core string
+    $this->assertSame('Individuals', CoreUtil::getInfoItem('Individual', 'title_plural'));
+    $this->assertSame('Contacts of type Person.', CoreUtil::getInfoItem('Individual', 'description'));
+    $this->assertSame('fa-child', CoreUtil::getInfoItem('Individual', 'icon'));
+    // The API name is unchanged
+    $this->assertSame('Individual', CoreUtil::getInfoItem('Individual', 'name'));
+  }
+
+  /**
+   * A Contact access rule which runs after core's own check also applies to writes through a contact type.
+   */
+  public function testContactAccessRuleAppliesToContactTypes(): void {
+    $contactID = $this->createTestRecord('Individual')['id'];
+    $update = Individual::update(FALSE);
+    $create = Individual::create(FALSE);
+    $this->assertTrue(CoreUtil::checkAccessRecord($update, ['id' => $contactID, 'first_name' => 'Renamed']));
+    $this->assertTrue(CoreUtil::checkAccessRecord($create, ['first_name' => 'New']));
+
+    $denyListener = fn(AuthorizeRecordEvent $e) => $e->setAuthorized(FALSE);
+    \Civi::dispatcher()->addListener('civi.api4.authorizeRecord::Contact', $denyListener, -10);
+    try {
+      $this->assertFalse(CoreUtil::checkAccessRecord($update, ['id' => $contactID, 'first_name' => 'Renamed']));
+      $this->assertFalse(CoreUtil::checkAccessRecord($create, ['first_name' => 'New']));
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('civi.api4.authorizeRecord::Contact', $denyListener);
+    }
+  }
+
+  /**
+   * Another facade of Contact, e.g. from an extension, doesn't change which contact type a field belongs to.
+   */
+  public function testTypeSpecificFieldsIgnoreOtherContactFacades(): void {
+    $addFacade = function($e) {
+      $e->entityTypes['TestDonor'] = ['name' => 'TestDonor', 'facade_of' => 'Contact', 'where' => ['contact_type' => 'Individual']];
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_entityTypes', $addFacade);
+    EntityRepository::flush();
+    unset(\Civi::$statics['CRM_Contact_BAO_ContactType']['getTypeSpecificFields']);
+    try {
+      $this->assertContains('TestDonor', EntityRepository::getFacadesOf('Contact'));
+      $typeSpecificFields = \CRM_Contact_BAO_ContactType::getTypeSpecificFields();
+      $this->assertSame('Individual', $typeSpecificFields['first_name']);
+      $this->assertSame('Organization', $typeSpecificFields['organization_name']);
+      $this->assertSame('Household', $typeSpecificFields['household_name']);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_entityTypes', $addFacade);
+      EntityRepository::flush();
+      unset(\Civi::$statics['CRM_Contact_BAO_ContactType']['getTypeSpecificFields']);
+    }
+  }
+
+  public function testRefCountForContactType(): void {
+    $contactID = $this->createTestRecord('Individual')['id'];
+    $this->createTestRecord('Email', ['contact_id' => $contactID]);
+    // A dynamic reference (entity_table + entity_id)
+    $this->createTestRecord('Note', ['entity_table' => 'civicrm_contact', 'entity_id' => $contactID]);
+    $contactRefs = CoreUtil::getRefCount('Contact', $contactID);
+    $refFields = array_map(fn($ref) => $ref['name'] . '.' . $ref['field'], $contactRefs);
+    $this->assertContains('Email.contact_id', $refFields);
+    $this->assertContains('Note.entity_id', $refFields);
+    $this->assertSame($contactRefs, CoreUtil::getRefCount('Individual', $contactID));
   }
 
   public function testMenuItemWillBeCreatedAndDeleted(): void {

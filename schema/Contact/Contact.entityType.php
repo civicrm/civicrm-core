@@ -209,7 +209,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Organization Name.'),
       'add' => '1.1',
-      'contact_type' => 'Organization',
       'usage' => [
         'import',
         'export',
@@ -251,7 +250,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('First Name.'),
       'add' => '1.1',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -268,7 +266,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Middle Name.'),
       'add' => '1.1',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -285,7 +282,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Last Name.'),
       'add' => '1.1',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -444,7 +440,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Legal Name.'),
       'add' => '1.1',
-      'contact_type' => 'Organization',
       'usage' => [
         'import',
         'export',
@@ -556,7 +551,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Prefix or Title for name (Ms, Mr...). FK to prefix ID'),
       'add' => '1.2',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -572,7 +566,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Suffix for name (Jr, Sr...). FK to suffix ID'),
       'add' => '1.2',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -588,7 +581,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Formal (academic or similar) title in front of name. (Prof., Dr. etc.)'),
       'add' => '4.5',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -724,7 +716,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Job Title'),
       'add' => '1.1',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -741,7 +732,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('FK to gender ID'),
       'add' => '1.2',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -760,7 +750,6 @@ return [
       'input_type' => 'Select Date',
       'description' => ts('Date of birth'),
       'add' => '1.1',
-      'contact_type' => 'Individual',
       'usage' => [
         'import',
         'export',
@@ -809,7 +798,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Household Name.'),
       'add' => '1.1',
-      'contact_type' => 'Household',
       'usage' => [
         'import',
         'export',
@@ -827,7 +815,6 @@ return [
       'readonly' => TRUE,
       'description' => ts('Optional FK to Primary Contact for this household.'),
       'add' => '1.1',
-      'contact_type' => 'Household',
       'input_attrs' => [
         'label' => ts('Household Primary Contact'),
       ],
@@ -843,7 +830,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Standard Industry Classification Code.'),
       'add' => '1.1',
-      'contact_type' => 'Organization',
       'usage' => [
         'import',
         'export',
@@ -869,7 +855,6 @@ return [
       'description' => ts('OPTIONAL FK to civicrm_contact record.'),
       'add' => '2.1',
       'unique_name' => 'current_employer_id',
-      'contact_type' => 'Individual',
       'usage' => [
         'export',
       ],
