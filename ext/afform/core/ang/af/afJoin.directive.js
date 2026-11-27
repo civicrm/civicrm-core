@@ -14,6 +14,7 @@
           self.repeatItem = ctrls[2];
           // Used when there is > 1 block per entity
           self.offset = self.afFieldset.getJoinOffset($attr.afJoin);
+          $el.on('$destroy', () => self.afFieldset.releaseJoinOffset($attr.afJoin, self.offset));
         },
         controller: function($scope) {
           const self = this;
