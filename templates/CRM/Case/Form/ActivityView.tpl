@@ -21,7 +21,7 @@
             </td>
           {else}
             <td colspan="2">
-              {if $row.label eq 'Details'}{$row.value|crmStripAlternatives|nl2brIfNotHTML|purify}{elseif $row.type eq 'Date'}{$row.value|crmDate}{else}{$row.value}{/if}</td>
+              {if $row.name eq 'Details'}{$row.value|crmStripAlternatives|nl2brIfNotHTML|purify}{elseif $row.type eq 'Date'}{$row.value|crmDate}{else}{$row.value}{/if}</td>
           {/if}
         </tr>
       {/foreach}

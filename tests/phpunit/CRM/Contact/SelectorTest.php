@@ -22,7 +22,9 @@
 class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_tag', 'civicrm_entity_tag']);
+    \Civi\Api4\WordReplacement::delete(FALSE)->addWhere('id', '>', 0)->execute();
+    CRM_Core_BAO_WordReplacement::rebuild();
+    $this->quickCleanup(['civicrm_tag', 'civicrm_entity_tag', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group', 'civicrm_saved_search']);
     parent::tearDown();
   }
 
@@ -872,6 +874,52 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       . ' LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1)'
       . ' LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) '
       . 'LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ';
+  }
+
+  /**
+   * Group members are styled by their status, whatever the status is called.
+   */
+  public function testGroupMemberStatusStyleWithTranslatedStatus(): void {
+    \Civi\Api4\WordReplacement::save(FALSE)
+      ->setRecords([['find_word' => 'Pending', 'replace_word' => 'Ausstehend', 'match_type' => 'exactMatch']])
+      ->execute();
+    CRM_Core_BAO_WordReplacement::rebuild();
+    $groupID = $this->groupCreate();
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('GroupContact', 'create', ['group_id' => $groupID, 'contact_id' => $contactID, 'status' => 'Pending']);
+
+    $formValues = ['group' => $groupID, 'group_contact_status' => ['Pending' => 1]];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+    $selector = new CRM_Contact_Selector(NULL, $formValues, $params, NULL, CRM_Core_Action::NONE, FALSE, FALSE, 'smog');
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
+    $this->assertEquals('Ausstehend', $rows[$contactID]['status']);
+
+    $smarty = CRM_Core_Smarty::singleton();
+    $form = ['toggleSelect' => ['html' => '']] + array_fill_keys(array_column($rows, 'checkbox'), ['html' => '']);
+    $smarty->assign(['rows' => $rows, 'form' => $form, 'context' => 'smog', 'id' => NULL, 'action' => CRM_Core_Action::NONE, 'columnHeaders' => []]);
+    $html = $smarty->fetch('CRM/Contact/Form/Selector.tpl');
+    $this->assertMatchesRegularExpression('/<td class="status-pending">\s*Ausstehend<\/td>/', $html);
+  }
+
+  /**
+   * Members of a smart group are listed with the status 'Smart' and no status style.
+   */
+  public function testSmartGroupMemberStatus(): void {
+    $groupID = $this->smartGroupCreate();
+    $householdID = $this->householdCreate();
+    CRM_Contact_BAO_GroupContactCache::loadAll($groupID);
+
+    $formValues = ['group' => $groupID];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+    $selector = new CRM_Contact_Selector(NULL, $formValues, $params, NULL, CRM_Core_Action::NONE, FALSE, FALSE, 'smog');
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
+    $this->assertSame('Smart', $rows[$householdID]['status']);
+
+    $smarty = CRM_Core_Smarty::singleton();
+    $form = ['toggleSelect' => ['html' => '']] + array_fill_keys(array_column($rows, 'checkbox'), ['html' => '']);
+    $smarty->assign(['rows' => $rows, 'form' => $form, 'context' => 'smog', 'id' => NULL, 'action' => CRM_Core_Action::NONE, 'columnHeaders' => []]);
+    $html = $smarty->fetch('CRM/Contact/Form/Selector.tpl');
+    $this->assertMatchesRegularExpression('/<td>\s*Smart<\/td>/', $html);
   }
 
   /**
