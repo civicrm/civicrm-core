@@ -265,17 +265,17 @@ class Admin {
         foreach (array_reverse($entity['fields'] ?? [], TRUE) as $index => $field) {
           if (!empty($field['fk_entity']) && !$field['options'] && !$field['suffixes'] && !empty($schema[$field['fk_entity']]['search_fields'])) {
             $labelFields = array_unique(array_merge($schema[$field['fk_entity']]['search_fields'], (array) ($schema[$field['fk_entity']]['label_field'] ?? [])));
+            $isCustom = strpos($field['name'], '.');
+            // Custom fields: append "Contact ID" etc. to original field label
+            if ($isCustom) {
+              $idField = array_column($schema[$field['fk_entity']]['fields'], NULL, 'name')['id'];
+              $entity['fields'][$index]['label'] .= ' ' . $idField['title'];
+            }
+            // DAO fields: use title instead of label since it represents the id (title usually ends in ID but label does not)
+            else {
+              $entity['fields'][$index]['label'] = $field['title'];
+            }
             foreach ($labelFields as $labelField) {
-              $isCustom = strpos($field['name'], '.');
-              // Custom fields: append "Contact ID" etc. to original field label
-              if ($isCustom) {
-                $idField = array_column($schema[$field['fk_entity']]['fields'], NULL, 'name')['id'];
-                $entity['fields'][$index]['label'] .= ' ' . $idField['title'];
-              }
-              // DAO fields: use title instead of label since it represents the id (title usually ends in ID but label does not)
-              else {
-                $entity['fields'][$index]['label'] = $field['title'];
-              }
               // Add the label field from the other entity to this entity's list of fields
               $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $labelField])[0] ?? NULL;
               if ($newField) {
