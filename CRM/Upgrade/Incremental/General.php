@@ -108,6 +108,14 @@ class CRM_Upgrade_Incremental_General {
       ]);
       $preUpgradeMessage .= '</p>';
     }
+    if (version_compare(CRM_Utils_System::version(), $latestVer, '<')) {
+      $preUpgradeMessage .= '<p>';
+      $preUpgradeMessage .= ts('This upgrade includes pre-release database upgrade steps up to %1. The released code version is %2. You should only continue if you know what you are doing.', [
+        1 => $latestVer,
+        2 => CRM_Utils_System::version(),
+      ]);
+      $preUpgradeMessage .= '</p>';
+    }
 
     // http://issues.civicrm.org/jira/browse/CRM-13572
     // Depending on how the code was upgraded, some sites may still have copies of old
