@@ -42,13 +42,6 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
    * which runs *after* this
    */
   public function postInstall() {
-
-    // Ensure users can login with username/password via authx.
-    Civi::settings()->set('authx_login_cred', array_unique(array_merge(
-      Civi::settings()->get('authx_login_cred'),
-      ['pass']
-    )));
-
     // Ensure default roles exist
     \Civi\Api4\Role::save(FALSE)
       ->setMatch(['name'])
