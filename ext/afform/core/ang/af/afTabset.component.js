@@ -11,6 +11,7 @@
     },
     bindings: {
       urlArg: '@',
+      orientation: '@',
       selectedTab: '=?',
       rememberSelection: '<',
       pageNavButtons: '<',
@@ -23,6 +24,10 @@
 
       this.$onInit = function() {
         $element.addClass('crm-tabset');
+        // Direction is carried by a class rather than written into the markup, so a theme
+        // styles both orientations from the same `.nav-tabs` rules it already has.
+        this.isVertical = this.orientation === 'vertical';
+        $element.addClass(this.isVertical ? 'crm-tab-v' : 'crm-tab-h');
 
         if (this.urlArg) {
           // Afforms are not routed (@see afCore.js), so `$bindToRoute` is unavailable
