@@ -155,6 +155,38 @@ EOHTML;
     $this->assertNull($this->getJobTitle($attacker), 'The caller must not be written to either');
   }
 
+  public static function verificationConfirmationProvider(): array {
+    return [
+      'message with field token' => [
+        ['verification_confirmation_type' => 'show_confirmation_message', 'verification_confirmation_message' => 'Thanks [Individual1.0.job_title]'],
+        ['message' => 'Thanks R&amp;D'],
+      ],
+      'redirect with field token' => [
+        ['verification_confirmation_type' => 'redirect_to_url', 'verification_redirect' => 'civicrm/thanks?title=[Individual1.0.job_title]'],
+        ['redirect' => 'civicrm/thanks?title=R%26D'],
+      ],
+      'empty message' => [
+        ['verification_confirmation_type' => 'show_confirmation_message', 'verification_redirect' => 'civicrm/unused'],
+        [],
+      ],
+    ];
+  }
+
+  /**
+   * @dataProvider verificationConfirmationProvider
+   */
+  public function testVerificationConfirmation(array $settings, array $expected): void {
+    Afform::update(FALSE)->addWhere('name', '=', $this->formName)->setValues($settings)->execute();
+    $submitter = $this->createTestRecord('Individual')['id'];
+    $submissionId = $this->submitAs($submitter, 'R&D');
+
+    $this->login(NULL);
+    $result = Afform::process(FALSE)->setName($this->formName)->setSubmissionId($submissionId)->execute()->single();
+
+    $this->assertSame($expected, array_intersect_key($result, array_flip(['message', 'redirect'])));
+    $this->assertSame('R&D', $this->getJobTitle($submitter));
+  }
+
   /**
    * Submit as the given contact, returning the id of the stored submission.
    */

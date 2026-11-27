@@ -39,18 +39,21 @@ class CRM_Afform_Page_Verify extends CRM_Core_Page {
           ->first();
 
         if (!empty($processResult['redirect'])) {
-          \CRM_Utils_System::redirect($processResult['redirect']);
+          $url = $processResult['redirect'];
+          if (str_starts_with($url, 'civicrm/')) {
+            $url = (string) \Civi::url('current://' . $url, 'a');
+          }
+          \CRM_Utils_System::redirect($url);
         }
 
-        if (isset($processResult['message'])) {
-          $this->assign('success_message', $processResult['message']);
-        }
+        $successMessage = $processResult['message'] ?? NULL;
 
         $verified = TRUE;
       }
     }
 
     $this->assign('verified', $verified);
+    $this->assign('success_message', $successMessage ?? NULL);
 
     parent::run();
   }

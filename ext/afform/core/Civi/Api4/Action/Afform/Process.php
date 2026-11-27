@@ -42,11 +42,11 @@ class Process extends AbstractProcessor {
     }
 
     // preprocess submitted values
-    $entityValues = $this->preprocessSubmittedValues($afformSubmissionData['data']);
+    $this->_entityValues = $this->preprocessSubmittedValues($afformSubmissionData['data']);
 
-    \CRM_Core_Transaction::create()->run(function () use ($entityValues, $afformSubmissionData) {
+    \CRM_Core_Transaction::create()->run(function () use ($afformSubmissionData) {
       // process and save various enities
-      $this->processFormData($entityValues);
+      $this->processFormData($this->_entityValues);
 
       // combine ids with existing data
       $submissionData = $this->combineValuesAndIds($afformSubmissionData['data'], $this->_entityIds);
@@ -60,7 +60,6 @@ class Process extends AbstractProcessor {
     });
     $this->dispatchSubmitted();
 
-    // Return ids plus token for uploading files
     foreach ($this->_entityIds as $key => $value) {
       $this->setResponseItem($key, $value);
     }
@@ -68,12 +67,14 @@ class Process extends AbstractProcessor {
     if (isset($this->_response['redirect']) || isset($this->_response['message'])) {
       // redirect / message is already set, ignore defaults
     }
-    elseif ($this->_afform['verification_confirmation_type'] === 'show_confirmation_message') {
-      $message = $this->replaceTokens($this->_afform['verification_confirmation_message']);
-      $this->setResponseItem('message', $message);
+    elseif (($this->_afform['verification_confirmation_type'] ?? NULL) === 'show_confirmation_message') {
+      if (!empty($this->_afform['verification_confirmation_message'])) {
+        $message = $this->replaceTokens($this->_afform['verification_confirmation_message']);
+        $this->setResponseItem('message', $message);
+      }
     }
-    elseif ($this->_afform['verification_redirect']) {
-      $redirect = $this->replaceTokens($this->_afform['verification_redirect']);
+    elseif (!empty($this->_afform['verification_redirect'])) {
+      $redirect = $this->replaceTokens($this->_afform['verification_redirect'], 'url');
       $this->setResponseItem('redirect', $redirect);
     }
 
