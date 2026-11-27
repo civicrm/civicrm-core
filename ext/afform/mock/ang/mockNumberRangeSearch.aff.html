@@ -1,4 +1,7 @@
 <div af-fieldset="">
   <af-field name="id" defn="{input_type: 'Number', search_range: true}" />
+  <af-field name="employer_id" defn="{input_type: 'Number', search_range: true, input_attrs: {min: -10, max: 0}}" />
+  <af-field name="primary_contact_id" defn="{input_type: 'Number', input_attrs: {min: 0, max: 10}}" />
+  <af-field name="legal_identifier" defn="{input_type: 'Range', input_attrs: {min: -10, max: 0}}" />
   <crm-search-display-table search-name="MockNumberRangeSearch" display-name="MockNumberRangeDisplay"></crm-search-display-table>
 </div>
