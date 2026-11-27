@@ -2359,12 +2359,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'payment_instrument_id:name' => 'Debit Card',
     ], $params);
     if (!is_numeric($params['payment_processor_type_id'])) {
-      // really the api should handle this through getoptions but it's not exactly api call so lets just sort it
-      //here
-      $params['payment_processor_type_id'] = $this->callAPISuccess('payment_processor_type', 'getvalue', [
-        'name' => $params['payment_processor_type_id'],
-        'return' => 'id',
-      ], 'integer');
+      $params['payment_processor_type_id:name'] = $params['payment_processor_type_id'];
+      unset($params['payment_processor_type_id']);
     }
     $result = $this->createTestEntity('PaymentProcessor', $params, $identifier);
     return $result['id'];
@@ -2471,7 +2467,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       ->execute();
     $this->membershipTypeCreate($membershipParams);
     //create a contribution so our membership & contribution don't both have id = 1
-    if ($this->callAPISuccess('Contribution', 'getcount') === 0) {
+    if (Contribution::get(FALSE)->selectRowCount()->execute()->count() === 0) {
       $this->contributionCreate([
         'contact_id' => $this->ids['Contact']['individual_0'],
         'is_test' => 1,
