@@ -72,6 +72,8 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
    * @return array
    *   array of Pcp if found
    * @throws \Civi\Core\Exception\DBQueryException
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public static function getPcpDashboardInfo(int $contactID): array {
     $query = '

@@ -91,6 +91,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of required dashboard settings,
    *                    null if no element offered
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public function getUserDashboardElement() {
     // no dashboard element for this component
@@ -106,6 +108,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
 
   /**
    * @return mixed
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public function getUserDashboardObject() {
     // no dashboard element for this component

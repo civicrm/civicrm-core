@@ -33,6 +33,8 @@ abstract class CRM_Core_Component_Info {
   /**
    * Name of the class (minus component namespace path)
    * of the component user dashboard plugin.
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   const COMPONENT_USERDASHBOARD_CLASS = 'Page_UserDashboard';
 
@@ -153,6 +155,8 @@ abstract class CRM_Core_Component_Info {
    * @return array|null
    *   collection of required dashboard settings,
    *                    null if no element offered
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   abstract public function getUserDashboardElement();
 
@@ -242,6 +246,8 @@ abstract class CRM_Core_Component_Info {
    *
    * @return mixed
    *   component's User Dashboard applet object
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public function getUserDashboardObject() {
     return $this->_instantiate(self::COMPONENT_USERDASHBOARD_CLASS);

@@ -16,6 +16,8 @@ use Civi\Api4\ContributionRecur;
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
+ *
+ * @deprecated will be replaced by core extension user_dashboard
  */
 class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 

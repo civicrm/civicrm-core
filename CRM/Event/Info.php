@@ -94,6 +94,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   /**
    * @inheritDoc
    * @return array
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public function getUserDashboardElement() {
     return [

@@ -13,6 +13,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
+ *
+ * @deprecated will be replaced by core extension user_dashboard
  */
 class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 

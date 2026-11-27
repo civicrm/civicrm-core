@@ -74,6 +74,8 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of required dashboard settings,
    *                    null if no element offered
+   *
+   * @deprecated will be replaced by core extension user_dashboard
    */
   public function getUserDashboardElement() {
     return [

@@ -17,6 +17,8 @@
 
 /**
  * This class is used to build User Dashboard
+ *
+ * @deprecated will be replaced by core extension user_dashboard
  */
 class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   public $_contactId;
