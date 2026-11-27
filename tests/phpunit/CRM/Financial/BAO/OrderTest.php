@@ -254,8 +254,6 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
     $this->assertSame('2006-12-21', $membership['end_date']);
-    // A membership payment should have been created for legacy compatibility.
-    $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
   }
 
   /**

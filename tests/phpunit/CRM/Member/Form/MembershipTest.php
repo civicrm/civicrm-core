@@ -1162,11 +1162,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ]);
 
     //Check if Membership Payment is recorded.
-    $this->callAPISuccessGetCount('MembershipPayment', [
-      'membership_id' => $membership['id'],
-      'contribution_id' => $contribution['id'],
-      'version' => 3,
-    ], 1);
+    $this->getMembershipContribution($membership['id'], $contribution['id']);
 
     // CRM-16992.
     $this->callAPISuccessGetCount('LineItem', [
@@ -1217,7 +1213,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $memberships = $this->callAPISuccess('Membership', 'get')['values'];
     $this->assertCount(2, $memberships);
     $this->callAPISuccessGetSingle('Contribution', ['financial_type_id' => $this->getFinancialTypeID('Donation')]);
-    $this->callAPISuccessGetCount('MembershipPayment', ['version' => 3], 2);
+    $this->assertCount(2, $this->getMembershipContributions());
     $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $lines);
     $this->assertSame('civicrm_membership', $lines[0]['entity_table']);
@@ -1478,10 +1474,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->testSubmitPayLaterWithBilling();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $this->assertEquals($membership['status_id'], array_search('Pending', $memStatus));
-    $contribution = $this->callAPISuccessGetSingle('MembershipPayment', [
-      'membership_id' => $membership['id'],
-      'version' => 3,
-    ]);
+    $contribution = $this->getMembershipContribution($membership['id']);
     $prevContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['contribution_id']]);
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $contribution['contribution_id'],
@@ -1634,8 +1627,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * CRM-20955, CRM-20966:
    * Test creating two memberships with inheritance via price set in the back end,
-   * checking that the correct primary & secondary memberships, contributions, line items
-   * & membership_payment records are created.
+   * checking that the correct primary & secondary memberships, contributions and line items
+   * are created.
    *
    * @throws \CRM_Core_Exception
    */
@@ -1675,13 +1668,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       $this->assertContains($membership['owner_membership_id'], $primaryMembershipIds, "Inherited membership owner_membership_id should be the id of a primary membership.");
     }
 
-    // CRM-20966: check that the correct membership contribution, line items
-    // & membership_payment records were created for the organization.
+    // CRM-20966: check that the correct membership contribution and line items
+    // were created for the organization.
     $contributionResult = $this->callAPISuccess('contribution', 'get', [
       'contact_id' => $orgID,
       'sequential' => 1,
       'api.line_item.get' => [],
-      'api.membership_payment.get' => [],
     ]);
     $this->assertSame(1, $contributionResult['count'], "One contribution should have been created for the organization's memberships.");
 
@@ -1689,12 +1681,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     foreach ($contributionResult['values'][0]['api.line_item.get']['values'] as $lineItem) {
       $this->assertSame('civicrm_membership', $lineItem['entity_table'], "Membership line item's entity_table should be 'civicrm_membership'.");
       $this->assertContains($lineItem['entity_id'], $primaryMembershipIds, "Membership line item's entity_id should be the id of a primary membership.");
-    }
-
-    $this->assertSame(2, $contributionResult['values'][0]['api.membership_payment.get']['count'], "2 membership payment records should have been created for the organization's memberships.");
-    foreach ($contributionResult['values'][0]['api.membership_payment.get']['values'] as $membershipPayment) {
-      $this->assertEquals($contributionResult['values'][0]['id'], $membershipPayment['contribution_id'], "membership payment's contribution ID should be the ID of the organization's membership contribution.");
-      $this->assertContains($membershipPayment['membership_id'], $primaryMembershipIds, "membership payment's membership ID should be the ID of a primary membership.");
     }
     // Check for orphan line items.
     $this->callAPISuccessGetCount('LineItem', [], 2);

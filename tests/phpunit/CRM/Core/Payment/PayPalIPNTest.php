@@ -193,7 +193,6 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['values'][1]['id'],
       'entity_table' => 'civicrm_membership',
     ]);
-    $this->callAPISuccessGetSingle('membership_payment', ['contribution_id' => $contribution['values'][1]['id']]);
   }
 
   /**

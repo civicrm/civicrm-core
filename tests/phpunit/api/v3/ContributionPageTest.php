@@ -168,7 +168,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     }
 
     //Membership should be in Pending state.
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['version' => 3, 'return' => ['membership_id', 'contribution_id']]);
+    $membershipPayment = $this->getMembershipContribution();
     $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions['values']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id'], 'return' => ['status_id', 'contact_id']]);
     $pendingStatus = $this->callAPISuccessGetSingle('MembershipStatus', ['return' => ['id'], 'name' => 'Pending']);
@@ -272,7 +272,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(2, $contributions);
     $this->assertSame('88.00', $contributions[0]['total_amount']);
     $this->assertSame('50.00', $contributions[1]['total_amount']);
-    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'return' => ['membership_id', 'contribution_id']]);
+    $membershipPayment = $this->getMembershipContribution();
     $this->assertEquals($contributions[1]['id'], $membershipPayment['contribution_id']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id'], 'return' => 'contact_id']);
     $this->assertEquals($membership['contact_id'], $contributions[1]['contact_id']);
@@ -373,7 +373,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(2, $contributions);
 
     // Check the recurring contribution is linked to the membership payment.
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['version' => 3]);
+    $membershipPayment = $this->getMembershipContribution();
     $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertNotEmpty($contributions[$membershipPayment['contribution_id']]['contribution_recur_id']);
     $this->callAPISuccess('ContributionRecur', 'getsingle');
@@ -682,7 +682,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(2, $contributions, print_r($contributions, TRUE));
     $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1, 'return' => 'line_total'])['values'];
     $this->assertEquals($contributionAmount, $lines[0]['line_total']);
-    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'return' => ['contribution_id', 'membership_id']]);
+    $membershipPayment = $this->getMembershipContribution();
     $this->assertArrayKeyExists($membershipPayment['contribution_id'], $contributions);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id'], 'return' => 'contact_id']);
     $this->assertEquals($membership['contact_id'], $contributions[$membershipPayment['contribution_id']]['contact_id']);

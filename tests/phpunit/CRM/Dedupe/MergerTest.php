@@ -1994,6 +1994,7 @@ WHERE
    * the legacy MembershipPayment records, onto the surviving membership.
    */
   public function testMergeMembershipsMovesLineItems(): void {
+    Civi::settings()->set('member_use_civicrm_membership_payment_table', TRUE);
     [$mainID, $otherID] = $this->createMergePair();
     $membershipTypeID = $this->membershipTypeCreate();
     $mainMembershipID = $this->contactMembershipCreate([
@@ -2082,6 +2083,7 @@ WHERE
    * A contribution that paid for both memberships must not break the merge.
    */
   public function testMergeMembershipsWithSharedContribution(): void {
+    Civi::settings()->set('member_use_civicrm_membership_payment_table', TRUE);
     [$mainID, $otherID] = $this->createMergePair();
     $membershipTypeID = $this->membershipTypeCreate();
     $mainMembershipID = $this->contactMembershipCreate([
@@ -2122,7 +2124,7 @@ WHERE
 
     $this->mergeContactsMergingMemberships($mainID, $otherID);
 
-    $this->assertEquals([$mainMembershipID], $this->getMembershipPaymentMembershipIDs($contributionID));
+    $this->assertEquals($mainMembershipID, $this->getMembershipLineItemEntityID($contributionID));
     $this->assertEquals([$mainMembershipID], $this->getMembershipIDs([$mainMembershipID, $otherMembershipID]));
   }
 
