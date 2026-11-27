@@ -186,9 +186,11 @@
 
         editor.afform.permission_operator = editor.afform.permission_operator || 'AND';
         // set redirect to url as default if not set
-        if (!editor.afform.confirmation_type && editor.meta.afform_fields.confirmation_type.options.length > 0) {
-          editor.afform.confirmation_type = editor.meta.afform_fields.confirmation_type.options[0].id;
-        }
+        ['confirmation_type', 'verification_confirmation_type'].forEach((field) => {
+          if (!editor.afform[field] && editor.meta.afform_fields[field].options.length > 0) {
+            editor.afform[field] = editor.meta.afform_fields[field].options[0].id;
+          }
+        });
 
         // Initialize undo history
         undoAction = 'initialLoad';
