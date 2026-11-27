@@ -318,7 +318,9 @@ class Authenticator extends AutoService {
    * @throws \Exception
    */
   protected function login(AuthenticatorTarget $tgt) {
-    if ($this->checkAlreadyLoggedIn($tgt)) {
+    $alreadyLoggedIn = $this->checkAlreadyLoggedIn($tgt);
+    // Secret-link tokens grant extra access, so apply them (for this request only) even if the same user is logged in.
+    if ($alreadyLoggedIn && $tgt->flow !== 'afformpage') {
       // Already logged in. Post-condition met - but by unusual means.
       \CRM_Core_Session::singleton()->set('authx', $tgt->createAlreadyLoggedIn());
       return;
@@ -339,7 +341,7 @@ class Authenticator extends AutoService {
     if ($tgt->userId && $tgt->useSession) {
       $this->authxUf->loginSession($tgt->userId);
     }
-    if ($tgt->userId && !($tgt->useSession)) {
+    if ($tgt->userId && !($tgt->useSession) && !$alreadyLoggedIn) {
       $this->authxUf->loginStateless($tgt->userId);
     }
 
