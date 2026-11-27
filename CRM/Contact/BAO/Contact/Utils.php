@@ -201,13 +201,17 @@ WHERE  id IN ( $idString )
    * @param int $contactID
    * @param string $inputCheck
    *   Checksum to match against.
+   * @param int|null $asOf
+   *   Unix timestamp to check expiry against, e.g. when a queued request was
+   *   made. Defaults to now. Only pass a time from a trusted source: an
+   *   earlier time could accept checksums that have since expired.
    *
    * @return bool
    *   true if valid, else false
    *
    * @throws \CRM_Core_Exception
    */
-  public static function validChecksum($contactID, $inputCheck) {
+  public static function validChecksum($contactID, $inputCheck, ?int $asOf = NULL) {
     // Allow a hook to invalidate checksums
     $invalid = FALSE;
     CRM_Utils_Hook::invalidateChecksum($contactID, $inputCheck, $invalid);
@@ -234,8 +238,7 @@ WHERE  id IN ( $idString )
     }
 
     // checksum matches so now check timestamp
-    $now = time();
-    return ($inputTS + ($inputLF * 60 * 60) >= $now);
+    return ($inputTS + ($inputLF * 60 * 60) >= ($asOf ?? time()));
   }
 
   /**
