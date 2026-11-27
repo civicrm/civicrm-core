@@ -550,13 +550,24 @@ class CRM_Utils_File {
    * @param string $dir
    *   The directory to be secured.
    * @param bool $overwrite
+   *   Replace an existing .htaccess.
+   *
+   * @throws \CRM_Core_Exception
+   *   If the .htaccess has to be written and cannot be.
    */
   public static function restrictAccess($dir, $overwrite = FALSE) {
-    // note: empty value for $dir can play havoc, since that might result in putting '.htaccess' to root dir
-    // of site, causing site to stop functioning.
-    // FIXME: we should do more checks here -
-    if (!empty($dir) && is_dir($dir)) {
-      $htaccess = <<<HTACCESS
+    // An empty $dir would put the .htaccess into the site root and break the site.
+    if (empty($dir) || !is_dir($dir)) {
+      return;
+    }
+    $file = self::addTrailingSlash($dir) . '.htaccess';
+    if (!$overwrite && file_exists($file)) {
+      return;
+    }
+    if (!is_writable(file_exists($file) ? $file : $dir)) {
+      throw new \CRM_Core_Exception("Cannot write {$file}: not writable");
+    }
+    $htaccess = <<<HTACCESS
 <Files "*">
 # OpenLiteSpeed 1.4.38+
   <IfModule !authz_core_module>
@@ -576,13 +587,8 @@ class CRM_Utils_File {
 </Files>
 
 HTACCESS;
-      $file = $dir . '.htaccess';
-      if ($overwrite || !file_exists($file)) {
-        $writeResult = file_put_contents($file, $htaccess);
-        if ($writeResult === FALSE) {
-          throw new \CRM_Core_Exception("Error writing {$file}");
-        }
-      }
+    if (file_put_contents($file, $htaccess) === FALSE) {
+      throw new \CRM_Core_Exception("Error writing {$file}");
     }
   }
 

@@ -734,6 +734,43 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertSame($afterModificationCheck, CRM_Utils_File::isExtensionSafe($extension));
   }
 
+  public function testRestrictAccessWithoutTrailingSlash(): void {
+    $dir = rtrim($this->createTempDir('restrict-'), '/');
+
+    CRM_Utils_File::restrictAccess($dir);
+
+    $this->assertStringContainsString('Require all denied', file_get_contents("$dir/.htaccess"));
+    $this->assertFileDoesNotExist("$dir.htaccess");
+  }
+
+  public function testRestrictAccessOverwrite(): void {
+    $dir = $this->createTempDir('restrict-');
+    file_put_contents("$dir.htaccess", 'custom');
+
+    CRM_Utils_File::restrictAccess($dir);
+    $this->assertSame('custom', file_get_contents("$dir.htaccess"));
+
+    CRM_Utils_File::restrictAccess($dir, TRUE);
+    $this->assertStringContainsString('Require all denied', file_get_contents("$dir.htaccess"));
+  }
+
+  public function testRestrictAccessReadOnlyDir(): void {
+    $dir = $this->createTempDir('restrict-');
+    chmod($dir, 0555);
+    try {
+      $this->assertFalse(is_writable($dir), 'The test needs a user that honours directory permissions.');
+      CRM_Utils_File::restrictAccess($dir);
+      $this->fail('restrictAccess() should throw for a read-only directory');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertSame("Cannot write {$dir}.htaccess: not writable", $e->getMessage());
+    }
+    finally {
+      chmod($dir, 0755);
+    }
+    $this->assertFileDoesNotExist("$dir.htaccess");
+  }
+
   public function testCleanDir(): void {
     $a_dir = sys_get_temp_dir() . '/testCleanDir';
     system('rm -rf ' . escapeshellarg($a_dir));
