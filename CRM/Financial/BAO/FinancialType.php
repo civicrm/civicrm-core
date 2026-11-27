@@ -98,7 +98,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       return Civi::$statics[__CLASS__][$key];
     }
     try {
-      $types = EntityFinancialAccount::get($checkPermissions)
+      // Skip the API permission check: EntityFinancialAccount 'get' requires
+      // 'access CiviContribute', which users managing event price sets may not
+      // have (dev/core#6148). Financial type ACLs are applied below instead.
+      $types = EntityFinancialAccount::get(FALSE)
         ->addWhere('account_relationship:name', '=', 'Income Account is')
         ->addWhere('entity_table', '=', 'civicrm_financial_type')
         ->addSelect('entity_id', 'financial_type.name')
@@ -108,7 +111,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
           'financial_type.id',
         ])
         ->addWhere('financial_type.is_active', '=', '1')
-        ->execute()->indexBy('entity_id');
+        ->execute()->indexBy('entity_id')->getArrayCopy();
+      if ($checkPermissions) {
+        $availableTypes = [];
+        self::getAvailableFinancialTypes($availableTypes, CRM_Core_Action::VIEW, FALSE, TRUE);
+        $types = array_intersect_key($types, $availableTypes);
+      }
       Civi::$statics[__CLASS__][$key] = [];
       foreach ($types as $type) {
         Civi::$statics[__CLASS__][$key][$type['entity_id']] = $type['financial_type.name'];
