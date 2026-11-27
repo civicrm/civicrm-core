@@ -168,20 +168,48 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
    * @internal
    */
   public static function deleteMembershipPayment(int $membershipId, bool $preserveContrib = FALSE): void {
+    $contributionIDs = $preserveContrib ? [] : self::getContributionIDsForMembership($membershipId);
+
     $membershipPayment = new CRM_Member_DAO_MembershipPayment();
     $membershipPayment->membership_id = $membershipId;
     $membershipPayment->find();
-    $deleteContributions = [];
-
     while ($membershipPayment->fetch()) {
       self::deleteRecord(['id' => $membershipPayment->id]);
-      if (!$preserveContrib && $membershipPayment->contribution_id) {
-        $deleteContributions[] = ['id' => $membershipPayment->contribution_id];
+    }
+
+    if ($contributionIDs) {
+      CRM_Contribute_BAO_Contribution::deleteRecords(array_map(fn($id) => ['id' => $id], $contributionIDs));
+    }
+  }
+
+  /**
+   * Get the contributions that paid for a membership.
+   *
+   * Recurring templates are excluded: they are not payments, and no legacy
+   * record is written for them.
+   *
+   * @param int $membershipID
+   *
+   * @return int[]
+   */
+  private static function getContributionIDsForMembership(int $membershipID): array {
+    $contributionIDs = LineItem::get(FALSE)
+      ->addSelect('contribution_id')
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $membershipID)
+      ->addWhere('contribution_id', 'IS NOT NULL')
+      ->addWhere('contribution_id.is_template', '=', FALSE)
+      ->execute()
+      ->column('contribution_id');
+    if (CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()) {
+      $legacyPayments = new CRM_Member_DAO_MembershipPayment();
+      $legacyPayments->membership_id = $membershipID;
+      $legacyPayments->find();
+      while ($legacyPayments->fetch()) {
+        $contributionIDs[] = $legacyPayments->contribution_id;
       }
     }
-    if ($deleteContributions) {
-      CRM_Contribute_BAO_Contribution::deleteRecords($deleteContributions);
-    }
+    return array_values(array_unique(array_map('intval', array_filter($contributionIDs))));
   }
 
   /**
