@@ -53,6 +53,9 @@ class WebEntrypoint {
     // Remove empty path segments, a//b becomes equivalent to a/b
     $args = array_values(array_filter($args));
 
+    // Redirect urls from WP mailings
+    self::wpredirect($parts[0] ?? '', $parts[1] ?? '');
+
     // if request is for any path that doesn't start civicrm,
     // throw 404 before we waste any effort doing anything else
     // (may well be spam)
@@ -93,6 +96,26 @@ class WebEntrypoint {
 
     // Render the page
     print \CRM_Core_Invoke::invoke($args);
+  }
+
+  /**
+   * Redirect URLs from old mailings sent before migration from WordPress
+   *
+   * @param string $path
+   * @param string $params
+   * @return void
+   */
+  public static function wpredirect($path, $params) {
+    if (preg_match('@^/wp-content/uploads/civicrm/persist/contribute/images/(.*)@', $path, $matches)) {
+      \CRM_Utils_System::redirect('/public/media/images/' . $matches[1]);
+    }
+    if (preg_match('@^/wp-content/uploads/civicrm/(mosaico_tpl/.*)@', $path, $matches)) {
+      \CRM_Utils_System::redirect('/public/' . $matches[1]);
+    }
+    if ($path === '/civicrm/' && $params &&
+      preg_match('@^civiwp=CiviCRM\&q=civicrm/mailing/url\&(u=\d+\&qid=\d+)@', $params, $matches)) {
+      \CRM_Utils_System::redirect('/civicrm/mailing/url?' . $matches[1]);
+    }
   }
 
   public static function installer(): void {
