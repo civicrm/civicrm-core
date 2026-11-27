@@ -87,18 +87,28 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     $query['casEntityIdField'] = 'e.id';
     $query['casContactTableAlias'] = NULL;
 
-    // Leaving this in case of legacy databases
-    $query['casDateField'] = str_replace('membership_', 'e.', ($schedule->start_action_date ?? ''));
+    // With an absolute trigger date there is no start_action_date, so fall back to
+    // the "Until" date field, which is what the repeat end filter is measured from.
+    $dateField = $schedule->start_action_date ?: ($schedule->end_date ?? '');
 
-    // Date field needs a proper alias
-    if (!(str_starts_with($query['casDateField'], 'e.') || str_starts_with($query['casDateField'], 'cr.'))) {
-      if ($query['casDateField'] == 'next_sched_contribution_date') {
-        // Alias the Auto-renew
-        $query['casDateField'] = 'cr.' . $query['casDateField'];
-      }
-      else {
-        // Otherwise alias all other Membership fields
-        $query['casDateField'] = 'e.' . $query['casDateField'];
+    if ($dateField === '' && $schedule->absolute_date) {
+      // Neither field is set, so the best reference left is the absolute date itself.
+      $query['casDateField'] = "'" . CRM_Utils_Type::escape($schedule->absolute_date, 'String') . "'";
+    }
+    else {
+      // Leaving this in case of legacy databases
+      $query['casDateField'] = str_replace('membership_', 'e.', $dateField);
+
+      // Date field needs a proper alias
+      if (!(str_starts_with($query['casDateField'], 'e.') || str_starts_with($query['casDateField'], 'cr.'))) {
+        if ($query['casDateField'] == 'next_sched_contribution_date') {
+          // Alias the Auto-renew
+          $query['casDateField'] = 'cr.' . $query['casDateField'];
+        }
+        else {
+          // Otherwise alias all other Membership fields
+          $query['casDateField'] = 'e.' . $query['casDateField'];
+        }
       }
     }
 
