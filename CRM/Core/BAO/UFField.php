@@ -868,7 +868,8 @@ SELECT  id
 
     if (CRM_Core_Permission::access('CiviCase')) {
       $caseFields = CRM_Case_BAO_Query::getFields(TRUE);
-      $caseFields = array_merge($caseFields, CRM_Core_BAO_CustomField::getFieldsForImport('Case'));
+      // Include multi-record ("Tab with table") case fields too.
+      $caseFields = array_merge($caseFields, CRM_Core_BAO_CustomField::getFieldsForImport('Case', FALSE, FALSE, FALSE, TRUE, TRUE));
       if ($caseFields) {
         // Remove fields not supported by profiles
         CRM_Utils_Array::remove($caseFields,

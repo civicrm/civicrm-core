@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\CustomGroup;
 use Civi\Api4\UFGroup;
 use Civi\Test\Invasive;
 
@@ -262,7 +263,54 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     $this->relabelMailingListGroupType('Mailing List');
     Civi::settings()->revert('profile_double_optin');
     $this->quickCleanup(['civicrm_group']);
+    if ($this->getTestEntityID('UFGroup', 'case_records')) {
+      UFGroup::delete(FALSE)->addWhere('id', '=', $this->getTestEntityID('UFGroup', 'case_records'))->execute();
+    }
+    if ($this->getTestEntityID('CustomGroup', 'case_records')) {
+      CustomGroup::delete(FALSE)->addWhere('id', '=', $this->getTestEntityID('CustomGroup', 'case_records'))->execute();
+    }
+    unset(Civi::$statics['UFFieldsFlat']);
     parent::tearDown();
+  }
+
+  /**
+   * A profile holding a multi-record ("Tab with table") case field loads it.
+   *
+   * The field also counts towards the profile type, which is Case.
+   */
+  public function testMultiRecordCaseFieldIsLoadedAndTypesTheProfile(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->createTestEntity('CustomGroup', [
+      'title' => 'Case records',
+      'extends' => 'Case',
+      'is_multiple' => TRUE,
+      'style' => 'Tab with table',
+    ], 'case_records');
+    $fieldName = 'custom_' . $this->createTestEntity('CustomField', [
+      'custom_group_id' => $this->getTestEntityID('CustomGroup', 'case_records'),
+      'label' => 'Record title',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ])['id'];
+    unset(Civi::$statics['UFFieldsFlat']);
+    $ufGroupID = $this->createTestEntity('UFGroup', [
+      'title' => 'Case records profile',
+      'is_active' => TRUE,
+    ], 'case_records')['id'];
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => $fieldName,
+      'field_type' => 'Case',
+      'label' => 'Record title',
+      'is_active' => TRUE,
+    ]);
+
+    $fields = CRM_Core_BAO_UFGroup::getFields($ufGroupID, FALSE, NULL, NULL, NULL, TRUE, NULL, TRUE);
+
+    $this->assertSame([$fieldName], array_keys($fields));
+    $this->assertSame('Case', $fields[$fieldName]['field_type']);
+    $this->assertSame(['Case' => 'Case'], CRM_Core_BAO_UFGroup::calculateGroupType($ufGroupID));
+    $this->assertSame('Case', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $ufGroupID, 'group_type'));
   }
 
 }

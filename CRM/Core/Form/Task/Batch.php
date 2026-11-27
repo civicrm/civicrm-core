@@ -95,9 +95,17 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
 
     // remove file type field and then limit fields
-    $suppressFields = FALSE;
+    $suppressFields = $suppressMultiRecordFields = FALSE;
     $removeHtmlTypes = ['File'];
     foreach ($this->_fields as $name => $field) {
+      // A row holds one value per field, so a multi-record field (several
+      // records per entity, e.g. a case's "Tab with table" set) can't be
+      // updated here.
+      if (CRM_Core_BAO_CustomField::getKeyID($name) && CRM_Core_BAO_CustomField::isMultiRecordField($name)) {
+        $suppressMultiRecordFields = TRUE;
+        unset($this->_fields[$name]);
+        continue;
+      }
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removeHtmlTypes)
       ) {
@@ -160,6 +168,9 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
     $buttonName = $this->controller->getButtonName('submit');
     if ($suppressFields && $buttonName != '_qf_Batch_next') {
       CRM_Core_Session::setStatus(ts("File type fields in the selected profile are not supported for Update multiple %1s", [1 => $this::$entityShortname]), ts('Unsupported Field Type'), 'error');
+    }
+    if ($suppressMultiRecordFields && $buttonName != '_qf_Batch_next') {
+      CRM_Core_Session::setStatus(ts("Multi-record fields in the selected profile are not supported for Update multiple %1s", [1 => $this::$entityShortname]), ts('Unsupported Field Type'), 'error');
     }
 
     $this->addDefaultButtons(ts('Update'));
