@@ -812,7 +812,7 @@ if (!CRM.vars) CRM.vars = {};
             callback(multiple ? existing : existing[0]);
             $el.trigger('initSelectionComplete');
           } else {
-            var params = $.extend({quickEdit: !!select2Options.quickEdit}, getApiParams(), {ids: idsNeeded});
+            var params = $.extend({quickEdit: !!select2Options.quickEdit}, getApiParams(), {ids: idsNeeded, currentValues: true});
             CRM.api4(entityName, 'autocomplete', params).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
               $el.trigger('initSelectionComplete');

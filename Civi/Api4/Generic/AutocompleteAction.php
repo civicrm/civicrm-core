@@ -24,6 +24,8 @@ use Civi\Core\Event\GenericHookEvent;
  * @method string getInput()
  * @method $this setIds(array $ids) Set array of ids.
  * @method array getIds()
+ * @method $this setCurrentValues(bool $currentValues) Set whether ids are the field's current values.
+ * @method bool getCurrentValues()
  * @method $this setSearchField(string $searchField) Set searchField.
  * @method string getSearchField()
  * @method $this setFormName(string $formName) Set formName.
@@ -56,6 +58,13 @@ class AutocompleteAction extends AbstractAction {
    * @var array
    */
   protected $ids;
+
+  /**
+   * Whether `ids` are the field's current values, loaded for display, not validation
+   *
+   * @var bool
+   */
+  protected $currentValues = FALSE;
 
   /**
    * Name of field currently being searched

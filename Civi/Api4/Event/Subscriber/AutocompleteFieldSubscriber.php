@@ -60,22 +60,30 @@ class AutocompleteFieldSubscriber {
           'where' => [['name', '=', $fieldName]],
         ])->single();
 
-        // Auto-add filters defined in schema
-        foreach ($fieldSpec['input_attrs']['filter'] ?? [] as $key => $value) {
-          $apiRequest->addFilter($key, $value);
-        }
-
-        // Auto-add raw where-clauses defined in schema (e.g. a custom field's "Advanced Filter"
-        // pasted in as a where-clause instead of the simpler flat field=value syntax).
-        // `input_attrs.where` is populated by EntityMetadataBase::getCustomFields() from the
-        // raw JSON - it's never literally present in what the user typed.
-        foreach ($fieldSpec['input_attrs']['where'] ?? [] as $clause) {
-          $apiRequest->addWhere($clause);
-        }
-
         // Use FK key from fieldSpec, e.g. custom Autocomplete field keys by 'value' not 'id'
         if (!$apiRequest->getKey() && !empty($fieldSpec['fk_column'])) {
           $apiRequest->setKey($fieldSpec['fk_column']);
+        }
+
+        // Schema filters limit which entities can be selected, but a field's current value should
+        // still be shown — except when permission checks are off (e.g. Afform FBAC), where we can't
+        // trust the values from the client, or when we aren't looking up by id (e.g. option values),
+        // where the filters are necessary (e.g. the option group).
+        if (!$apiRequest->getCurrentValues() || !$apiRequest->getIds() || !$apiRequest->getCheckPermissions()
+          || !in_array($apiRequest->getKey(), [NULL, '', CoreUtil::getIdFieldName($apiRequest->getEntityName())], TRUE)
+        ) {
+          // Auto-add filters defined in schema
+          foreach ($fieldSpec['input_attrs']['filter'] ?? [] as $key => $value) {
+            $apiRequest->addFilter($key, $value);
+          }
+
+          // Auto-add raw where-clauses defined in schema (e.g. a custom field's "Advanced Filter"
+          // pasted in as a where-clause instead of the simpler flat field=value syntax).
+          // `input_attrs.where` is populated by EntityMetadataBase::getCustomFields() from the
+          // raw JSON - it's never literally present in what the user typed.
+          foreach ($fieldSpec['input_attrs']['where'] ?? [] as $clause) {
+            $apiRequest->addWhere($clause);
+          }
         }
 
         if ($formType === 'qf') {
