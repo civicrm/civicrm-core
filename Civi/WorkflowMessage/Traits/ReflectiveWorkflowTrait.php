@@ -190,10 +190,34 @@ trait ReflectiveWorkflowTrait {
    * @see \Civi\WorkflowMessage\WorkflowMessageInterface::validate()
    */
   public function validate(): array {
-    $props = $this->export('modelProps');
+    $errors = [];
+    try {
+      $props = $this->export('modelProps');
+    }
+    catch (\Throwable $e) {
+      // An unpopulated model is what validate() is asked to describe, but
+      // export() runs every getter in one go, so a getter that cannot cope
+      // with its own id being unset takes the whole call down. Read the
+      // properties one at a time instead and report the ones that fail.
+      $props = [];
+      foreach ($this->getFieldsByFormat('modelProps') as $key => $field) {
+        /** @var \Civi\WorkflowMessage\FieldSpec $field */
+        $getter = 'get' . ucfirst($field->getName());
+        try {
+          \CRM_Utils_Array::pathSet($props, explode('.', $key), $this->$getter());
+        }
+        catch (\Throwable $fieldException) {
+          $errors[] = [
+            'severity' => 'error',
+            'fields' => [$field->getName()],
+            'name' => 'unreadable',
+            'message' => ts('Field %1 could not be read: %2', [1 => $field->getName(), 2 => $fieldException->getMessage()]),
+          ];
+        }
+      }
+    }
     $fields = $this->getFields();
 
-    $errors = [];
     foreach ($fields as $fieldName => $fieldSpec) {
       /** @var \Civi\WorkflowMessage\FieldSpec $fieldSpec */
       $fieldValue = $props[$fieldName] ?? NULL;
