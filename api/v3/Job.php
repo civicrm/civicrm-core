@@ -242,6 +242,7 @@ function _civicrm_api3_job_send_reminder(&$params) {
  *                        sendmail - Boolean - should email be sent?, required
  *                        instanceId - Integer - the report instance ID
  *                        resetVal - Integer - should we reset form state (always true)?
+ *                        skip_empty - Boolean - skip sending email if report has no rows
  *
  * @return array
  */
@@ -255,6 +256,44 @@ function civicrm_api3_job_mail_report($params) {
   else {
     return civicrm_api3_create_error($result['messages']);
   }
+}
+
+/**
+ * Adjust Metadata for mail_report action.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_job_mail_report_spec(&$params) {
+  $params['instanceId'] = [
+    'title' => 'Report Instance ID',
+    'description' => 'ID of the report instance to email',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
+  ];
+  $params['format'] = [
+    'title' => 'Output Format',
+    'description' => 'Report output format (e.g. pdf, csv, print). Defaults to pdf.',
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.aliases' => ['output'],
+  ];
+  $params['sendmail'] = [
+    'title' => 'Send Email',
+    'description' => 'Whether to send the report email',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => TRUE,
+  ];
+  $params['reset'] = [
+    'title' => 'Reset',
+    'description' => 'Whether to reset report form state',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => TRUE,
+  ];
+  $params['skip_empty'] = [
+    'title' => 'Skip Empty Report',
+    'description' => 'Do not send email if the report has no rows',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => FALSE,
+  ];
 }
 
 /**

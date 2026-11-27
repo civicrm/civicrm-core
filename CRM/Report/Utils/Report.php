@@ -431,6 +431,7 @@ WHERE  inst.report_id = %1";
     // hack for now, CRM-8358
     $_REQUEST['instanceId'] = $instanceId;
     $_REQUEST['sendmail'] = $params['sendmail'] ?? 1;
+    $_REQUEST['skip_empty'] = !empty($params['skip_empty']) ? 1 : 0;
 
     // if cron is run from terminal --output is reserved, and therefore we would provide another name 'format'
     $_REQUEST['output'] = $params['format'] ?? $params['output'] ?? 'pdf';

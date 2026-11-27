@@ -436,6 +436,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_sendmail;
 
   /**
+   * @var bool
+   */
+  protected bool $_skipEmpty = FALSE;
+
+  /**
    * @var int
    */
   protected $_chartId;
@@ -2993,6 +2998,12 @@ class CRM_Report_Form extends CRM_Core_Form {
         NULL
       );
 
+    $this->_skipEmpty = (bool) CRM_Utils_Request::retrieve(
+      'skip_empty',
+      'Boolean',
+      NULL
+    );
+
     if ($this->_sendmail && !$this->_outputMode) {
       // If we're here from the mail_report job, then the default there gets
       // set to pdf before we get here, but if we're somehow here and sending
@@ -3688,6 +3699,12 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
     else {
       if ($this->_sendmail) {
+        if ($this->_skipEmpty) {
+          $checkRows = $rows ?? $this->getTemplate()->getTemplateVars('rows');
+          if (empty($checkRows)) {
+            return;
+          }
+        }
         $this->sendEmail();
       }
       elseif (!empty($this->outputHandler)) {
