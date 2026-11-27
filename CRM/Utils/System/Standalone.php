@@ -265,6 +265,19 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       \Civi::log()->warning('Non-array passed to appendBreadCrumb');
       return;
     }
+    // Substitute %%cid%% / %%mid%% tokens from menu path_arguments, as the
+    // other CMS integrations do (e.g. the Mailing Report breadcrumb).
+    foreach ($breadcrumbs as &$crumb) {
+      if (!empty($crumb['url']) && stripos($crumb['url'], 'id%%')) {
+        foreach (['cid', 'mid'] as $a) {
+          $val = CRM_Utils_Request::retrieve($a, 'Positive');
+          if ($val) {
+            $crumb['url'] = str_ireplace("%%{$a}%%", $val, $crumb['url']);
+          }
+        }
+      }
+    }
+    unset($crumb);
     $allCrumbs = array_merge(\Civi::$statics[__CLASS__]['breadcrumb'] ?? [], $breadcrumbs);
     \Civi::$statics[__CLASS__]['breadcrumb'] = $allCrumbs;
     CRM_Core_Smarty::singleton()->assign('breadcrumb', array_values($allCrumbs));
