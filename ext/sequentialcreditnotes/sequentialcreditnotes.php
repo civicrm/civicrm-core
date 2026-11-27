@@ -50,11 +50,12 @@ function sequentialcreditnotes_create_credit_note_id() {
   do {
     $creditNoteNum++;
     $creditNoteId = Civi::settings()->get('credit_notes_prefix') . '' . $creditNoteNum;
-    $result = civicrm_api3('Contribution', 'getcount', [
-      'sequential' => 1,
-      'creditnote_id' => $creditNoteId,
-    ]);
-  } while ($result > 0);
+    $existingCount = Contribution::get(FALSE)
+      ->addWhere('creditnote_id', '=', $creditNoteId)
+      ->selectRowCount()
+      ->execute()
+      ->count();
+  } while ($existingCount > 0);
 
   return $creditNoteId;
 }
