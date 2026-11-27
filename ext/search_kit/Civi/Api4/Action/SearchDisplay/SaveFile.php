@@ -62,7 +62,7 @@ class SaveFile extends AbstractRunAction {
     $this->preprocessLinks();
 
     // Displays are only exportable if they have actions enabled
-    if (empty($settings['actions'])) {
+    if ($this->checkPermissions && empty($settings['actions'])) {
       \CRM_Utils_System::permissionDenied();
     }
 

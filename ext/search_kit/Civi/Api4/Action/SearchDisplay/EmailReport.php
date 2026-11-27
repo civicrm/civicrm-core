@@ -28,7 +28,6 @@ class EmailReport extends SaveFile {
    * The ID of the message template to be used for the email.
    *
    * @var int
-   * @required
    */
   protected $templateID;
 
@@ -68,10 +67,11 @@ class EmailReport extends SaveFile {
       $contactIDs = explode(',', $this->contactID);
 
       $messageTemplates = new \CRM_Core_DAO_MessageTemplate();
-      $messageTemplates->id = $this->templateID;
-
-      if (!$messageTemplates->find(TRUE)) {
-        throw new \API_Exception('Could not find template with ID: ' . $this->templateID);
+      if (!empty($this->templateID)) {
+        $messageTemplates->id = $this->templateID;
+        if (!$messageTemplates->find(TRUE)) {
+          throw new \API_Exception('Could not find template with ID: ' . $this->templateID);
+        }
       }
 
       [$defaultFromName, $defaultFromEmail] = \CRM_Core_BAO_Domain::getNameAndEmail();
@@ -108,8 +108,10 @@ class EmailReport extends SaveFile {
           'toEmail' => $toEmail,
           'messageTemplate' => [
             'msg_subject' => $this->subject,
+            'msg_text' => $messageTemplates->msg_text ?? \CRM_Search_ExtensionUtil::ts('Please find attached the %1 report.', [1 => $this->reportName]),
+            'msg_html' => $messageTemplates->msg_html ?? ('<p>' . \CRM_Search_ExtensionUtil::ts('Please find attached the %1 report.', [1 => htmlspecialchars($this->reportName)]) . '</p>'),
           ],
-          'messageTemplateID' => $messageTemplates->id,
+          'messageTemplateID' => $messageTemplates->id ?? NULL,
           'contactId' => $contactId,
           'attachments' => [$attachment],
           'tokenContext' => $tokenContext,

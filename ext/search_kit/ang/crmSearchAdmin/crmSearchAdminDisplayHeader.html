@@ -3,8 +3,16 @@
     <i class="crm-i {{:: $ctrl.parent.displayType.icon }}" role="img" aria-hidden="true"></i>
     {{:: $ctrl.parent.displayType.description }}
   </div>
-  <div class="btn-group crm-search-admin-display-header-links" ng-if="$ctrl.parent.crmSearchAdmin.displayIsViewable($ctrl.display)">
-    <a ng-href="{{ $ctrl.parent.crmSearchAdmin.searchDisplayPath + '#/display/' + $ctrl.parent.savedSearch.name + '/' + $ctrl.display.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search display on its own page') }}">
+  <div class="btn-group crm-search-admin-display-header-links" ng-if="$ctrl.display.id">
+    <button type="button" class="btn btn-secondary-outline" ng-if="$ctrl.parent.canSchedule"
+      crm-dialog-popup="searchScheduleDialog"
+      popup-tpl="~/crmSearchAdmin/searchSchedule/editDialog.html"
+      popup-data="{search_display_id: $ctrl.display.id, display: $ctrl.display, savedSearch: $ctrl.parent.savedSearch}"
+      title="{{:: ts('Schedule this display to be emailed periodically') }}">
+      <i class="crm-i fa-calendar-check-o" role="img" aria-hidden="true"></i>
+      {{:: ts('Email Schedule') }}
+    </button>
+    <a ng-if="$ctrl.parent.crmSearchAdmin.displayIsViewable($ctrl.display)" ng-href="{{ $ctrl.parent.crmSearchAdmin.searchDisplayPath + '#/display/' + $ctrl.parent.savedSearch.name + '/' + $ctrl.display.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search display on its own page') }}">
       <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
       {{:: ts('View Display') }}
     </a>
