@@ -140,15 +140,32 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       $values['related_contact'] = $relatedContact['individual_id'];
     }
 
+    // Profiles on the page, with filters so Contribution / Membership profile
+    // fields are loaded for this contribution / membership.
+    $params = [];
+    foreach (['custom_pre_id', 'custom_post_id'] as $key) {
+      if (empty($values[$key])) {
+        continue;
+      }
+      $gIds[$key] = $values[$key];
+      $profileType = CRM_Core_BAO_UFField::getProfileType($values[$key]);
+      if ($profileType === 'Membership' && !empty($values['membership_id'])) {
+        $params[$key] = [['member_id', '=', $values['membership_id'], 0, 0]];
+      }
+      elseif ($profileType === 'Contribution' && !empty($values['contribution_id'])) {
+        $params[$key] = [['contribution_id', '=', $values['contribution_id'], 0, 0]];
+      }
+      if ($isTest && !empty($params[$key])) {
+        $params[$key][] = ['contribution_test', '=', 1, 0, 0];
+      }
+    }
+
     if (!$returnMessageText && !empty($gIds)) {
       //send notification email if field values are set (CRM-1941)
       foreach ($gIds as $key => $gId) {
-        if ($gId) {
-          $email = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify');
-          if ($email) {
-            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, $params[$key] ?? NULL, TRUE);
-            CRM_Core_BAO_UFGroup::commonSendMail($contactID, $val);
-          }
+        if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify')) {
+          $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, $params[$key] ?? NULL, TRUE);
+          CRM_Core_BAO_UFGroup::commonSendMail($contactID, $val);
         }
       }
     }
