@@ -1509,6 +1509,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * Create custom group.
    *
+   * @deprecated
+   *   Use CRMTraits_Custom_CustomDataTrait::createCustomGroup().
+   *
    * @param array $params
    *
    * @return array
@@ -1531,6 +1534,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * Existing function doesn't allow params to be over-ridden so need a new one
    * this one allows you to only pass in the params you want to change
    *
+   * @deprecated
+   *   Use CRMTraits_Custom_CustomDataTrait::createCustomGroup().
+   *
    * @param array $params
    *
    * @return array|int
@@ -1550,6 +1556,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * Create custom group with multi fields.
    *
+   * @deprecated
+   *   Use CRMTraits_Custom_CustomDataTrait::createCustomGroup() with 'is_multiple' => TRUE.
+   *
    * @param array $params
    *
    * @return array|int
@@ -1565,6 +1574,10 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   /**
    * Create custom group with multi fields.
+   *
+   * @deprecated
+   *   Use CRMTraits_Custom_CustomDataTrait::createCustomGroup() with 'is_multiple' => TRUE,
+   *   and the trait's create*CustomField() helpers.
    *
    * @param array $params
    *
@@ -1607,6 +1620,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * Create a custom group with a single text custom field.  See
    * participant:testCreateWithCustom for how to use this
    *
+   * @deprecated
+   *   Use CRMTraits_Custom_CustomDataTrait::createCustomGroupWithFieldOfType().
+   *
    * @param string $function
    *   __FUNCTION__.
    * @param string $filename
@@ -1629,6 +1645,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * Create a custom group with a single text custom field, multi-select widget, with a variety of option values including upper and lower case.
    * See api_v3_SyntaxConformanceTest:testCustomDataGet for how to use this
+   *
+   * @deprecated
+   *   Use CRMTraits_Custom_CustomDataTrait::createCustomGroupWithFieldOfType().
    *
    * @param string $function
    *   __FUNCTION__.
@@ -1690,6 +1709,10 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * Create custom field.
    *
+   * @deprecated
+   *   Use the CRMTraits_Custom_CustomDataTrait create*CustomField() helpers,
+   *   e.g. createTextCustomField().
+   *
    * @param array $params
    *   (custom_group_id) is required.
    *
@@ -1743,6 +1766,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   /**
    * Create custom field with Option Values.
+   *
+   * @deprecated
+   *   Use CRMTraits_Custom_CustomDataTrait::createSelectCustomField().
    *
    * @param array $customGroup
    * @param string $name

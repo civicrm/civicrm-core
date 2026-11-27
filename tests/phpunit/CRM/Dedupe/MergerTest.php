@@ -282,11 +282,12 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       return $a;
     };
 
-    $customGroupID = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'Contacts')['custom_group_id'];
+    $this->createCustomGroupWithFieldOfType([], 'text');
+    $customTable = $this->getCustomGroupTable();
 
     // These are deliberately unset.
     $unsetRefs = array_fill_keys(['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache'], 1);
-    $this->assertEquals($sortRefs(array_diff_key($this->getStaticCIDRefs($customGroupID), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
+    $this->assertEquals($sortRefs(array_diff_key($this->getStaticCIDRefs($customTable), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
     $this->assertEquals($sortRefs(array_diff_key($this->getCalculatedCIDRefs(), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
   }
 
@@ -933,11 +934,14 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $customField1 = $this->setupCustomField('TestField', $createGroup);
 
     // Create multi-value custom field
-    $multiGroup = $this->CustomGroupMultipleCreateByParams();
-    $multiField = $this->customFieldCreate([
-      'custom_group_id' => $multiGroup['id'],
-      'label' => 'field_1' . $multiGroup['id'],
-      'in_selector' => 1,
+    $multiGroupID = $this->createCustomGroup([
+      'title' => 'Multiple Group',
+      'style' => 'Tab',
+      'is_multiple' => TRUE,
+    ]);
+    $multiField = $this->createTextCustomField([
+      'custom_group_id' => $multiGroupID,
+      'in_selector' => TRUE,
     ]);
 
     // Contacts setup
@@ -956,7 +960,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // Merge, and ensure that no value was migrated
     $this->mergeContacts($originalContactID, $duplicateContactID, [
       "move_custom_{$customField1['id']}" => NULL,
-      "move_rel_table_custom_{$multiGroup['id']}" => NULL,
+      "move_rel_table_custom_{$multiGroupID}" => NULL,
     ]);
     $this->assertCustomFieldValue($originalContactID, NULL, $customField1['id']);
     $this->assertCustomFieldValue($originalContactID, NULL, $multiField['id']);
@@ -977,11 +981,14 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $customField2 = $this->setupCustomField('Test2', $createGroup);
 
     // Create multi-value custom field
-    $multiGroup = $this->CustomGroupMultipleCreateByParams();
-    $multiField = $this->customFieldCreate([
-      'custom_group_id' => $multiGroup['id'],
-      'label' => 'field_1' . $multiGroup['id'],
-      'in_selector' => 1,
+    $multiGroupID = $this->createCustomGroup([
+      'title' => 'Multiple Group',
+      'style' => 'Tab',
+      'is_multiple' => TRUE,
+    ]);
+    $multiField = $this->createTextCustomField([
+      'custom_group_id' => $multiGroupID,
+      'in_selector' => TRUE,
     ]);
 
     // Contacts setup
@@ -1003,7 +1010,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->mergeContacts($originalContactID, $duplicateContactID, [
       "move_custom_{$customField1['id']}" => NULL,
       "move_custom_{$customField2['id']}" => 'def',
-      "move_rel_table_custom_{$multiGroup['id']}" => '1',
+      "move_rel_table_custom_{$multiGroupID}" => '1',
     ]);
     $this->assertCustomFieldValue($originalContactID, NULL, $customField1['id']);
     $this->assertCustomFieldValue($originalContactID, 'def', $customField2['id']);
@@ -1020,37 +1027,30 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testMigrationOfContactReferenceCustomField(): void {
     // Create Custom Fields
     $contactGroup = $this->setupCustomGroupForIndividual();
-    $activityGroup = $this->customGroupCreate([
-      'name'    => 'test_group_activity',
+    $activityGroupID = $this->createCustomGroup([
+      'title' => 'Test Group Activity',
+      'name' => 'test_group_activity',
       'extends' => 'Activity',
     ]);
     // Contact reference fields
-    $refFieldContact = $this->customFieldCreate([
+    $refFieldContact = $this->createContactReferenceCustomField([
       'custom_group_id' => $contactGroup['id'],
-      'label'           => 'field_1' . $contactGroup['id'],
-      'data_type'       => 'ContactReference',
-      'default_value'   => NULL,
+      'label' => 'field_1' . $contactGroup['id'],
     ]);
-    $refFieldActivity = $this->customFieldCreate([
-      'custom_group_id' => $activityGroup['id'],
-      'label'           => 'field_1' . $activityGroup['id'],
-      'data_type'       => 'ContactReference',
-      'default_value'   => NULL,
+    $refFieldActivity = $this->createContactReferenceCustomField([
+      'custom_group_id' => $activityGroupID,
+      'label' => 'field_1' . $activityGroupID,
     ]);
     // Entity reference fields
-    $entityrefFieldContact = $this->customFieldCreate([
+    $entityrefFieldContact = $this->createEntityReferenceCustomField([
       'custom_group_id' => $contactGroup['id'],
-      'label'           => 'field_2' . $contactGroup['id'],
-      'data_type'       => 'EntityReference',
-      'fk_entity'       => 'Individual',
-      'default_value'   => NULL,
+      'label' => 'field_2' . $contactGroup['id'],
+      'fk_entity' => 'Individual',
     ]);
-    $entityrefFieldActivity = $this->customFieldCreate([
-      'custom_group_id' => $activityGroup['id'],
-      'label'           => 'field_2' . $activityGroup['id'],
-      'data_type'       => 'EntityReference',
-      'fk_entity'       => 'Contact',
-      'default_value'   => NULL,
+    $entityrefFieldActivity = $this->createEntityReferenceCustomField([
+      'custom_group_id' => $activityGroupID,
+      'label' => 'field_2' . $activityGroupID,
+      'fk_entity' => 'Contact',
     ]);
 
     // Contacts setup
@@ -1097,23 +1097,20 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testMigrationOfContactEntityReferenceCustomField(string $fkEntity): void {
     // Create Custom Fields
     $contactGroup = $this->setupCustomGroupForIndividual();
-    $activityGroup = $this->customGroupCreate([
+    $activityGroupID = $this->createCustomGroup([
+      'title' => 'Test Group Activity',
       'name' => 'test_group_activity',
       'extends' => 'Activity',
     ]);
-    $refFieldContact = $this->customFieldCreate([
+    $refFieldContact = $this->createEntityReferenceCustomField([
       'custom_group_id' => $contactGroup['id'],
       'label' => 'field_1' . $contactGroup['id'],
-      'data_type' => 'EntityReference',
       'fk_entity' => $fkEntity,
-      'default_value' => NULL,
     ]);
-    $refFieldActivity = $this->customFieldCreate([
-      'custom_group_id' => $activityGroup['id'],
-      'label' => 'field_1' . $activityGroup['id'],
-      'data_type' => 'EntityReference',
+    $refFieldActivity = $this->createEntityReferenceCustomField([
+      'custom_group_id' => $activityGroupID,
+      'label' => 'field_1' . $activityGroupID,
       'fk_entity' => $fkEntity,
-      'default_value' => NULL,
     ]);
 
     // Contacts setup
@@ -1445,9 +1442,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * There is also a check against an automated list but having both seems to
    * add extra stability to me. They do not change often.
    *
-   * @param int $customGroupID
+   * @param string $customTable
    */
-  public function getStaticCIDRefs(int $customGroupID) {
+  public function getStaticCIDRefs(string $customTable) {
     return [
       'civicrm_acl_cache' => [
         0 => 'contact_id',
@@ -1632,7 +1629,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_user_job' => [
         0 => 'created_id',
       ],
-      'civicrm_value_testgetcidref_' . $customGroupID => [
+      $customTable => [
         0 => 'entity_id',
       ],
       'civicrm_website' => [
