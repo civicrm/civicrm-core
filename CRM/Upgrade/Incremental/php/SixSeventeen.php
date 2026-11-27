@@ -34,7 +34,7 @@ class CRM_Upgrade_Incremental_php_SixSeventeen extends CRM_Upgrade_Incremental_B
    */
   public function upgrade_6_17_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    // creation moved to 6.20.1
+    // creation moved to 6.20.2
     // $this->addTask(ts('Create Mysql Full Text Search indices if active'), 'createMissingFtsIndices');
     $from = '{$participant_status}';
     $to = '{participant.status_id:label}';
