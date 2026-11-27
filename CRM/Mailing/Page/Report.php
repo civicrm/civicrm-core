@@ -129,6 +129,7 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
     $this->assign('report', $report);
     CRM_Utils_System::setTitle(ts('CiviMail Report: %1', [1 => $report['mailing']['name']]));
     $this->assign('public_url', CRM_Mailing_BAO_Mailing::getPublicViewUrl($this->_mailing_id));
+    $this->assign('canRefreshRunQueueDate', CRM_Core_Permission::check('administer civicrm system'));
 
     return CRM_Core_Page::run();
   }
