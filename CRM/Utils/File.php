@@ -1178,7 +1178,8 @@ HTACCESS;
    *   In php8 the return value from is_dir() is always bool but in php7 it can be null.
    */
   public static function isDir(?string $dir) {
-    if ($dir === NULL) {
+    // php 8.6+ is_dir() throws a ValueError for paths containing null bytes.
+    if ($dir === NULL || str_contains($dir, "\0")) {
       return FALSE;
     }
     set_error_handler(function($errno, $errstr) {
