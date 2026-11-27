@@ -259,6 +259,7 @@ class CRM_Core_Payment_PayPalIPN {
     }
 
     Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(CRM_Contribute_BAO_Contribution::isEmailReceipt(NULL, (int) $contribution->id, NULL))
       ->addValue('contribution_id', $contribution->id)
       ->addValue('total_amount', $input['total_amount'])
       ->addValue('payment_processor_id', $input['payment_processor_id'])

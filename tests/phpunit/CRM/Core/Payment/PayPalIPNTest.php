@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 
 /**
@@ -96,6 +97,50 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
     $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
+  }
+
+  public static function isEmailReceiptProvider(): array {
+    return [
+      'receipt enabled' => [TRUE],
+      'receipt disabled' => [FALSE],
+    ];
+  }
+
+  /**
+   * A one-off IPN payment should only send a receipt if the contribution page is configured to.
+   *
+   * @dataProvider isEmailReceiptProvider
+   */
+  public function testOneOffIPNPaymentReceiptFollowsContributionPageSetting(bool $isEmailReceipt): void {
+    $contributionPageID = $this->createTestEntity('ContributionPage', [
+      'title' => 'PayPal receipt test page',
+      'financial_type_id' => $this->_financialTypeID,
+      'currency' => 'USD',
+      'is_email_receipt' => $isEmailReceipt,
+      'receipt_from_email' => 'receipts@example.org',
+    ])['id'];
+    $this->_contributionID = $this->createTestEntity('Contribution', [
+      'contact_id' => $this->_contactID,
+      'financial_type_id' => $this->_financialTypeID,
+      'contribution_page_id' => $contributionPageID,
+      'total_amount' => 100,
+      'invoice_id' => 'xyz',
+      'contribution_status_id:name' => 'Pending',
+    ])['id'];
+
+    global $_REQUEST;
+    $_REQUEST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $this->getPaypalTransaction();
+
+    $mut = new CiviMailUtils($this, TRUE);
+    $payment = Civi\Payment\System::singleton()->getByProcessor($this->callAPISuccessGetSingle('PaymentProcessor', ['id' => $this->_paymentProcessorID]));
+    $payment->handlePaymentNotification();
+
+    $contributionStatus = Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $this->_contributionID)
+      ->execute()->single()['contribution_status_id:name'];
+    $this->assertEquals('Completed', $contributionStatus);
+    $this->assertCount($isEmailReceipt ? 1 : 0, $mut->getAllMessages());
   }
 
   /**
