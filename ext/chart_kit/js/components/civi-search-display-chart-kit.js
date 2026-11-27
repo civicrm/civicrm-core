@@ -377,6 +377,18 @@
         .title((d) => this.renderDataLabel(d, 'title'))
         .label((d) => this.renderDataLabel(d, 'label'));
 
+      // Always-on value labels for coordinate-grid charts (line / series / bar). dc only renders
+      // the .label() accessor for charts that draw labels natively (pie, row); line/bar charts have
+      // no label layer, so a column set to dataLabelType 'label' ("Always show") would otherwise do
+      // nothing. This draws the label text at each point/bar via a renderlet. Pie/row keep dc's
+      // native labels (they are not coordinate-grid), so they are left alone.
+      const wantsDataLabels = this.getColumns().some((col) => col.dataLabelType === 'label');
+      if (wantsDataLabels && this.chartType.hasCoordinateGrid && this.chartType.hasCoordinateGrid()) {
+        // Registered after any type-backend renderlet (e.g. the grouped-bar offset), so bars have
+        // their final geometry when labels are placed.
+        this.chart.on('renderlet.ckDataLabels', (chart) => this.drawCoordinateGridLabels(chart));
+      }
+
       this.chart
         .width(() => (this._settings.format.width))
         .height(() => (this._settings.format.height))
@@ -588,6 +600,91 @@
         // remove blanks
         .filter((label) => !!label)
         .join(' - ');
+    }
+
+    // Draw always-on value labels on a coordinate-grid chart (line / series / bar). Positions come
+    // from the chart's own scales (not animating DOM attributes), so they land correctly on the
+    // first render as well as on redraws. Labels are rewritten from scratch each pass.
+    drawCoordinateGridLabels(chart) {
+      if (!chart || !chart.x || !chart.y) {
+        return;
+      }
+      const xScale = chart.x();
+      const yScale = chart.y();
+      if (!xScale || !yScale) {
+        return;
+      }
+      // Remove the labels from the previous render so repeated renders do not stack them.
+      chart.selectAll('text.ck-data-label').remove();
+
+      const svgNs = 'http://www.w3.org/2000/svg';
+      const fill = (this._settings.format && this._settings.format.labelColor) || '#000000';
+      const addLabel = (parent, px, py, text) => {
+        if (parent == null || px == null || Number.isNaN(px) || text == null || text === '') {
+          return;
+        }
+        const node = document.createElementNS(svgNs, 'text');
+        node.setAttribute('class', 'ck-data-label');
+        node.setAttribute('x', px);
+        node.setAttribute('y', py);
+        node.setAttribute('text-anchor', 'middle');
+        node.setAttribute('font-size', '10px');
+        node.setAttribute('font-weight', 'bold');
+        node.setAttribute('pointer-events', 'none');
+        node.setAttribute('fill', fill);
+        node.textContent = text;
+        parent.appendChild(node);
+      };
+
+      // Bars sit on a band x-scale; lines/areas on a continuous one.
+      const isBar = typeof xScale.bandwidth === 'function';
+      if (isBar) {
+        const bandWidth = xScale.bandwidth();
+        const subs = chart.selectAll('g.sub').nodes();
+        const seriesCount = subs.length || 1;
+        // Mirror the grouped-bar offset (see chartKitSeries groupSeriesBars renderlet) so each
+        // label centres over its own bar rather than the whole category band.
+        let barWidth = bandWidth;
+        let gap = 0;
+        if (seriesCount >= 2 && bandWidth > 0) {
+          gap = Math.min(4, Math.floor(bandWidth / (seriesCount * 4)));
+          barWidth = Math.max(1, Math.floor((bandWidth - (gap * (seriesCount - 1))) / seriesCount));
+        }
+        chart.selectAll('rect.bar').nodes().forEach((rect) => {
+          const d = rect.__data__;
+          if (!d) {
+            return;
+          }
+          let seriesIndex = 0;
+          let ancestor = rect.parentNode;
+          while (ancestor && !(ancestor.classList && ancestor.classList.contains('sub'))) {
+            ancestor = ancestor.parentNode;
+          }
+          if (ancestor) {
+            const idx = subs.indexOf(ancestor);
+            if (idx >= 0) {
+              seriesIndex = idx;
+            }
+          }
+          const bandStart = xScale(d.x);
+          if (bandStart == null) {
+            return;
+          }
+          const cx = (seriesCount >= 2)
+            ? bandStart + (seriesIndex * (barWidth + gap)) + (barWidth / 2)
+            : bandStart + (bandWidth / 2);
+          addLabel(rect.parentNode, cx, yScale(d.y) - 3, this.renderDataLabel(d, 'label'));
+        });
+      }
+      else {
+        chart.selectAll('circle.dot').nodes().forEach((dot) => {
+          const d = dot.__data__;
+          if (!d) {
+            return;
+          }
+          addLabel(dot.parentNode, xScale(d.x), yScale(d.y) - 8, this.renderDataLabel(d, 'label'));
+        });
+      }
     }
 
     get chartCanvas() {
