@@ -3,7 +3,10 @@
 (function(angular, $) {
   angular.module('crmResource', []);
 
-  angular.module('crmResource').factory('crmResource', function($q, $http) {
+  // Deduplicate angular-modules.json fetches across multiple angular.bootstrap() injectors.
+  const bundleRequests = {};
+
+  angular.module('crmResource').factory('crmResource', function($q, $http, $rootScope) {
     var deferreds = {}; // null|object; deferreds[url][idx] = Deferred;
 
     var notify = function notify() {
@@ -31,22 +34,25 @@
       });
     };
 
-    var moduleUrl = CRM.angular.bundleUrl;
-    $http.get(moduleUrl)
-      .then(function httpSuccess(response) {
-        CRM.angular.templates = CRM.angular.templates || {};
-        angular.forEach(response.data, function (module) {
-          if (module.partials) {
-            angular.extend(CRM.angular.templates, module.partials);
-          }
-          if (module.strings) {
-            CRM.addStrings(module.domain, module.strings);
-          }
+    const moduleUrl = CRM.angular.bundleUrl;
+    if (!bundleRequests[moduleUrl]) {
+      bundleRequests[moduleUrl] = $http.get(moduleUrl)
+        .then((response) => {
+          CRM.angular.templates = CRM.angular.templates || {};
+          angular.forEach(response.data, (module) => {
+            if (module.partials) {
+              angular.extend(CRM.angular.templates, module.partials);
+            }
+            if (module.strings) {
+              CRM.addStrings(module.domain, module.strings);
+            }
+          });
         });
-        notify();
-      }, function httpError() {
-        notify();
-      });
+    }
+    bundleRequests[moduleUrl].then(
+      () => $rootScope.$applyAsync(notify),
+      () => $rootScope.$applyAsync(notify)
+    );
 
     return {
       // @return string|Promise<string>
