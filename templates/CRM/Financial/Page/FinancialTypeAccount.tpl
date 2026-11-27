@@ -22,8 +22,8 @@
     {strip}
     {* handle enable/disable actions*}
      {include file="CRM/common/enableDisableApi.tpl"}
-      <table cellpadding="0" cellspacing="0" border="0">
-        <thead class="sticky">
+      <table class="crm-sticky-header" cellpadding="0" cellspacing="0" border="0">
+        <thead>
           <th>{ts}Relationship{/ts}</th>
           <th>{ts}Financial Account{/ts}</th>
           <th>{ts}Accounting Code{/ts}</th>

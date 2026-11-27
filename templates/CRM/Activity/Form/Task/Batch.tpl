@@ -13,8 +13,8 @@
     {ts}Update field values for each Activities as needed. Click <strong>Update Activities</strong> below to save all your changes. To set a field to the same value for ALL rows, enter that value for the first Activity and then click the <strong>Copy icon</strong> (next to the column title).{/ts}
 </div>
     <div class="crm-submit-buttons">{if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-    <table class="crm-copy-fields">
-    <thead class="sticky">
+    <table class="crm-copy-fields crm-sticky-header">
+    <thead>
             <tr class="columnheader">
              {foreach from=$readOnlyFields item=fTitle key=fName}
               <th>{$fTitle}</th>

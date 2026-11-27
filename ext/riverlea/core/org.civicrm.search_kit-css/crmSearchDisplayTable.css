@@ -2,11 +2,6 @@
    Forked on 19 July 24. Called on SearchKit Admin pages
    Status: merged */
 
-table.crm-sticky-header > thead > tr {
-  position: sticky !important;
-  top: var(--crm-menubar-bottom, 0);
-  z-index: 2;
-}
 .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
   padding-inline: var(--crm-l-medium);
   text-transform: none;

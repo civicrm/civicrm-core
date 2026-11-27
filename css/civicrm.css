@@ -122,7 +122,6 @@ input.crm-form-checkbox + label {
 
 .crm-container th,
 .crm-container table.display thead th,
-.crm-container table thead.sticky th,
 .crm-container table.caseSelector tr.columnheader th {
   background-color: #fff;
   border-color: #fff #fff #cfcec3;
@@ -136,37 +135,19 @@ input.crm-form-checkbox + label {
   vertical-align: top;
 }
 /* Styles for Sticky Header */
-.crm-sticky thead > tr > th,
-.crm-container table thead.sticky > tr > th {
-  background-color: #fff;
-}
-
-.crm-sticky thead,
-.crm-container table thead.sticky {
-  border-bottom: 2px solid #cfcec3;
-  background-color: #fff;
-  z-index: 10;
-  position: sticky;
-  top: var(--crm-menubar-bottom, 0);
-  box-shadow: 0 2px 2px -1px #cfcec3;
-}
-
-@media (max-width: 782px) {
-  /** WP **/
-  .wp-admin .crm-sticky thead {
-    top: 48px;
-  }
-  /** Drupal **/
-  .path-civicrm.crm-menu-visible {
-    top: 39px;
+@media (min-width: 768px) {
+  table.crm-sticky-header > thead > tr {
+    position: sticky !important;
+    top: var(--crm-menubar-bottom, 0);
+    z-index: 2;
   }
 }
 
 /* Styles for Sorting Header */
 .crm-container table thead th.sorting_asc,
 .crm-container table thead th.sorting_desc,
-.crm-container table .sticky th a.sort-ascending,
-.crm-container table .sticky th a.sort-descending,
+.crm-container table thead th a.sort-ascending,
+.crm-container table thead th a.sort-descending,
 .crm-container table.caseSelector tr.columnheader th a.sort-ascending,
 .crm-container table.caseSelector tr.columnheader th a.sort-descending {
   color: #3e3e3e;
@@ -433,17 +414,6 @@ input.crm-form-entityref {
 .crm-container .crm-section,
 .crm-container div.crm-field-wrapper {
   margin-bottom: 1em;
-}
-
-@media (min-width:1079px) {
-  .wp-toolbar {
-    --crm-sticky-top: 80px;
-  }
-  .wp-toolbar .crm-menubar-above-cms-menu,
-  .wp-toolbar .crm-menubar-below-cms-menu {
-    --crm-sticky-top: 112px;
-  }
-
 }
 
 /* todo: See PR#19968 to move towards configurable breakpoints */

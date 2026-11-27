@@ -9,8 +9,8 @@
 *}
 
 <div id="enableDisableStatusMsg" class="crm-container" style="display:none;"></div>
-<table id="batch-summary" cellpadding="0" cellspacing="0" border="0" class="report crm-batch_summary">
-  <thead class="sticky">
+<table id="batch-summary" cellpadding="0" cellspacing="0" border="0" class="report crm-batch_summary crm-sticky-header">
+  <thead>
     <tr>
      {foreach from=$columnHeaders item=head}
        <th>{$head}</th>
@@ -36,7 +36,7 @@
   <p></p>
   <div class="form-item">
   {strip}
-    <table id="crm-transaction-selector-remove-{$entityID}" cellpadding="0" cellspacing="0" border="0">
+    <table class="crm-sticky-header" id="crm-transaction-selector-remove-{$entityID}" cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
           <th class="crm-transaction-checkbox">{if in_array($batchStatus, array('Open', 'Reopened'))}{$form.toggleSelects.html}{/if}</th>

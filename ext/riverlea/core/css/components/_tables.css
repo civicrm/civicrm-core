@@ -12,7 +12,6 @@
   background-color: var(--crm-table-header-bg-color);
 }
 .crm-container th,
-.crm-container table thead.sticky th,
 .crm-container table.dataTable thead th,
 .crm-container tr.columnheader td {
   background-color: var(--crm-table-header-bg-color);
@@ -82,18 +81,12 @@
 }
 
 /* Sticky header */
-.crm-sticky thead > tr > th,
-.crm-container table thead.sticky > tr > th {
-  background-color: var(--crm-table-header-bg-color);
-}
-.crm-sticky thead,
-.crm-container table thead.sticky {
-  border-bottom: 2px solid #cfcec3;
-  background-color: var(--crm-table-header-bg-color);
-  z-index: 10;
-  position: sticky;
-  top: var(--crm-menubar-bottom, 0);
-  box-shadow: 0 2px 2px -1px #cfcec3;
+@media (min-width: 768px) {
+  table.crm-sticky-header > thead > tr {
+    position: sticky !important;
+    top: var(--crm-menubar-bottom, 0);
+    z-index: 2;
+  }
 }
 
 /* Data Tables */

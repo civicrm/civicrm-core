@@ -30,8 +30,8 @@
     {/if}
     <p>{ts}Click <strong>Update Participant(s)</strong> below to save all your changes.{/ts}</p>
   </div>
-        <table class="crm-copy-fields">
-       <thead class="sticky">
+        <table class="crm-copy-fields crm-sticky-header">
+       <thead>
             <tr class="columnheader">
              {foreach from=$readOnlyFields item=fTitle key=fName}
               <td>{$fTitle}</td>

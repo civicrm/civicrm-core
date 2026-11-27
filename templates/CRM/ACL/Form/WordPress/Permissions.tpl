@@ -12,8 +12,8 @@
   <p>{ts}Use this form to Grant access to CiviCRM components and other CiviCRM permissions to WordPress roles.{/ts}</p>
   <p>{ts}<strong>NOTE: Super Admin</strong> and <strong>Administrator</strong> roles will have all permissions in CiviCRM.{/ts}</p>
 </div>
-<div class="crm-block crm-sticky">
-  <table class="table-striped">
+<div class="crm-block">
+  <table class="table-striped crm-sticky-header">
     <thead>
       <tr>
         <th class="label">&nbsp;</th>

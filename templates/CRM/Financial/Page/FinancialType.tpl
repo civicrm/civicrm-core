@@ -26,8 +26,8 @@
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
    {include file="CRM/common/jsortable.tpl"}
-        <table cellpadding="0" cellspacing="0" border="0" class="row-highlight">
-          <thead class="sticky">
+        <table cellpadding="0" cellspacing="0" border="0" class="row-highlight crm-sticky-header">
+          <thead>
             <th>{ts}Name{/ts}</th>
             <th>{ts}Description{/ts}</th>
             <th>{ts}Financial Accounts{/ts}</th>

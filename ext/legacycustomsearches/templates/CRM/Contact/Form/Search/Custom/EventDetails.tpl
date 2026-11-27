@@ -65,8 +65,8 @@
         {include file="CRM/common/pagerAToZ.tpl"}
 
         {strip}
-        <table summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
-            <thead class="sticky">
+        <table class="crm-sticky-header" summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
+            <thead>
                 {foreach from=$columnHeaders item=header}
                     <th scope="col">
                         {if $header.sort}

@@ -11,8 +11,8 @@
 
 {strip}
   <div class="crm-contact-contribute-contributions">
-  <table class="selector row-highlight">
-    <thead class="sticky">
+  <table class="selector row-highlight crm-sticky-header">
+    <thead>
     <tr>
       <th scope="col"></th>
       {if !$single and $context eq 'Search'}

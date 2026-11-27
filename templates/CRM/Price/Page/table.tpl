@@ -18,8 +18,8 @@
         {ts}This price set is used by the event(s) listed below. Click the event title to change or remove the price set.{/ts}
     {/if}
     <br /><br />
-<table class="report">
-      <thead class="sticky">
+<table class="report crm-sticky-header">
+      <thead>
             <th scope="col">{ts}Event{/ts}</th>
            <th scope="col">{ts}Type{/ts}</th>
            <th scope="col">{ts}Public{/ts}</th>
@@ -44,8 +44,8 @@
         {ts}This price set is used by the contribution page(s) listed below. Click the contribution page title to change or remove the price set.{/ts}
     {/if}
     <br /><br />
-<table class="report">
-      <thead class="sticky">
+<table class="report crm-sticky-header">
+      <thead>
             <th scope="col">{ts}Contribution Page{/ts}</th>
            <th scope="col">{ts}Type{/ts}</th>
            <th scope="col">{ts}Date(s){/ts}</th>
@@ -68,8 +68,8 @@
     {ts}This price set is used by the event template(s) listed below. Click the event template title to change or remove the price set.{/ts}
   {/if}
   <br /><br />
-<table class="report">
-  <thead class="sticky">
+<table class="report crm-sticky-header">
+  <thead>
     <th scope="col">{ts}Event Template Name{/ts}</th>
     <th scope="col">{ts}Type{/ts}</th>
     <th scope="col">{ts}Public{/ts}</th>

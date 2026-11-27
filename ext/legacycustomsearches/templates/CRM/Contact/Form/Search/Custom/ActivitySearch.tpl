@@ -56,8 +56,8 @@
           {include file="CRM/common/pagerAToZ.tpl"}
 
           {strip}
-            <table summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
-              <thead class="sticky">
+            <table class="crm-sticky-header" summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
+              <thead>
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
                 {foreach from=$columnHeaders item=header}
                   {if ($header.sort eq 'activity_id') or ($header.sort eq 'case_id')}

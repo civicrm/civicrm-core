@@ -16,8 +16,8 @@
   {strip}
     {* handle enable/disable actions*}
     {include file="CRM/common/enableDisableApi.tpl"}
-    <table cellpadding="0" cellspacing="0" border="0" class="row-highlight">
-      <thead class="sticky">
+    <table cellpadding="0" cellspacing="0" border="0" class="row-highlight crm-sticky-header">
+      <thead>
         <th>{ts}Label{/ts}</th>
         <th>{ts}Name (Status ID){/ts}</th>
         <th>{ts}Class{/ts}</th>
