@@ -62,7 +62,10 @@
       {/if}
       {assign var="profileID" value=$field.group_id}
       {assign var="profileFieldName" value=$field.name}
-      {assign var="formElement" value=$form.$profileFieldName}
+      {* $form is not assigned when the form was just saved and is not displayed again
+         (CRM_Core_BAO_UFGroup::getEditHTML() after a POST), and has no element for a
+         phone field without an extension: read form elements null-safely. *}
+      {assign var="formElement" value=$form.$profileFieldName|default:null}
       {assign var="rowIdentifier" value=$field.name}
 
       {if $field.groupTitle != $fieldset}
@@ -92,34 +95,34 @@
           {/if}
         <div class="form-layout-compressed">
         {/if}
-        {if $field.help_pre && $action neq 4 && $form.$profileFieldName.html}
+        {if $field.help_pre && $action neq 4 && !empty($form.$profileFieldName.html)}
           <div class="crm-section helprow-{$profileFieldName}-section helprow-pre" id="helprow-{$profileFieldName}">
             <div class="content description">{$field.help_pre|purify}</div>
           </div>
         {/if}
         {if array_key_exists('options_per_line', $field) && $field.options_per_line}
           <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$profileFieldName}">
-            <div class="label">{$form.$profileFieldName.label}</div>
+            <div class="label">{$form.$profileFieldName.label|default:''}</div>
             <div class="content edit-value">
-              {$formElement.html}
+              {$formElement.html|default:''}
              </div>
             <div class="clear"></div>
           </div>
           {else}
           <div id="editrow-{$profileFieldName}" class="crm-section editrow_{$profileFieldName}-section form-item">
             <div class="label">
-              {$form.$profileFieldName.label}
+              {$form.$profileFieldName.label|default:''}
             </div>
             <div class="edit-value content">
               {if $profileFieldName|substr:0:3 eq 'im-'}
                 {assign var="provider" value="$profileFieldName-provider_id"}
-                {$form.$provider.html}&nbsp;
+                {$form.$provider.html|default:''}&nbsp;
               {/if}
               {if $profileFieldName eq 'email_greeting' or  $profileFieldName eq 'postal_greeting' or $profileFieldName eq 'addressee'}
                 {include file="CRM/Profile/Form/GreetingType.tpl"}
-              {elseif ( $profileFieldName eq 'group' && $form.group ) || ( $profileFieldName eq 'tag' && $form.tag )}
+              {elseif ( $profileFieldName eq 'group' && !empty($form.group) ) || ( $profileFieldName eq 'tag' && !empty($form.tag) )}
                 {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$profileFieldName context="profile" tableLayout=1}
-              {elseif ( $form.$profileFieldName.name eq 'image_URL' )}
+              {elseif ( $form.$profileFieldName.name|default:'' eq 'image_URL' )}
                 {$form.$profileFieldName.html}
                 {if !empty($imageURL)}
                   <div class="crm-section contact_image-section">
@@ -130,13 +133,13 @@
                  {/if}
               {elseif $profileFieldName|substr:0:5 eq 'phone'}
                 {assign var="phone_ext_field" value=$profileFieldName|replace:'phone':'phone_ext'}
-                {$form.$profileFieldName.html}
-                {if $form.$phone_ext_field.html}
+                {$form.$profileFieldName.html|default:''}
+                {if !empty($form.$phone_ext_field.html)}
                 &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
                 {if $field.html_type neq 'File' || ($field.html_type eq 'File' && !$field.is_view)}
-                   {$form.$profileFieldName.html}
+                   {$form.$profileFieldName.html|default:''}
                 {/if}
                 {if $field.html_type eq 'Autocomplete-Select'}
                   {if $field.data_type eq 'ContactReference'}
@@ -148,7 +151,7 @@
             <div class="clear"></div>
           </div>
 
-          {if $form.$profileFieldName.type eq 'file'}
+          {if $form.$profileFieldName.type|default:'' eq 'file'}
             <div class="crm-section file_displayURL-section file_displayURL{$profileFieldName}-section"><div class="content">{$customFiles.$profileFieldName.displayURL}</div></div>
             {if !$fields.$profileFieldName.is_view}
                <div class="crm-section file_deleteURL-section file_deleteURL{$profileFieldName}-section"><div class="content">{$customFiles.$profileFieldName.deleteURL}</div></div>
@@ -157,7 +160,7 @@
         {/if}
 
       {* Show explanatory text for field if not in 'view' mode *}
-        {if $field.help_post && $action neq 4 && $form.$profileFieldName.html}
+        {if $field.help_post && $action neq 4 && !empty($form.$profileFieldName.html)}
           <div class="crm-section helprow-{$profileFieldName}-section helprow-post" id="helprow-{$profileFieldName}">
             <div class="content description">{$field.help_post|purify}</div>
           </div>
