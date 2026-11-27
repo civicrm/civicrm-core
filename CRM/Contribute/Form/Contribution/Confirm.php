@@ -1895,25 +1895,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $emailValues['useForMember'] = 0;
       $emailValues['amount'] = 0;
 
-      //CRM-18071, where on selecting $0 free membership payment section got hidden and
-      // also it reset any payment processor selection result into pending free membership
-      // so its a kind of hack to complete free membership at this point since there is no $form->_paymentProcessor info
+      // CRM-18071: a free membership paid separately from the main contribution is left
+      // Pending (it isn't created by Order::create(), which settles $0 orders itself), so
+      // record the payment of 0 that completes it.
       if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
-        try {
-          CRM_Contribute_BAO_Contribution::completeOrder(
-            ['payment_processor_id' => $this->getPaymentProcessorID()],
-            $membershipContribution->contribution_recur_id,
-            $membershipContribution->id,
-            NULL);
-        }
-        catch (CRM_Core_Exception $e) {
-          if ($e->getErrorCode() != 'contribution_completed') {
-            \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CRM_Core_Exception: ' . $e->getMessage());
-            throw new CRM_Core_Exception('Failed to update contribution in database');
-          }
-        }
+        $this->recordProcessedPayment((int) $membershipContribution->id, [], []);
       }
-      // return as completeTransaction() already sends the receipt mail.
+      // Return as recording the payment sends the receipt.
       return;
     }
 
@@ -2373,14 +2361,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Record the payment doPayment() took, completing the contribution.
+   * Record the payment that settles the contribution's balance, completing it.
    *
    * Payment::create() serialises with a payment processor webhook recording the
    * same charge, and returns the webhook's payment if it got there first.
    *
    * @param int $contributionID
    * @param array $paymentResult
-   *   The result of doPayment().
+   *   The result of doPayment(), or empty when nothing was charged.
    * @param array $paymentParams
    *
    * @throws \CRM_Core_Exception
