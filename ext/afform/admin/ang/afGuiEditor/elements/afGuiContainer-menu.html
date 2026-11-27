@@ -33,7 +33,7 @@
   <div class="af-gui-field-select-in-dropdown form-inline">
     {{:: ts('Layout:') }}
     <div class="btn-group btn-group-sm" role="group">
-      <button type="button" class="btn btn-default" ng-class="{active: opt === getLayout()}" ng-repeat="(opt, label) in layouts" ng-click="setLayout(opt)" title="{{ label }}">
+      <button type="button" class="btn btn-default crm-icon-button" ng-class="{active: opt === getLayout()}" ng-repeat="(opt, label) in layouts" ng-click="setLayout(opt)" title="{{ label }}">
         <i class="af-gui-layout-icon {{ opt }}" role="img" aria-hidden="true"></i>
       </button>
     </div>
