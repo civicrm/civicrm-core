@@ -433,6 +433,8 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ])->indexBy('name');
       foreach ($task['apiBatch']['fields'] as &$field) {
         $field += $fieldInfo[$field['name']] ?? [];
+        // Fields unknown to getFields have no `nullable`, so go by `required`
+        $field += ['nullable' => empty($field['required'])];
       }
     }
     catch (\CRM_Core_Exception $e) {
