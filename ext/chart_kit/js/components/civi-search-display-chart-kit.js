@@ -455,11 +455,7 @@
       legend.highlightSelected(true);
 
       if (this._settings.showLegend === 'right') {
-        // depends on chart type which padding keys are set
-        // (potential bug: if you set right padding on an axis chart, then switch to a chart without a right axis setting,
-        // it will keep using the right padding value, which you can no longer edit
-        const rightPadding = this._settings.format.padding.right ? this._settings.format.padding.right : this._settings.format.padding.outer;
-        legend.x(this._settings.format.width - legend.itemWidth() - rightPadding);
+        this.placeRightLegend(legend);
       }
       this.chart.legend(legend);
 
@@ -469,6 +465,178 @@
         this.chart.selectAll('.dc-legend-item text')
           .attr('y', legend.itemHeight() - 2)
       );
+    }
+
+    // Place a right-hand legend in the margin beside the plot rather than on top of the
+    // data, and size that space to the legend itself instead of a hand-tuned
+    // format.padding.right per report. After each render we measure the widest legend
+    // item and park the legend so it never overlaps the plotted data (to its left) or
+    // clips at the canvas edge (to its right) — however many entries it has or however
+    // long the labels are.
+    placeRightLegend(legend) {
+      const leftGap = 16;   // space between the plot (or its right axis) and the legend
+      const rightGap = 12;  // space between the legend and the canvas's right edge
+      const minRight = this._settings.format.padding.outer || 10;
+      const maxWidth = this._settings.format.legendMaxWidth || 180;
+
+      // First-paint guess, corrected by the fit handler once the legend DOM can be measured.
+      legend.x(this._settings.format.width - legend.itemWidth() - rightGap);
+      legend.y(this._settings.format.padding.top || 0);
+
+      const isGrid = this.chartType.hasCoordinateGrid();
+
+      this.chart.on('pretransition.ckLegendFit', (chart) => {
+        const svg = chart.svg();
+        if (!svg || svg.empty()) {
+          return;
+        }
+        // Wrap long labels to maxWidth and re-stack the items; returns the bounded legend
+        // width (widest wrapped line plus the swatch offset).
+        const legendBand = this.wrapRightLegend(svg, maxWidth);
+        if (!legendBand) {
+          return;
+        }
+
+        // Charts without a coordinate grid (e.g. pie) have no margins() to reserve — the plot
+        // is centred in the canvas, so a right legend would sit on top of it. Right-align the
+        // now-bounded legend, then centre the pie in the space to its left and fit the radius
+        // to that space so the two don't overlap. (Calling chart.margins() would throw here.)
+        if (!isGrid) {
+          const top = this._settings.format.padding.top || 0;
+          const canvasW = chart.width();
+          const canvasH = chart.height();
+          const legendX = canvasW - legendBand - rightGap;
+          svg.select('.dc-legend').attr('transform', `translate(${legendX},${top})`);
+
+          // Only pie-type charts expose cx()/radius(); if they're missing, just place the
+          // legend and leave the plot alone.
+          if (typeof chart.cx === 'function' && typeof chart.radius === 'function') {
+            const availWidth = legendX - leftGap;
+            const newCx = Math.round(availWidth / 2);
+            const newCy = Math.round(canvasH / 2);
+            const newRadius = Math.max(20, Math.floor(Math.min(availWidth, canvasH) / 2) - 10);
+            const cxNow = chart.cx() || Math.round(canvasW / 2);
+            const rNow = chart.radius() || 0;
+            // Re-centre/resize once, guarded by a threshold so it settles instead of looping.
+            if (Math.abs(cxNow - newCx) > 2 || Math.abs(rNow - newRadius) > 2) {
+              chart.cx(newCx);
+              chart.cy(newCy);
+              chart.radius(newRadius);
+              chart.redraw();
+            }
+          }
+          return;
+        }
+
+        // A composite chart can carry a right-hand Y axis. dc draws its ticks just outside
+        // the plot's right edge and pins its label hard against the canvas edge, so the
+        // legend has to clear both: reserve a band for the (measured) tick width to the
+        // left of the legend, and keep a strip free at the far right for the label.
+        const rightAxis = svg.select('g.axis.yr');
+        const hasRightAxis = !rightAxis.empty();
+        const axisBand = hasRightAxis ? Math.ceil(rightAxis.node().getBBox().width) : 0;
+        const hasRightAxisLabel = hasRightAxis &&
+          typeof chart.rightYAxisLabel === 'function' &&
+          chart.rightYAxisLabel();
+        const labelStrip = hasRightAxisLabel ? 24 : 0;
+
+        const neededRight = Math.max(minRight, axisBand + leftGap + legendBand + labelStrip + rightGap);
+        const top = chart.margins().top || 0;
+        const x = chart.width() - legendBand - labelStrip - rightGap;
+
+        legend.x(x);
+        legend.y(top);
+        svg.select('.dc-legend').attr('transform', `translate(${x},${top})`);
+
+        // Re-fit the plot margin to what we measured, then redraw once. The threshold stops
+        // it looping on sub-pixel differences and lets a later legend change (e.g. a filter)
+        // re-fit on its own.
+        if (Math.abs((chart.margins().right || 0) - neededRight) > 2) {
+          chart.margins(Object.assign({}, chart.margins(), { right: neededRight }));
+          chart.redraw();
+        }
+      });
+    }
+
+    // Wrap each right-legend label onto multiple lines at a maximum width and re-stack the
+    // items vertically. dc lays legend items out single-line at a fixed row height, and SVG
+    // <text> does not wrap on its own, so we rebuild each label as stacked <tspan> lines and
+    // recompute each item's vertical offset (wrapped items are taller). Returns the widest
+    // wrapped line plus the swatch offset — the bounded width the caller reserves.
+    wrapRightLegend(svg, maxWidth) {
+      const items = svg.selectAll('.dc-legend-item').nodes();
+      if (!items.length) {
+        return 0;
+      }
+      const svgNs = 'http://www.w3.org/2000/svg';
+      const lineHeight = 13;
+      const rowGap = 6;
+
+      // Measure text with a canvas using the legend's own font — cheap, and no DOM reflow per
+      // word the way repeatedly setting textContent + getComputedTextLength would cost.
+      const firstText = items[0].querySelector('text');
+      const font = firstText ? window.getComputedStyle(firstText).font : '';
+      this._legendMeasureCtx = this._legendMeasureCtx || document.createElement('canvas').getContext('2d');
+      const ctx = this._legendMeasureCtx;
+      ctx.font = font || '11px sans-serif';
+      const widthOf = (s) => ctx.measureText(s).width;
+
+      let runningY = 0;
+      let widest = 0;
+      let textOffset = 14;
+
+      items.forEach((g) => {
+        const textEl = g.querySelector('text');
+        if (!textEl) {
+          return;
+        }
+        textOffset = +(textEl.getAttribute('x') || 14);
+        const full = (textEl.textContent || '').trim();
+
+        // Greedy word wrap to maxWidth (a single word longer than maxWidth stays on its own
+        // line rather than being split mid-word).
+        const words = full.split(/\s+/);
+        const lines = [];
+        let cur = '';
+        words.forEach((w) => {
+          const trial = cur ? `${cur} ${w}` : w;
+          if (cur && widthOf(trial) > maxWidth) {
+            lines.push(cur);
+            cur = w;
+          }
+          else {
+            cur = trial;
+          }
+        });
+        if (cur) {
+          lines.push(cur);
+        }
+        if (!lines.length) {
+          lines.push(full);
+        }
+
+        // Rebuild the <text> as stacked <tspan> lines.
+        while (textEl.firstChild) {
+          textEl.removeChild(textEl.firstChild);
+        }
+        lines.forEach((line, i) => {
+          const ts = document.createElementNS(svgNs, 'tspan');
+          ts.setAttribute('x', textOffset);
+          ts.setAttribute('dy', i === 0 ? '0' : String(lineHeight));
+          ts.textContent = line;
+          textEl.appendChild(ts);
+          const lw = widthOf(line);
+          if (lw > widest) {
+            widest = lw;
+          }
+        });
+
+        // Re-stack: position this item below the previous one by its wrapped height.
+        g.setAttribute('transform', `translate(0,${runningY})`);
+        runningY += Math.max(12, lines.length * lineHeight) + rowGap;
+      });
+
+      return Math.ceil(textOffset + widest);
     }
 
     buildColumns() {
