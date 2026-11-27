@@ -2,7 +2,9 @@
 namespace Civi\ext\afform\mock\tests\phpunit\api\v4\Afform;
 
 use api\v4\Afform\AfformUsageTestCase;
+use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Api4\Afform;
+use Civi\Api4\Contact;
 
 /**
  * Test case for Afform with validation.
@@ -358,6 +360,53 @@ EOHTML;
     $this->assertCount(1, $validResult);
     $validResponse = $validResult->first();
     $this->assertEmpty($validResponse);
+  }
+
+  public function testValidateListenerSeesTheRecordBeingUpdated(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="FBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $cid = $this->createTestRecord('Individual', ['first_name' => 'Old'])['id'];
+    $missingId = $this->createTestRecord('Individual', ['first_name' => 'Gone'])['id'];
+    Contact::delete(FALSE)->addWhere('id', '=', $missingId)->setUseTrash(FALSE)->execute();
+
+    $seen = [];
+    $listener = function (AfformValidateEvent $event) use (&$seen) {
+      $seen[] = $event->getEntityIds('Individual1');
+    };
+    \Civi::dispatcher()->addListener('civi.afform.validate', $listener);
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setArgs(['Individual1' => $cid])
+        ->setValues(['Individual1' => [['fields' => ['first_name' => 'New']]]])
+        ->execute();
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => [['fields' => ['first_name' => 'Other']]]])
+        ->execute();
+      Afform::submit()
+        ->setName($this->formName)
+        ->setArgs(['Individual1' => $missingId])
+        ->setValues(['Individual1' => [['fields' => ['first_name' => 'Unresolved']]]])
+        ->execute();
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('civi.afform.validate', $listener);
+    }
+
+    $this->assertSame([[$cid], [], []], $seen);
   }
 
 }
