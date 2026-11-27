@@ -13,6 +13,7 @@
  * @property string $provider
  * @property string $guid
  * @property string|null $tenant
+ * @property string|null $pkce_method
  * @property string|null $secret
  * @property string|null $options
  * @property bool|string $is_active

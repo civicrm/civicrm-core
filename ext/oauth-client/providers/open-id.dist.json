@@ -1,0 +1,7 @@
+{
+  "title": "OpenID Connect",
+  "pkceMethods": ["S256"],
+  "class": "Civi\\OAuth\\CiviOpenIdProvider",
+  "options": {"scopes": ["openid", "profile", "email"]},
+  "tags": ["Login"]
+}

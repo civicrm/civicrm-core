@@ -7,6 +7,7 @@ class CRM_OAuth_Angular {
 
     $s['redirectUrl'] = \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
     $s['providers'] = self::getProvidersWithClientCounts();
+    $s['pkceMethods'] = CRM_OAuth_BAO_OAuthClient::getPkceMethods();
 
     return $s;
   }
