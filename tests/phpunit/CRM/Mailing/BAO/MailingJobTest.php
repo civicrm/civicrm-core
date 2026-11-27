@@ -11,6 +11,9 @@
 
 use Civi\Api4\Mailing;
 use Civi\Api4\MailingJob;
+use Civi\Core\Container;
+use Civi\Core\Lock\LockInterface;
+use Civi\Core\Lock\LockManager;
 use Civi\Test\Invasive;
 
 /**
@@ -175,7 +178,38 @@ class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
       $this->fail('revert() should refuse a mailing whose delivery has started');
     }
     catch (CRM_Core_Exception $e) {
-      // Expected.
+      $this->assertStringContainsString('Only a scheduled mailing whose delivery has not started', $e->getMessage());
+    }
+
+    $this->assertEquals($mailingBefore, Mailing::get(FALSE)->addWhere('id', '=', $mailingID)->execute()->single());
+    $this->assertEquals($jobsBefore, (array) MailingJob::get(FALSE)->addWhere('mailing_id', '=', $mailingID)->addWhere('is_test', 'IN', [TRUE, FALSE])->execute());
+  }
+
+  /**
+   * revert() refuses, and changes nothing, while cron holds a parent job's lock.
+   */
+  public function testRevertRefusedWhileJobLockIsHeld(): void {
+    $mailingID = $this->createRevertTestMailing('Scheduled', ['status' => 'Scheduled']);
+    $mailingBefore = Mailing::get(FALSE)->addWhere('id', '=', $mailingID)->execute()->single();
+    $jobsBefore = (array) MailingJob::get(FALSE)->addWhere('mailing_id', '=', $mailingID)->addWhere('is_test', 'IN', [TRUE, FALSE])->execute();
+
+    // A register() call would not help: the default '/^data\./' rule matches first.
+    $originalLockManager = Civi::lockManager();
+    $lockManager = new LockManager();
+    $heldLock = $this->createMock(LockInterface::class);
+    $heldLock->method('isAcquired')->willReturn(FALSE);
+    $lockManager->register('/^data\.mailing\.job\.' . $this->ids['MailingJob']['parent'] . '$/', fn() => $heldLock);
+    $lockManager->register('/./', fn($name) => $originalLockManager->create($name));
+    Civi::$statics[Container::class]['boot']['lockManager'] = $lockManager;
+    try {
+      CRM_Mailing_BAO_MailingJob::revert($mailingID);
+      $this->fail('revert() should refuse while a job lock is held');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString('being processed right now', $e->getMessage());
+    }
+    finally {
+      Civi::$statics[Container::class]['boot']['lockManager'] = $originalLockManager;
     }
 
     $this->assertEquals($mailingBefore, Mailing::get(FALSE)->addWhere('id', '=', $mailingID)->execute()->single());
