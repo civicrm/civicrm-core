@@ -2914,7 +2914,8 @@ WHERE      f.id IN ($ids)";
    */
   private static function getFieldOptions(int $id, ?int $optionGroupID, string $dataType, string $entity, ?string $context = NULL): array {
     CRM_Core_DAO::buildOptionsContext($context);
-    $cacheKey = "CRM_Core_BAO_CustomField_getOptions_{$id}_$context";
+    global $tsLocale;
+    $cacheKey = "CRM_Core_BAO_CustomField_getOptions_{$id}_{$context}_{$tsLocale}";
     $cache = CRM_Utils_Cache::singleton();
     $options = $cache->get($cacheKey);
     if (!isset($options)) {

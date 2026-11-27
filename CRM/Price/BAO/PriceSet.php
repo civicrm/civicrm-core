@@ -631,7 +631,8 @@ WHERE  id = %1";
    * @noinspection PhpUnhandledExceptionInspection
    */
   public static function getCachedPriceSetDetail(int $priceSetID): array {
-    $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID;
+    global $tsLocale;
+    $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID . '_' . $tsLocale;
     $cache = CRM_Utils_Cache::singleton();
     $data = $cache->get($cacheKey);
     if (empty($data)) {
