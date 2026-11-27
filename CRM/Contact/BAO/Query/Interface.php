@@ -89,6 +89,9 @@ abstract class CRM_Contact_BAO_Query_Interface {
    *   For boolean options, use value "yesno". For pseudoconstants/FKs, use the name of an API entity
    *   from which the metadata of the field may be queried. (Yes - that is a mouthful.)
    * @void
+   *
+   * @deprecated will be replaced by core extension search_kit
+   *   Only used by the legacy Search Builder - see CRM_Contact_Form_Search_Builder.
    */
   public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
   }

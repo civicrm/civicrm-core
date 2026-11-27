@@ -393,6 +393,9 @@ class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
    *
    * @param array $apiEntities
    * @param array $fieldOptions
+   *
+   * @deprecated will be replaced by core extension search_kit
+   *   Only used by the legacy Search Builder - see CRM_Contact_Form_Search_Builder.
    */
   public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
     $apiEntities[] = 'grant';

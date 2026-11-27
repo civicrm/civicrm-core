@@ -8,6 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Search Builder *}
+{* Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement. *}
 <div class="messages status no-popup">
   {icon icon="fa-info-circle"}{/icon}
   {capture assign='skUrl'}{crmURL p='civicrm/admin/search'}{/capture}

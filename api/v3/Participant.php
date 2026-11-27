@@ -128,6 +128,7 @@ function _civicrm_api3_participant_create_spec(&$params) {
   $params['event_id']['api.required'] = 1;
   $params['contact_id']['api.required'] = 1;
   // These are for the sake of search builder options - can be removed if that is fixed
+  // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
   $params['role_id']['api.aliases'] = ['participant_role'];
   $params['status_id']['api.aliases'] = ['participant_status'];
 }

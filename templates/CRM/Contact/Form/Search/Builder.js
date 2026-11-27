@@ -1,4 +1,5 @@
 // http://civicrm.org/licensing
+// Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
 (function($) {
   'use strict';
 

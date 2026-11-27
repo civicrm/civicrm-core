@@ -16,7 +16,23 @@
  */
 
 /**
- * This class is for search builder processing.
+ * Legacy Search Builder form (civicrm/contact/search/builder).
+ *
+ * @deprecated will be replaced by core extension search_kit
+ *
+ * SearchKit is the replacement and where effort should go. Rather than fixing or
+ * extending this form, fix whatever stops people moving from it to SearchKit.
+ * Changes here should be limited to security issues, fatal errors and PHP compatibility.
+ *
+ * It is not in the navigation menu on new installs but can still be reached:
+ * - directly at civicrm/contact/search/builder, including from menu items kept by
+ *   sites upgraded from versions that had one;
+ * - via "Edit Smart Group Criteria" on a smart group created with it
+ *   (CRM_Contact_BAO_SavedSearch::getEditSearchUrl());
+ * - by returning from a task (e.g. send mailing, add to group) run on its results.
+ *
+ * Code paths elsewhere that exist only to serve this form are marked with a
+ * comment pointing back here.
  */
 class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 

@@ -43,6 +43,7 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
       $fragment = 'search';
     }
     elseif ($this->_action == CRM_Core_Action::PROFILE) {
+      // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
       $fragment = 'search/builder';
     }
     elseif ($this->_action == CRM_Core_Action::ADVANCED) {

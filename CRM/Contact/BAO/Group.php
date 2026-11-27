@@ -467,6 +467,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $ssId = $params['saved_search_id'] ?? NULL;
 
     //add mapping record only for search builder saved search
+    // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
     $mappingId = NULL;
     if ($params['search_context'] == 'builder') {
       //save the mapping for search builder

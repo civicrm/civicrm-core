@@ -26,8 +26,9 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
   /**
    * Class constructor.
    *
-   * @param object $controller
-   * @param \const|int $action
+   * @param CRM_Core_Controller $controller
+   * @param int $action
+   *   A CRM_Core_Action constant selecting which search form to show.
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
@@ -38,6 +39,7 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
       [$task, $result] = $this->taskName($controller, 'Advanced');
     }
     elseif ($action == CRM_Core_Action::PROFILE) {
+      // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
       $this->_pages['CRM_Contact_Form_Search_Builder'] = NULL;
       [$task, $result] = $this->taskName($controller, 'Builder');
     }

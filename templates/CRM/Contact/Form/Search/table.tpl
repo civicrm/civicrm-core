@@ -8,6 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* template for search builder *}
+{* Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement. *}
 <div id="map-field">
 {strip}
   {section start=1 name=blocks loop=$blockCount}

@@ -302,6 +302,7 @@ SELECT contact_id
       return $this->controller->exportValues('Advanced');
     }
     if ($this->_action === CRM_Core_Action::PROFILE) {
+      // Legacy Search Builder only (deprecated, see CRM_Contact_Form_Search_Builder) - SearchKit is the replacement.
       return $this->controller->exportValues('Builder');
     }
     if ($this->_action == CRM_Core_Action::COPY) {

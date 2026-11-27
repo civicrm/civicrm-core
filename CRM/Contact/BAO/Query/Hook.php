@@ -85,6 +85,9 @@ class CRM_Contact_BAO_Query_Hook {
   /**
    * @param $apiEntities
    * @param $fieldOptions
+   *
+   * @deprecated will be replaced by core extension search_kit
+   *   Only used by the legacy Search Builder - see CRM_Contact_Form_Search_Builder.
    */
   public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
     foreach (self::getSearchQueryObjects() as $obj) {
