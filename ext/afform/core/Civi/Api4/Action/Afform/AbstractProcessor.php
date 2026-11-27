@@ -394,11 +394,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $joinIdField = CoreUtil::getIdFieldName($joinEntity);
     $join = $afEntity['joins'][$joinEntity];
     $multipleLocationBlocks = is_array($join['data']['location_type_id'] ?? NULL);
-    $limit = 1;
-    // Repeating blocks - set limit according to `max`, if set, otherwise 0 for unlimited
-    if (!empty($join['af-repeat'])) {
-      $limit = $join['max'] ?? 0;
-    }
+    // As many records as a submission saves: `max` (0 for unlimited) when repeating, else one per af-join element
+    $limit = isset($join['af-repeat']) ? ($join['max'] ?? 0) : $join['#count'];
     // Remove limit when handling multiple location blocks
     if ($multipleLocationBlocks) {
       $limit = 0;
@@ -843,15 +840,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           // Only accept values from join fields on the form
           $allowedFields = $this->getAllowedJoinFields($entity['joins'][$joinEntity]);
           $fileFields = $this->getFileFields($joinEntity, $allowedFields);
-          // Enforce the limit set by join[max]
-          $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
+          // $vals could be NULL when a join is in a repeating group.
+          // Then $joinValues[0] = null and $joinValues[1] = array
+          $joinValues = array_filter($joinValues, fn($vals) => $vals !== NULL);
+          // Enforce the limit set by join[max], or one record per af-join element without af-repeat
+          $join = $entity['joins'][$joinEntity];
+          $maxRecords = isset($join['af-repeat']) ? ($join['max'] ?? NULL) : $join['#count'];
+          $joinValues = array_slice($joinValues, 0, $maxRecords, TRUE);
           foreach ($joinValues as $index => $vals) {
-            // $vals could be NULL when a join is in a repeating group.
-            // Then $joinValues[0] = null and $joinValues[1] = array
-            if ($vals === NULL) {
-              unset($joinValues[$index]);
-              continue;
-            }
             // As with the main entity, use default values from DisplayOnly fields + values from submittable fields
             $joinValues[$index] = $this->getForcedDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []);
             $joinValues[$index] += array_intersect_key($vals, $allowedFields);
