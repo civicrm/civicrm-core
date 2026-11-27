@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "edbb349162899bdde3d3d28cfc1c600a",
+    "content-hash": "ebce19dd9f9998ba50f7612d7386fa93",
     "packages": [
         {
             "name": "behat/mink",
@@ -2248,21 +2248,24 @@
         },
         {
             "name": "pear/mail_mime",
-            "version": "1.10.13",
+            "version": "1.11.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Mail_Mime.git",
-                "reference": "cda56082cc1a3722d6929caa66abfe95b7406e12"
+                "reference": "4c8db5d9166293fe8b16b193f9921f2ee70efd46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/cda56082cc1a3722d6929caa66abfe95b7406e12",
-                "reference": "cda56082cc1a3722d6929caa66abfe95b7406e12",
+                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/4c8db5d9166293fe8b16b193f9921f2ee70efd46",
+                "reference": "4c8db5d9166293fe8b16b193f9921f2ee70efd46",
                 "shasum": ""
             },
             "require": {
                 "pear/pear-core-minimal": "*",
                 "php": ">=5.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7.21 || ^6 || ^7 || ^9 || ^10 || ^11"
             },
             "type": "library",
             "autoload": {
@@ -2295,7 +2298,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Mail_Mime",
                 "source": "https://github.com/pear/Mail_Mime"
             },
-            "time": "2026-08-08T07:08:35+00:00"
+            "time": "2026-11-26T19:07:56+00:00"
         },
         {
             "name": "pear/net_smtp",

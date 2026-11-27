@@ -287,7 +287,7 @@ class CRM_Utils_Mail {
         CRM_Core_Session::setStatus(ts('Unable to send email. Please report this message to the site administrator'), ts('Mailing Error'), 'error');
         return FALSE;
       }
-      if (is_a($result, 'PEAR_Error')) {
+      if ($result instanceof PEAR_Error) {
         $errorMessage = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to
         // this method in the course of sending a batch of messages.
