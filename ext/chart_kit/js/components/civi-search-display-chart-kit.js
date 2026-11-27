@@ -354,7 +354,10 @@
         // if we could pass that back up to the search kit filters
         // that would be amazing but very non-trivial
         .brushOn(false)
-        .mouseZoomable(xCol.scaleType !== 'categorical');
+        // Wheel-zoom defaults to core's behavior (on for non-categorical axes); a display can turn it
+        // off with the `mouseZoom` format setting. On a dashboard, scroll-zoom hijacks page scrolling
+        // and the zoomed range is surfaced nowhere, so a display can opt out.
+        .mouseZoomable(this._settings.format.mouseZoom ?? (xCol.scaleType !== 'categorical'));
     }
 
     loadChartData() {
