@@ -189,6 +189,7 @@ class CRM_Core_Resources_Common {
       "js/crm.datepicker.js",
       "js/crm.ajax.js",
       "js/wysiwyg/crm.wysiwyg.js",
+      'elements/civi-count-marker.js',
     ];
 
     if (!CRM_Utils_System::isFrontEndPage() || CRM_Utils_System::currentPath() === 'civicrm/user') {

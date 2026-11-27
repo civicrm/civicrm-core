@@ -309,6 +309,10 @@
         apiCalls.run = ['SearchDisplay', 'run', apiParams];
         // Run all preRun callbacks
         this.onPreRun.forEach(callback => callback.call(this, apiCalls));
+
+        // if there are facets clear existing counts - show blur
+        this.afFieldset?.setFacetCounts(null);
+
         const apiRequest = crmApi4(apiCalls);
         apiRequest.then((apiResults) => {
           if (requestId < this._runCount) {
@@ -344,6 +348,10 @@
                 }
 
                 this.afFieldset.setFacetCounts(result);
+              })
+              .catch(() => {
+                CRM.alert(ts('Error loading option counts'), null, 'warning');
+                this.afFieldset.setFacetCounts('?');
               });
           }
           // Run all postRun callbacks on success

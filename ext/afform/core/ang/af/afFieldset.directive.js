@@ -258,9 +258,12 @@
         this.setFacetCounts = (counts) => this.facetCounts = counts;
 
         this.getFacetCount = (fieldName, optionId) => {
-          if (!this.facetCounts) {
-            // until facets have been fetched show '?'
+          if (this.facetCounts === '?') {
             return '?';
+          }
+          if (!this.facetCounts) {
+            // displays blur whilst loading/unknown
+            return null;
           }
           // indexes are json-encoded @see \Civi\Api4\Action\SearchDisplay\Run::processFacetCountResult
           const optionIndex = JSON.stringify(optionId);

@@ -186,6 +186,19 @@ af-search-param-sets dl > div > dt {
   opacity: 1;
   box-shadow: none !important; /* vs dropdown-toggle */
 }
-.crm-afform-filter-count {
-  margin-left: var(--crm-l-small, 0.25rem);
+civi-count-marker {
+  background-color: var(--crm-secondary-color, grey);
+  color: var(--crm-secondary-text-color, black);
+  border-radius: var(--crm-l-small, 0.25rem);
+  padding: 0 var(--crm-l-small, 0.25rem);
+  font-size: var(--crm-font-small-size);
+}
+label:has(civi-count-marker),
+#bootstrap-theme .radio-inline:has(civi-count-marker) {
+  display: flex;
+  align-items: center;
+  gap: var(--crm-l-medium);
+}
+label:has(.crm-count-loading) {
+  filter: blur(1px);
 }
