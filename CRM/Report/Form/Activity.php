@@ -131,16 +131,14 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'alias' => 'civicrm_contact_assignee',
             'dbAlias' => "civicrm_contact_assignee.id",
             'title' => ts('Assignee Contact ID'),
-            'default' => TRUE,
-            'required' => TRUE,
+            'default' => FALSE,
           ],
           'contact_target_id' => [
             'name' => 'id',
             'alias' => 'civicrm_contact_target',
             'dbAlias' => "civicrm_contact_target.id",
             'title' => ts('Target Contact ID'),
-            'default' => TRUE,
-            'required' => TRUE,
+            'default' => FALSE,
           ],
           'contact_source_employer_id' => [
             'name' => 'employer_id',
@@ -457,12 +455,41 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    *   different tables as the same table.
    */
   public function select($recordType = 'target') {
+    $internalFields = match ($recordType) {
+      'target' => ['contact_target_id'],
+      'assignee' => ['contact_assignee_id'],
+      'final' => ['contact_assignee_id', 'contact_target_id'],
+      default => [],
+    };
+    $requestedFields = [];
+    foreach ($internalFields as $fieldName) {
+      $requestedFields[$fieldName] = [
+        'exists' => array_key_exists($fieldName, $this->_params['fields']),
+        'value' => $this->_params['fields'][$fieldName] ?? NULL,
+      ];
+      if (empty($requestedFields[$fieldName]['value'])) {
+        $this->_nonDisplayFields[] = "civicrm_contact_{$fieldName}";
+      }
+      // Keep these IDs in the query for Activity's contact links and filters,
+      // while letting users choose whether to display them as report columns.
+      $this->_params['fields'][$fieldName] = 1;
+    }
+
     if (!array_key_exists("contact_{$recordType}", $this->_params['fields']) &&
       $recordType != 'final'
     ) {
       $this->_nonDisplayFields[] = "civicrm_contact_contact_{$recordType}";
     }
     parent::select();
+
+    foreach ($requestedFields as $fieldName => $wasRequested) {
+      if ($wasRequested['exists']) {
+        $this->_params['fields'][$fieldName] = $wasRequested['value'];
+      }
+      else {
+        unset($this->_params['fields'][$fieldName]);
+      }
+    }    
 
     if ($recordType == 'final' && !empty($this->_nonDisplayFields)) {
       foreach ($this->_nonDisplayFields as $fieldName) {
