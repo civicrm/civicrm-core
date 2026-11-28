@@ -17,6 +17,6 @@
   </select>
 </form>
 </li>
-
+<li af-gui-conditional-menu="tab" ng-if="$ctrl.editor.getEntities().length"></li>
 <li role="separator" class="divider"></li>
 <li><a href ng-click="$ctrl.deleteTab(tabIndex)"><span class="text-danger"><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {{:: ts('Delete tab') }}</span></a></li>

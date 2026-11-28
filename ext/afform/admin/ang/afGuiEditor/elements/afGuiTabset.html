@@ -14,6 +14,7 @@
     <a href role="tab" aria-selected="{{ tabIndex === $ctrl.selectedTab }}" ng-click="$ctrl.selectTab(tabIndex)">
       <i class="crm-i {{ tab.icon }}" ng-if="tab.icon" role="img" aria-hidden="true"></i>
       {{ tab['title'] }}
+      <i class="crm-i fa-code-fork" ng-if="tab['af-if']" title="{{:: ts('Conditional') }}" role="img" aria-hidden="true"></i>
       <button class="btn btn-default btn-xs af-gui-add-element-button" data-tab-id="{{ tabIndex }}" ng-click="$ctrl.getSearchDisplays(tabIndex)">
         <span>
           <i class="crm-i fa-gear" role="img" aria-hidden="true"></i>
