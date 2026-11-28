@@ -57,7 +57,7 @@ class CRM_Core_BAO_ConfigSetting {
 
     // also skip all Dir Params, we dont need to store those in the DB!
     foreach ($params as $name => $val) {
-      if (substr($name, -3) == 'Dir') {
+      if (str_ends_with($name, 'Dir')) {
         unset($params[$name]);
       }
     }

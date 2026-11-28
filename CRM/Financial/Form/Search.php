@@ -113,7 +113,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
   public function postProcess() {
     $batchIds = [];
     foreach ($_POST as $key => $value) {
-      if (substr($key, 0, 6) == "check_") {
+      if (str_starts_with($key, "check_")) {
         $batch = explode("_", $key);
         $batchIds[] = $batch[1];
       }

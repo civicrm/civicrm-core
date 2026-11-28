@@ -91,7 +91,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyThree extends CRM_Upgrade_Incremental
       'dateformatshortdate',
     ] as $setting) {
       $value = \Civi::settings()->get($setting);
-      if ($value && (strpos($value, '%A') !== FALSE)) {
+      if ($value && (str_contains($value, '%A'))) {
         $value = strtr($value, ['%A' => '%P']);
         \Civi::settings()->set($setting, $value);
       }

@@ -24,7 +24,7 @@ class CRM_Core_CodeGen_PhpSchema extends CRM_Core_CodeGen_BaseTask {
 
     $put = function ($files) {
       foreach ($files as $file => $content) {
-        if (substr($content, -1) !== "\n") {
+        if (!str_ends_with($content, "\n")) {
           $content .= "\n";
         }
         file_put_contents($this->config->sqlCodePath . $file, $content);

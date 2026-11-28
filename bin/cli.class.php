@@ -453,7 +453,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
     $params = [];
     foreach ($this->header as $i => $field) {
       //split any multiselect data, denoted with CRM_Core_DAO::VALUE_SEPARATOR
-      if (strpos($data[$i], CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+      if (str_contains($data[$i], CRM_Core_DAO::VALUE_SEPARATOR)) {
         $data[$i] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $data[$i]);
         $data[$i] = array_combine($data[$i], $data[$i]);
       }

@@ -109,7 +109,7 @@ class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
         continue;
       }
 
-      if (substr($values[0], 0, 6) == 'grant_') {
+      if (str_starts_with($values[0], 'grant_')) {
         self::whereClauseSingle($values, $query);
       }
     }

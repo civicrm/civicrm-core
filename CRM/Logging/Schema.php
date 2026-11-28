@@ -629,7 +629,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    */
   private function columnsOf($table, $force = FALSE) {
     if ($force || !isset(\Civi::$statics[__CLASS__]['columnsOf'][$table])) {
-      $from = (substr($table, 0, 4) == 'log_') ? "`{$this->db}`.$table" : $table;
+      $from = (str_starts_with($table, 'log_')) ? "`{$this->db}`.$table" : $table;
       \Civi::$statics[__CLASS__]['columnsOf'][$table] = [];
       try {
         $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from", [], TRUE, NULL, FALSE, FALSE);

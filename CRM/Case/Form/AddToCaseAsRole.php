@@ -52,7 +52,7 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
 
     foreach ($relType as $k => $v) {
       //Limit this to relationship types from contact A to B
-      if (substr($k, -4) == "_a_b") {
+      if (str_ends_with($k, "_a_b")) {
         $roleTypes[substr($k, 0, strpos($k, '_'))] = $v;
       }
     }

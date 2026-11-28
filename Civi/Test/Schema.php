@@ -96,7 +96,7 @@ class Schema {
     $drops = [];
     foreach ($tables as $table) {
       // skip log tables
-      if (substr($table, 0, 4) == 'log_') {
+      if (str_starts_with($table, 'log_')) {
         continue;
       }
 
@@ -105,10 +105,10 @@ class Schema {
         continue;
       }
 
-      if (substr($table, 0, 14) == 'civicrm_value_') {
+      if (str_starts_with($table, 'civicrm_value_')) {
         $drops[] = 'DROP TABLE ' . $table . ';';
       }
-      elseif (substr($table, 0, 9) == 'civitest_') {
+      elseif (str_starts_with($table, 'civitest_')) {
         // ignore
       }
       else {

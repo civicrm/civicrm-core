@@ -629,8 +629,8 @@ class CRM_Utils_Mail {
     $name = trim($name ?? '');
 
     // strip out double quotes if present at the beginning AND end
-    if (substr($name, 0, 1) == '"' &&
-      substr($name, -1, 1) == '"'
+    if (str_starts_with($name, '"') &&
+      str_ends_with($name, '"')
     ) {
       $name = substr($name, 1, -1);
     }
@@ -669,7 +669,7 @@ class CRM_Utils_Mail {
     $name = trim($name);
     if (!empty($name)) {
       // remove the quotes around the name part if they are already there
-      if (substr($name, 0, 1) == '"' && substr($name, -1) == '"') {
+      if (str_starts_with($name, '"') && str_ends_with($name, '"')) {
         $name = substr($name, 1, -1);
       }
 

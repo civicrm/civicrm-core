@@ -640,7 +640,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    * @return bool
    */
   public static function isFullyFormedUrl($url) {
-    return (substr($url, 0, 4) === 'http') || (substr($url, 0, 1) === '/');
+    return (str_starts_with($url, 'http')) || (str_starts_with($url, '/'));
   }
 
   /**

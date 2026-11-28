@@ -243,7 +243,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
     // We've made metadata an array but only supporting 'fields' atm.
     if (in_array('fields', (array) $params['options']['metadata']) && $action !== 'getfields') {
       $fields = civicrm_api3($entity, 'getfields', [
-        'action' => substr($action, 0, 3) == 'get' ? 'get' : 'create',
+        'action' => str_starts_with($action, 'get') ? 'get' : 'create',
       ]);
       $result['metadata']['fields'] = $fields['values'];
     }
@@ -531,7 +531,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $returnProperties = NULL;
   }
 
-  if (substr(($sort ?? ''), 0, 2) == 'id') {
+  if (str_starts_with(($sort ?? ''), 'id')) {
     $sort = $lowercase_entity . "_" . $sort;
   }
 
@@ -841,7 +841,7 @@ function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $e
     'version', 'prettyprint', 'check_permissions', 'sequential',
   ];
   foreach ($params as $n => $v) {
-    if (substr($n, 0, 7) === 'return.') {
+    if (str_starts_with($n, 'return.')) {
       $legacyreturnProperties[substr($n, 7)] = $v;
     }
     elseif ($n === 'id') {
@@ -2251,7 +2251,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
  * @throws Exception
  */
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity, $action) {
-  $isGet = substr($action ?? '', 0, 3) === 'get';
+  $isGet = str_starts_with($action ?? '', 'get');
   [$fieldValue, $op] = _civicrm_api3_field_value_check($params, $fieldName, 'String');
   if (str_contains(($op ?? ''), 'NULL') || str_contains(($op ?? ''), 'EMPTY') || CRM_Utils_System::isNull($fieldValue)) {
     return;

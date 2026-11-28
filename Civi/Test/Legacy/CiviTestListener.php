@@ -211,7 +211,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
 
       case 'phpcode':
         // If the last output is /*PHPCODE*/, then we managed to complete execution.
-        if (substr(trim($result), 0, 12) !== "/*BEGINPHP*/" || substr(trim($result), -10) !== "/*ENDPHP*/") {
+        if (!str_starts_with(trim($result), "/*BEGINPHP*/") || !str_ends_with(trim($result), "/*ENDPHP*/")) {
           throw new \RuntimeException("Command failed ($cmd):\n$result");
         }
         return $result;
@@ -254,7 +254,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     foreach ($byInterface['HeadlessInterface'] as $className => $nonce) {
       $clazz = new \ReflectionClass($className);
       $docComment = str_replace("\r\n", "\n", $clazz->getDocComment());
-      if (strpos($docComment, "@group headless\n") === FALSE) {
+      if (!str_contains($docComment, "@group headless\n")) {
         echo "WARNING: Class $className implements HeadlessInterface. It should declare \"@group headless\".\n";
       }
       if (str_contains($docComment, "@group e2e\n")) {
@@ -264,7 +264,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     foreach ($byInterface['EndToEndInterface'] as $className => $nonce) {
       $clazz = new \ReflectionClass($className);
       $docComment = str_replace("\r\n", "\n", $clazz->getDocComment());
-      if (strpos($docComment, "@group e2e\n") === FALSE) {
+      if (!str_contains($docComment, "@group e2e\n")) {
         echo "WARNING: Class $className implements EndToEndInterface. It should declare \"@group e2e\".\n";
       }
       if (str_contains($docComment, "@group headless\n")) {

@@ -260,7 +260,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         // We could push this down to the getRowsElementsAndInfo function but it's
         // already so overloaded - let's start moving towards doing form-things
         // on the form.
-        if (substr($element[1], 0, 13) === 'move_location') {
+        if (str_starts_with($element[1], 'move_location')) {
           $element[4] = array_merge(
             (array) ($element[4] ?? []),
             [
@@ -268,7 +268,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
               'data-is_location' => TRUE,
             ]);
         }
-        if (substr($element[1], 0, 15) === 'location_blocks') {
+        if (str_starts_with($element[1], 'location_blocks')) {
           // @todo We could add some data elements here to make jquery manipulation more straight-forward
           // @todo consider enabling if it is an add & defaulting to true.
           $element[4] = array_merge((array) ($element[4] ?? []), ['disabled' => TRUE]);

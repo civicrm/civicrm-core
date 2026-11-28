@@ -269,7 +269,7 @@ class CRM_Utils_JS {
     }
     $result = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     // Convert double-quotes around string to single quotes
-    if (is_string($value) && substr($result, 0, 1) === '"' && substr($result, -1) === '"') {
+    if (is_string($value) && str_starts_with($result, '"') && str_ends_with($result, '"')) {
       $backslash = chr(0) . 'backslash' . chr(0);
       return "'" . str_replace(['\\\\', '\\"', "'", $backslash], [$backslash, '"', "\\'", '\\\\'], substr($result, 1, -1)) . "'";
     }

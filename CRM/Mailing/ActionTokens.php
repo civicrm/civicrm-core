@@ -143,7 +143,7 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
 
       if ($value && $html) {
         // fix for CRM-2318
-        if (substr($token, -3) != 'Url') {
+        if (!str_ends_with($token, 'Url')) {
           $value = "mailto:$value";
         }
       }

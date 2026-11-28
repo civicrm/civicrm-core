@@ -256,7 +256,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     // use getEntity Defaults
     $requestParams = CRM_Utils_Request::exportValues();
     foreach (array_keys($requestParams) as $key) {
-      if (substr($key, 0, 7) !== 'custom_') {
+      if (!str_starts_with($key, 'custom_')) {
         continue;
       }
       elseif (empty($requestParams[$key])) {

@@ -214,14 +214,14 @@ class Mixlib {
     $info = [];
     $param = NULL;
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $comment) as $num => $line) {
-      if (!$num || strpos($line, '*/') !== FALSE) {
+      if (!$num || str_contains($line, '*/')) {
         continue;
       }
       $line = ltrim(trim($line), '*');
       if (strlen($line) && $line[0] === ' ') {
         $line = substr($line, 1);
       }
-      if (strpos(ltrim($line), '@') === 0) {
+      if (str_starts_with(ltrim($line), '@')) {
         $words = explode(' ', ltrim($line, ' @'));
         $key = array_shift($words);
         $param = NULL;
@@ -268,7 +268,7 @@ class Mixlib {
         }
       }
       // For multi-line description.
-      elseif (count($info) === 1 && isset($info['description']) && substr($info['description'], -1) !== '.') {
+      elseif (count($info) === 1 && isset($info['description']) && !str_ends_with($info['description'], '.')) {
         $info['description'] .= ' ' . $line;
       }
       else {

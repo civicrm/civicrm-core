@@ -266,7 +266,7 @@ function _civicrm_activity_get_handleSourceContactNameOrderBy(&$params, &$option
   $sourceContactID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
   if (!empty($options['sort'])
     && in_array($options['sort'], ['source_contact_name', 'source_contact_name desc', 'source_contact_name asc'])) {
-    $order = substr($options['sort'], -4) === 'desc' ? 'desc' : 'asc';
+    $order = str_ends_with($options['sort'], 'desc') ? 'desc' : 'asc';
     $sql->join(
       'source_contact',
       "LEFT JOIN
@@ -391,7 +391,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
   $returns = $options['return'];
   foreach ($params as $n => $v) {
     // @todo - the per-parsing on options should have already done this.
-    if (substr($n, 0, 7) == 'return.') {
+    if (str_starts_with($n, 'return.')) {
       $returnkey = substr($n, 7);
       $returns[$returnkey] = $v;
     }
@@ -463,7 +463,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
         break;
 
       default:
-        if (substr($n, 0, 6) == 'custom') {
+        if (str_starts_with($n, 'custom')) {
           $returnProperties[$n] = $v;
         }
     }

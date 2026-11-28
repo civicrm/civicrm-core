@@ -2010,9 +2010,9 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     if (!empty($form->_fields)) {
 
       foreach ($form->_fields as $name => $fieldInfo) {
-        if ((substr($name, 0, 7) == 'custom_' && !$form->_allowConfirmation
+        if ((str_starts_with($name, 'custom_') && !$form->_allowConfirmation
           && !CRM_Core_BAO_CustomGroup::checkCustomField(substr($name, 7), ['Participant']))
-          || substr($name, 0, 12) == 'participant_') {
+          || str_starts_with($name, 'participant_')) {
           continue;
         }
         $fields[$name] = $fieldInfo;

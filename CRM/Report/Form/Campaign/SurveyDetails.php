@@ -284,7 +284,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
     if ($this->_locationBasedPhoneField) {
       foreach ($this->surveyResponseFields as $key => $value) {
-        if (substr($key, 0, 5) == 'phone' && !empty($value['location_type_id'])
+        if (str_starts_with($key, 'phone') && !empty($value['location_type_id'])
         ) {
           $fName = str_replace('-', '_', $key);
           $this->_from .= "LEFT JOIN civicrm_phone " .
@@ -683,7 +683,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
       $this->surveyResponseFields = $responseFields;
     }
     foreach ($responseFields as $key => $value) {
-      if (substr($key, 0, 5) == 'phone' && !empty($value['location_type_id'])) {
+      if (str_starts_with($key, 'phone') && !empty($value['location_type_id'])) {
         $fName = str_replace('-', '_', $key);
         $this->_columns["civicrm_{$fName}"] = [
           'dao' => 'CRM_Core_DAO_Phone',

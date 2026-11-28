@@ -183,7 +183,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
   // CRM-16959: Handle multiple Contact IDs and Group IDs in legacy format
   // (contact_id.1, contact_id.2) or as an array
   foreach ($params as $n => $v) {
-    if (substr($n, 0, 10) == 'contact_id') {
+    if (str_starts_with($n, 'contact_id')) {
       if (is_array($v)) {
         foreach ($v as $arr_v) {
           $contactIDs[] = $arr_v;
@@ -193,7 +193,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
         $contactIDs[] = $v;
       }
     }
-    elseif (substr($n, 0, 8) == 'group_id') {
+    elseif (str_starts_with($n, 'group_id')) {
       if (is_array($v)) {
         foreach ($v as $arr_v) {
           $groupIDs[] = $arr_v;

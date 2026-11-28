@@ -1226,7 +1226,7 @@ class CRM_Utils_System {
     // http://www.php.net/manual/en/function.getallheaders.php#66335
     $headers = [];
     foreach ($_SERVER as $name => $value) {
-      if (substr($name, 0, 5) == 'HTTP_') {
+      if (str_starts_with($name, 'HTTP_')) {
         $headers[str_replace(' ',
           '-',
           ucwords(strtolower(str_replace('_',
@@ -1604,7 +1604,7 @@ class CRM_Utils_System {
   public static function absoluteURL($url, $removeLanguagePart = FALSE) {
     CRM_Core_Error::deprecatedFunctionWarning('url');
     // check if url is already absolute, if so return immediately
-    if (substr($url, 0, 4) == 'http') {
+    if (str_starts_with($url, 'http')) {
       return $url;
     }
 

@@ -900,7 +900,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     //Hence, assign the existing location type email by iterating through the params.
     if ($this->_emailExists && empty($this->_params["email-{$this->_bltID}"])) {
       foreach ($this->_params as $key => $val) {
-        if (substr($key, 0, 6) === 'email-') {
+        if (str_starts_with($key, 'email-')) {
           $this->assign('email', $this->_params[$key]);
           break;
         }
@@ -951,7 +951,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($fields) {
         // determine if email exists in profile so we know if we need to manually insert CRM-2888, CRM-15067
         foreach ($fields as $key => $field) {
-          if (substr($key, 0, 6) == 'email-' &&
+          if (str_starts_with($key, 'email-') &&
               !in_array($profileContactType, ['honor', 'onbehalf'])
           ) {
             $this->_emailExists = TRUE;

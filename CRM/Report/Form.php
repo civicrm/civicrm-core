@@ -1838,8 +1838,8 @@ class CRM_Report_Form extends CRM_Core_Form {
       !empty($fields['group_bys'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
-        if ((substr($tableName, 0, 13) == 'civicrm_value' ||
-            substr($tableName, 0, 12) == 'custom_value') &&
+        if ((str_starts_with($tableName, 'civicrm_value') ||
+            str_starts_with($tableName, 'custom_value')) &&
           !empty($this->_columns[$tableName]['fields'])
         ) {
           foreach ($this->_columns[$tableName]['fields'] as $fieldName => $field) {

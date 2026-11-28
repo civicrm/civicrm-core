@@ -80,7 +80,7 @@ class CaseManagerSpecProvider extends \Civi\Core\Service\AutoService implements 
         continue;
       }
       $relationshipTypeId = (int) substr($managerRoleId, 0, -4);
-      $contactColumn = substr($managerRoleId, -4) === '_a_b' ? 'contact_id_b' : 'contact_id_a';
+      $contactColumn = str_ends_with($managerRoleId, '_a_b') ? 'contact_id_b' : 'contact_id_a';
       $caseTypeId = (int) $caseTypeId;
 
       $whenClauses[] = "WHEN $alias.`case_type_id` = $caseTypeId THEN (

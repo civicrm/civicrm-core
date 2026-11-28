@@ -99,7 +99,7 @@ function _afform_civix_class_loader($class) {
   }
 
   // This allows us to tap-in to the installation process (without incurring real file-reads on typical requests).
-  if (strpos($class, 'CiviMix\\Schema\\Afform\\') === 0) {
+  if (str_starts_with($class, 'CiviMix\\Schema\\Afform\\')) {
     // civimix-schema@5 is designed for backported use in download/activation workflows,
     // where new revisions may become dynamically available.
     pathload()->loadPackage('civimix-schema@5', TRUE);

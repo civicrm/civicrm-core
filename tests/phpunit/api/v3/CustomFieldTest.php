@@ -549,7 +549,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   public function getCustomFieldKeys($getFieldsResult) {
     $isCustom = function ($key) {
-      return 0 === strpos($key, 'custom_');
+      return str_starts_with($key, 'custom_');
     };
     $r = array_values(array_filter(array_keys($getFieldsResult['values']), $isCustom));
     sort($r);

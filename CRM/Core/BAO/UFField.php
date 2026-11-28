@@ -94,7 +94,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     else {
       $ufField->website_type_id = 'null';
     }
-    if (!strstr($params['field_name'], 'phone')) {
+    if (!str_contains($params['field_name'], 'phone')) {
       $ufField->phone_type_id = 'null';
     }
 

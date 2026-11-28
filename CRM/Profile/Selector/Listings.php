@@ -292,7 +292,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
       foreach ($this->_fields as $name => $field) {
         // skip pseudo fields
-        if (substr($name, 0, 9) == 'phone_ext') {
+        if (str_starts_with($name, 'phone_ext')) {
           continue;
         }
 
@@ -495,7 +495,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
     foreach ($this->_fields as $key => $field) {
       // skip pseudo fields
-      if (substr($key, 0, 9) == 'phone_ext') {
+      if (str_starts_with($key, 'phone_ext')) {
         continue;
       }
 
@@ -587,7 +587,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             $result->contact_id
           );
         }
-        elseif (substr($name, -4) == '-url' &&
+        elseif (str_ends_with($name, '-url') &&
           !empty($result->$name)
         ) {
           $url = CRM_Utils_System::fixURL($result->$name);

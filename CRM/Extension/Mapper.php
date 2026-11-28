@@ -147,7 +147,7 @@ class CRM_Extension_Mapper {
    */
   public function isExtensionClass($clazz) {
     CRM_Core_Error::deprecatedFunctionWarning();
-    if (substr($clazz, 0, 4) != 'CRM_') {
+    if (!str_starts_with($clazz, 'CRM_')) {
       return (bool) preg_match('/^[a-z0-9]+(_[a-z0-9]+)+$/', $clazz);
     }
     return FALSE;

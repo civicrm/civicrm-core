@@ -2207,8 +2207,8 @@ LIKE %1
           $colName = $value['name'];
           $newObject->$colName = $object->$colName;
 
-          if (substr($name, -5) == '_date' ||
-            substr($name, -10) == '_date_time'
+          if (str_ends_with($name, '_date') ||
+            str_ends_with($name, '_date_time')
           ) {
             $newObject->$colName = CRM_Utils_Date::isoToMysql($newObject->$colName);
           }

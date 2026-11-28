@@ -1551,14 +1551,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       self::swapOutFieldsAffectedByQFZeroBug($migrationInfo);
       foreach ($migrationInfo as $key => $value) {
 
-        if (substr($key, 0, 12) === 'move_custom_' && $value != NULL) {
+        if (str_starts_with($key, 'move_custom_') && $value != NULL) {
           $submitted[substr($key, 5)] = $value;
           $submittedCustomFields[] = substr($key, 12);
         }
         elseif (in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) && $value != NULL) {
           $submitted[substr($key, 5)] = $value;
         }
-        elseif (substr($key, 0, 15) === 'move_rel_table_' and $value == '1') {
+        elseif (str_starts_with($key, 'move_rel_table_') and $value == '1') {
           $moveTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
           if (array_key_exists('operation', $migrationInfo)) {
             foreach ($relTables[substr($key, 5)]['tables'] as $table) {
@@ -1568,7 +1568,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             }
           }
         }
-        elseif (substr($key, 0, 15) === 'move_rel_table_' and $value == '0') {
+        elseif (str_starts_with($key, 'move_rel_table_') and $value == '0') {
           $removeTables = array_merge($removeTables, $relTables[substr($key, 5)]['tables']);
         }
       }
@@ -2099,7 +2099,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             // For custom fields a 0 (e.g in an int field) could be a true conflict. This
             // is probably true for other fields too - e.g. 'do_not_email'.
             // There should be pretty solid test cover here now.
-            || ($migrationInfo['rows'][$key]['main'] === '0' && substr($key, 0, 12) === 'move_custom_')
+            || ($migrationInfo['rows'][$key]['main'] === '0' && str_starts_with($key, 'move_custom_'))
           )
           && $migrationInfo['rows'][$key]['main'] != $migrationInfo['rows'][$key]['other']
         ) {
@@ -2109,7 +2109,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $conflicts[$key] = NULL;
         }
       }
-      elseif (substr($key, 0, 14) === 'move_location_' and $val != NULL) {
+      elseif (str_starts_with($key, 'move_location_') and $val != NULL) {
         $locField = explode('_', $key);
         $fieldName = $locField[2];
         $fieldCount = $locField[3];
@@ -2207,7 +2207,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
     foreach (array_keys($conflicts) as $index) {
-      if (substr($index, 0, 14) === 'move_location_') {
+      if (str_starts_with($index, 'move_location_')) {
         $parts = explode('_', $index);
         $entity = $parts[2];
         $blockIndex = $parts[3];
@@ -2230,7 +2230,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
         $return[$entity][] = $entityConflicts;
       }
-      elseif (substr($index, 0, 5) === 'move_') {
+      elseif (str_starts_with($index, 'move_')) {
         $contactFieldsToCompare[] = str_replace('move_', '', $index);
         $return['contact'][str_replace('move_', '', $index)] = [
           'title' => $migrationInfo[$index]['title'],

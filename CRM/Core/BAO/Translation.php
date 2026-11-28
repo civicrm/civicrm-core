@@ -321,7 +321,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation {
    * @return bool
    */
   private static function isNorwegianLocale(?string $locale): bool {
-    return substr($locale ?? '', -3, 3) === '_NO';
+    return str_ends_with($locale ?? '', '_NO');
   }
 
   /**

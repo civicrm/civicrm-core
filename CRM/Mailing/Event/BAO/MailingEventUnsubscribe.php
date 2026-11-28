@@ -128,7 +128,7 @@ WHERE  email = %2
 
     while ($do->fetch()) {
       // @todo this is should be a temporary measure until we stop storing the translated table name in the database
-      if (substr($do->entity_table, 0, 13) === 'civicrm_group') {
+      if (str_starts_with($do->entity_table, 'civicrm_group')) {
         if ($do->group_type === 'Base') {
           $base_groups[$do->entity_id] = NULL;
         }
@@ -136,7 +136,7 @@ WHERE  email = %2
           $groups[$do->entity_id] = NULL;
         }
       }
-      elseif (substr($do->entity_table, 0, 15) === 'civicrm_mailing') {
+      elseif (str_starts_with($do->entity_table, 'civicrm_mailing')) {
         // @todo this is should be a temporary measure until we stop storing the translated table name in the database
         $mailings[] = $do->entity_id;
       }
@@ -157,10 +157,10 @@ WHERE  email = %2
 
       while ($do->fetch()) {
         // @todo this is should be a temporary measure until we stop storing the translated table name in the database
-        if (substr($do->entity_table, 0, 13) === 'civicrm_group') {
+        if (str_starts_with($do->entity_table, 'civicrm_group')) {
           $groups[$do->entity_id] = TRUE;
         }
-        elseif (substr($do->entity_table, 0, 15) === 'civicrm_mailing') {
+        elseif (str_starts_with($do->entity_table, 'civicrm_mailing')) {
           // @todo this is should be a temporary measure until we stop storing the translated table name in the database
           $mailings[] = $do->entity_id;
         }

@@ -429,7 +429,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @return bool
    */
   private static function isNotFullyFormedUrl($url) {
-    return substr($url, 0, 4) !== 'http' && $url[0] !== '/' && $url[0] !== '#';
+    return !str_starts_with($url, 'http') && $url[0] !== '/' && $url[0] !== '#';
   }
 
   /**

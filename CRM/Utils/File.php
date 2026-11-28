@@ -711,7 +711,7 @@ HTACCESS;
       $directory = strtr($directory, '\\', '/');
       $basePath = strtr($basePath, '\\', '/');
     }
-    if (substr($directory, 0, strlen($basePath)) == $basePath) {
+    if (str_starts_with($directory, $basePath)) {
       return substr($directory, strlen($basePath));
     }
     else {
@@ -1123,7 +1123,7 @@ HTACCESS;
     if ($fileName) {
       $check = ($fileName === basename($fileName));
       if ($check) {
-        if (substr($fileName, 0, 1) == '/' || substr($fileName, 0, 1) == '.' || substr($fileName, 0, 1) == DIRECTORY_SEPARATOR) {
+        if (str_starts_with($fileName, '/') || str_starts_with($fileName, '.') || substr($fileName, 0, 1) == DIRECTORY_SEPARATOR) {
           $check = FALSE;
         }
       }

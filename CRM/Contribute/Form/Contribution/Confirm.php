@@ -898,7 +898,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       elseif (isset($contact[$name])) {
         $defaults[$name] = $contact[$name];
-        if (substr($name, 0, 7) === 'custom_') {
+        if (str_starts_with($name, 'custom_')) {
           $timeField = "{$name}_time";
           if (isset($contact[$timeField])) {
             $defaults[$timeField] = $contact[$timeField];
@@ -2133,7 +2133,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     //Set email-bltID if pre/post profile contains an email.
     if ($this->_emailExists == TRUE) {
       foreach ($this->_params as $key => $val) {
-        if (substr($key, 0, 6) == 'email-' && empty($this->_params["email-{$this->_bltID}"])) {
+        if (str_starts_with($key, 'email-') && empty($this->_params["email-{$this->_bltID}"])) {
           $this->_params["email-{$this->_bltID}"] = $this->_params[$key];
         }
       }

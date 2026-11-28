@@ -58,7 +58,7 @@ class AHQ {
    */
   public static function getProps($element) {
     return array_filter($element, function($key) {
-      return substr($key, 0, 1) !== '#';
+      return !str_starts_with($key, '#');
     }, ARRAY_FILTER_USE_KEY);
   }
 

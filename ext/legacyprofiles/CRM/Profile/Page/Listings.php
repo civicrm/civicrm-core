@@ -140,7 +140,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     ];
 
     foreach ($this->_fields as $name => $field) {
-      if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
+      if ((str_starts_with($name, 'custom')) && !empty($field['is_search_range'])) {
         $from = CRM_Utils_Request::retrieve($name . '_from', 'String', $this);
         $to = CRM_Utils_Request::retrieve($name . '_to', 'String', $this);
         $value = [];
@@ -155,7 +155,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           $value[$name . '_to'] = $to;
         }
       }
-      elseif ((substr($name, 0, 7) == 'custom_') &&
+      elseif ((str_starts_with($name, 'custom_')) &&
         (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
             substr($name, 7), 'html_type'
           ) == 'TextArea')
@@ -164,8 +164,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           $this, FALSE, NULL, 'REQUEST'
         ));
         if (!empty($value) &&
-          !((substr($value, 0, 1) == '%') &&
-            (substr($value, -1, 1) == '%')
+          !((str_starts_with($value, '%')) &&
+            (str_ends_with($value, '%'))
           )
         ) {
           $value = '%' . $value . '%';
@@ -231,7 +231,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         if ($operator) {
           $this->_params[$name . '_operator'] = $operator;
         }
-        if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
+        if ((str_starts_with($name, 'custom')) && !empty($field['is_search_range'])) {
           $this->_params += $value;
         }
         else {

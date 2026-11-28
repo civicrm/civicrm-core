@@ -18,7 +18,7 @@ function buildRedirectUrl($get) {
       basename(__FILE__), 'DEST'));
   }
   $query = http_build_query($get);
-  $delim = strpos($url, '?') === FALSE ? '?' : '&';
+  $delim = !str_contains($url, '?') ? '?' : '&';
   return $url . ($query === '' ? '' : $delim . $query);
 }
 

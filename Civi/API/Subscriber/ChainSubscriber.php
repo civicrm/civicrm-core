@@ -94,7 +94,7 @@ class ChainSubscriber implements EventSubscriberInterface {
     $blacklist = ['api.has_parent', 'api_params'];
     // Scan the params for chain calls.
     foreach ($params as $field => $newparams) {
-      if ((is_array($newparams) || $newparams === 1) && !in_array($field, $blacklist, TRUE) && substr($field, 0, 3) == 'api') {
+      if ((is_array($newparams) || $newparams === 1) && !in_array($field, $blacklist, TRUE) && str_starts_with($field, 'api')) {
         // This param is a chain call, e.g. api.<entity>.<action>
 
         // 'api.participant.delete' => 1 is a valid options - handle 1
@@ -152,7 +152,7 @@ class ChainSubscriber implements EventSubscriberInterface {
               // "contact_id" => parent_id.
               // See CRM-16084.
               foreach (array_keys($newparams) as $key) {
-                if (substr($key, 0, 11) == 'contact_id_') {
+                if (str_starts_with($key, 'contact_id_')) {
                   $addEntityId = FALSE;
                   break;
                 }

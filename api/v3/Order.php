@@ -171,7 +171,7 @@ function civicrm_api3_order_create(array $params): array {
     // Unset chained keys so the code does not attempt to do this chaining twice.
     // e.g if calling 'api.Payment.create' We want to finish creating the order first.
     // it would probably be better to have a full whitelist of contributionParams
-    if (substr($key, 0, 3) === 'api') {
+    if (str_starts_with($key, 'api')) {
       unset($contributionParams[$key]);
     }
   }

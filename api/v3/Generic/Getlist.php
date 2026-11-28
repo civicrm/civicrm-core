@@ -27,7 +27,7 @@ function civicrm_api3_generic_getList($apiRequest) {
   $meta = civicrm_api3_generic_getfields(['action' => 'get'] + $apiRequest, FALSE)['values'];
 
   // If the user types an integer into the search
-  $forceIdSearch = empty($request['id']) && !empty($request['input']) && !empty($meta['id']) && CRM_Utils_Rule::positiveInteger($request['input']) && (substr($request['input'], 0, 1) !== '0');
+  $forceIdSearch = empty($request['id']) && !empty($request['input']) && !empty($meta['id']) && CRM_Utils_Rule::positiveInteger($request['input']) && (!str_starts_with($request['input'], '0'));
   // Add an extra page of results for the record with an exact id match
   if ($forceIdSearch) {
     $request['page_num'] = ($request['page_num'] ?? 1) - 1;
@@ -286,7 +286,7 @@ function _civicrm_api3_generic_getlist_output($result, $request, $entity, $field
 function _civicrm_api3_generic_getlist_postprocess($result, $request, &$values) {
   $chains = [];
   foreach ($request['params'] as $field => $param) {
-    if (substr($field, 0, 4) === 'api.') {
+    if (str_starts_with($field, 'api.')) {
       $chains[] = $field;
     }
   }

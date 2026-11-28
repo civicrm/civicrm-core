@@ -463,7 +463,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected function getEmailFields(array $fields): array {
     $emailFields = [];
     foreach (array_keys($fields) as $fieldName) {
-      if (substr($fieldName, 0, 6) === 'email-'
+      if (str_starts_with($fieldName, 'email-')
           && (is_numeric(substr($fieldName, 6)) || substr($fieldName, 6) ===
         'Primary')) {
         $emailFields[] = $fieldName;

@@ -176,7 +176,7 @@ function civicrm_api3_mailing_clone($params) {
   $dao->find();
   while ($dao->fetch()) {
     // CRM-11431; account for multi-lingual
-    $entity = (substr($dao->entity_table, 0, 15) == 'civicrm_mailing') ? 'mailings' : 'groups';
+    $entity = (str_starts_with($dao->entity_table, 'civicrm_mailing')) ? 'mailings' : 'groups';
     $newParams[$entity][strtolower($dao->group_type)][] = $dao->entity_id;
   }
 

@@ -305,7 +305,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           // multiple checkbox values).
           // @todo extract submit functions on other Batch update classes &
           // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test them.
-          if (substr($fieldName, 0, 7) === 'custom_') {
+          if (str_starts_with($fieldName, 'custom_')) {
             unset($value[$fieldName]);
           }
         }

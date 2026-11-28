@@ -504,8 +504,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
 
     //adding custom field property
-    if (substr($field->field_name, 0, 6) == 'custom' ||
-      substr($field->field_name, 0, 14) === 'address_custom'
+    if (str_starts_with($field->field_name, 'custom') ||
+      str_starts_with($field->field_name, 'address_custom')
     ) {
       // if field is not present in customFields, that means the user
       // DOES NOT HAVE permission to access that field
@@ -1066,7 +1066,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $params[$index] = $details->$name;
         }
         else {
-          if (substr($name, 0, 7) === 'do_not_' || substr($name, 0, 3) === 'is_') {
+          if (str_starts_with($name, 'do_not_') || str_starts_with($name, 'is_')) {
             if ($details->$name) {
               $values[$index] = '[ x ]';
             }
@@ -1803,7 +1803,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'address_options', TRUE, NULL, TRUE
     );
 
-    if (substr($fieldName, 0, 14) === 'state_province') {
+    if (str_starts_with($fieldName, 'state_province')) {
       $form->addChainSelect($name, ['label' => $title, 'required' => $required]);
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, [CRM_Profile_Form::MODE_EDIT, CRM_Profile_Form::MODE_SEARCH]) &&
@@ -1813,7 +1813,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $form->setDefaults($defaultValues);
       }
     }
-    elseif (substr($fieldName, 0, 7) === 'country') {
+    elseif (str_starts_with($fieldName, 'country')) {
       $form->add('select', $name, $title, CRM_Core_PseudoConstant::country(), $required, $selectAttributes);
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, [CRM_Profile_Form::MODE_EDIT, CRM_Profile_Form::MODE_SEARCH]) &&
@@ -1823,23 +1823,23 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $form->setDefaults($defaultValues);
       }
     }
-    elseif (substr($fieldName, 0, 6) === 'county') {
+    elseif (str_starts_with($fieldName, 'county')) {
       if ($addressOptions['county']) {
         $form->addChainSelect($name, ['label' => $title, 'required' => $required]);
       }
     }
-    elseif (substr($fieldName, 0, 9) === 'image_URL') {
+    elseif (str_starts_with($fieldName, 'image_URL')) {
       if (!isset($attributes['accept'])) {
         $attributes['accept'] = 'image/png, image/jpeg, image/gif';
       }
       $form->add('file', $name, $title, $attributes, $required);
       $form->addUploadElement($name);
     }
-    elseif (substr($fieldName, 0, 2) === 'im') {
+    elseif (str_starts_with($fieldName, 'im')) {
       $form->add('text', $name, $title, $attributes, $required);
       if (!$contactId) {
         if ($usedFor) {
-          if (substr($name, -1) === ']') {
+          if (str_ends_with($name, ']')) {
             $providerName = substr($name, 0, -1) . '-provider_id]';
           }
           $form->add('select', $providerName, NULL,
@@ -1998,21 +1998,21 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         NULL, $title, $name
       );
     }
-    elseif (substr($fieldName, 0, 4) === 'url-') {
+    elseif (str_starts_with($fieldName, 'url-')) {
       $form->add('text', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Website', 'url'), $required);
       $form->addRule($name, ts('Enter a valid website address, such as https://example.org'), 'url');
     }
     // Note should be rendered as textarea
-    elseif (substr($fieldName, -4) == 'note') {
+    elseif (str_ends_with($fieldName, 'note')) {
       $form->add('textarea', $name, $title, $attributes, $required);
     }
-    elseif (substr($fieldName, 0, 6) === 'custom') {
+    elseif (str_starts_with($fieldName, 'custom')) {
       $customFieldID = CRM_Core_BAO_CustomField::getKeyID($fieldName);
       if ($customFieldID) {
         CRM_Core_BAO_CustomField::addQuickFormElement($form, $name, $customFieldID, $required, $search, $title);
       }
     }
-    elseif (substr($fieldName, 0, 14) === 'address_custom') {
+    elseif (str_starts_with($fieldName, 'address_custom')) {
       [$fName, $locTypeId] = CRM_Utils_System::explode('-', $fieldName, 2);
       $customFieldID = CRM_Core_BAO_CustomField::getKeyID(substr($fName, 8));
       if ($customFieldID) {
@@ -2113,7 +2113,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif ($fieldName == 'signature_text') {
       $form->add('textarea', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
     }
-    elseif (substr($fieldName, -11) == 'campaign_id') {
+    elseif (str_ends_with($fieldName, 'campaign_id')) {
       if (CRM_Core_Component::isEnabled('CiviCampaign')) {
         $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($form->_componentCampaigns[$contactId] ?? NULL, NULL, TRUE, FALSE);
         $form->add('select', $name, $title,
@@ -2139,7 +2139,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     else {
-      if (substr($fieldName, 0, 3) === 'is_' or substr($fieldName, 0, 7) === 'do_not_') {
+      if (str_starts_with($fieldName, 'is_') or str_starts_with($fieldName, 'do_not_')) {
         $form->add('advcheckbox', $name, $title, $attributes, $required);
       }
       elseif (($field['html_type'] ?? NULL) === 'Select Date') {
@@ -2217,7 +2217,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       //start of code to set the default values
       foreach ($fields as $name => $field) {
         // skip pseudo fields
-        if (substr($name, 0, 9) == 'phone_ext') {
+        if (str_starts_with($name, 'phone_ext')) {
           continue;
         }
 
@@ -2514,12 +2514,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   public static function setRegisterDefaults(&$fields, &$defaults) {
     $config = CRM_Core_Config::singleton();
     foreach ($fields as $name => $field) {
-      if (substr($name, 0, 8) == 'country-') {
+      if (str_starts_with($name, 'country-')) {
         if (!empty($config->defaultContactCountry)) {
           $defaults[$name] = $config->defaultContactCountry;
         }
       }
-      elseif (substr($name, 0, 15) == 'state_province-') {
+      elseif (str_starts_with($name, 'state_province-')) {
         if (!empty($config->defaultContactStateProvince)) {
           $defaults[$name] = $config->defaultContactStateProvince;
         }
@@ -2761,7 +2761,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         elseif ($key === 'gender') {
           $data['gender_id'] = $value;
         }
-        elseif (substr($key, 0, 6) === 'custom') {
+        elseif (str_starts_with($key, 'custom')) {
           if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
             //fix checkbox
             if ($customFields[$customFieldID]['html_type'] == 'CheckBox') {
@@ -3524,7 +3524,7 @@ SELECT  group_id
     //reformat fields array
     foreach ($fields as $name => $field) {
       //reformat phone and extension field
-      if (substr($field['name'], 0, 13) == 'phone_and_ext') {
+      if (str_starts_with($field['name'], 'phone_and_ext')) {
         $fieldSuffix = str_replace('phone_and_ext-', '', $field['name']);
 
         // retain existing element properties and just update and replace key

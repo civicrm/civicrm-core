@@ -198,10 +198,10 @@ class CRM_Core_BAO_CustomQuery {
         }
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
-          $qillValue = strstr($op, 'NULL') ? NULL : CRM_Core_BAO_CustomField::displayValue($value[$op], $id);
+          $qillValue = str_contains($op, 'NULL') ? NULL : CRM_Core_BAO_CustomField::displayValue($value[$op], $id);
         }
         else {
-          $op = strstr($op, 'IN') ? $op : 'IN';
+          $op = str_contains($op, 'IN') ? $op : 'IN';
           $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
         }
 
@@ -251,7 +251,7 @@ class CRM_Core_BAO_CustomQuery {
               }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
-              if ($isSerialized && !CRM_Utils_System::isNull($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
+              if ($isSerialized && !CRM_Utils_System::isNull($value) && !str_contains($op, 'NULL') && !str_contains($op, 'LIKE')) {
                 $sp = CRM_Core_DAO::VALUE_SEPARATOR;
                 $value = str_replace(",", "$sp|$sp", $value);
                 $value = str_replace(['[:comma:]', '(', ')'], [',', '[(]', '[)]'], $value);
@@ -327,9 +327,9 @@ class CRM_Core_BAO_CustomQuery {
             break;
 
           case 'Date':
-            if (substr($name, -9, 9) !== '_relative'
-              && substr($name, -4, 4) !== '_low'
-              && substr($name, -5, 5) !== '_high') {
+            if (!str_ends_with($name, '_relative')
+              && !str_ends_with($name, '_low')
+              && !str_ends_with($name, '_high')) {
               // Relative dates are handled in the buildRelativeDateQuery function.
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
               [$qillOp, $qillVal] = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);

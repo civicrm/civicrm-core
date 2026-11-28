@@ -306,7 +306,7 @@ class CRM_Utils_Type {
           // so we just clumsily re-assemble it. Test cover exists.
           $fieldClauseStart = NULL;
           foreach ($parts as $index => &$part) {
-            if (substr($part, 0, 6) === 'field(') {
+            if (str_starts_with($part, 'field(')) {
               // Looking to escape a string like 'field(contribution_status_id,3,4,5) asc'
               // to 'field(`contribution_status_id`,3,4,5) asc'
               $fieldClauseStart = $index;
@@ -316,7 +316,7 @@ class CRM_Utils_Type {
               // this is part of the list of field options. Concatenate it back on.
               $parts[$fieldClauseStart] .= ',' . $part;
               unset($parts[$index]);
-              if (!strstr($parts[$fieldClauseStart], ')')) {
+              if (!str_contains($parts[$fieldClauseStart], ')')) {
                 // we have not reached the end of the list.
                 continue;
               }
@@ -557,7 +557,7 @@ class CRM_Utils_Type {
     $checkType = $isStrict ? $checkTypeStrict : $checkTypeRelaxed;
 
     foreach ($types as $type) {
-      $isTypedArray = substr($type, -2, 2) === '[]';
+      $isTypedArray = str_ends_with($type, '[]');
       if (!$isTypedArray && $checkType($type, $value)) {
         return TRUE;
       }

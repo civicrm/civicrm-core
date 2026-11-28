@@ -89,10 +89,10 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
   $entityTable = 'civicrm_contact';
   if (is_array($params)) {
     foreach ($params as $n => $v) {
-      if ((substr($n, 0, 10) == 'contact_id') || (substr($n, 0, 9) == 'entity_id')) {
+      if ((str_starts_with($n, 'contact_id')) || (str_starts_with($n, 'entity_id'))) {
         $entityIDs[] = $v;
       }
-      elseif (substr($n, 0, 6) == 'tag_id') {
+      elseif (str_starts_with($n, 'tag_id')) {
         if (is_array($v)) {
           $tagIDs = array_merge($tagIDs, $v);
         }
@@ -100,7 +100,7 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
           $tagIDs[] = $v;
         }
       }
-      elseif (substr($n, 0, 12) == 'entity_table') {
+      elseif (str_starts_with($n, 'entity_table')) {
         $entityTable = $v;
       }
     }

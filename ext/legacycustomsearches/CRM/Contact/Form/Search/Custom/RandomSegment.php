@@ -283,7 +283,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     CRM_Core_DAO::executeQuery($sql);
     $this->_rand_table->createWithColumns("id int PRIMARY KEY");
 
-    if (substr($this->_segmentSize, -1) == '%') {
+    if (str_ends_with($this->_segmentSize, '%')) {
       $countSql = "SELECT DISTINCT contact_a.id $from $fromTail
                          WHERE " . $this->where();
       $dao = CRM_Core_DAO::executeQuery($countSql);

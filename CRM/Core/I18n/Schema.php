@@ -467,7 +467,7 @@ class CRM_Core_I18n_Schema {
     $db = $dao->_database;
     $lookup_table = $table;
 
-    if (substr($table, 0, 4) == 'log_') {
+    if (str_starts_with($table, 'log_')) {
       $lookup_table = substr($table, 4);
       $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
       $dsn = DB::parseDSN($dsn);

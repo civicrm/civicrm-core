@@ -239,7 +239,7 @@ class CRM_Core_BAO_SchemaHandler {
     $indexFields = NULL;
 
     foreach ($params as $name => $value) {
-      if (substr($name, 0, 11) == 'field_name_') {
+      if (str_starts_with($name, 'field_name_')) {
         $indexName .= "_{$value}";
         $indexFields .= " $value,";
       }
@@ -771,7 +771,7 @@ MODIFY      {$columnName} varchar( $length )
           $existingIndex = $dao->Key_name;
         }
         $fkSql = self::buildForeignKeySQL($params, ",\n", "ADD ", $params['table_name']);
-        if (substr(($existingIndex ?? ''), 0, 2) === 'FK' && !$fkSql) {
+        if (str_starts_with(($existingIndex ?? ''), 'FK') && !$fkSql) {
           $sql .= "$separator DROP FOREIGN KEY {$existingIndex},\nDROP INDEX {$existingIndex}";
           $separator = ",\n";
         }

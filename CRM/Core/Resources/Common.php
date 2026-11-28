@@ -123,7 +123,7 @@ class CRM_Core_Resources_Common {
       }
       else {
         // Don't bother  looking for ts() calls in packages, there aren't any
-        $translate = (substr($item, 0, 3) == 'js/');
+        $translate = (str_starts_with($item, 'js/'));
         $bundle->addScriptFile('civicrm', $item, [
           'weight' => $jsWeight++,
           'translate' => $translate,

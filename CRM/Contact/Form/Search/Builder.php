@@ -173,7 +173,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         ]) && !empty($v[2])) {
           $errorMsg["value[$v[3]][$v[4]]"] = ts('Please clear your value if you want to use %1 operator.', [1 => $v[1]]);
         }
-        elseif (substr($v[0], 0, 7) === 'do_not_' or substr($v[0], 0, 3) === 'is_') {
+        elseif (str_starts_with($v[0], 'do_not_') or str_starts_with($v[0], 'is_')) {
           if (isset($v[2])) {
             $v2 = [$v[2]];
             if (!isset($v[2])) {
@@ -190,7 +190,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
           }
         }
         else {
-          if (substr($v[0], 0, 7) == 'custom_') {
+          if (str_starts_with($v[0], 'custom_')) {
             // Get rid of appended location type id
             [$fieldKey] = explode('-', $v[0]);
             $type = $fields[$fieldKey]['data_type'];
@@ -207,7 +207,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             $fldName = $v[0];
             // FIXME: no idea at this point what to do with this,
             // FIXME: but definitely needs fixing.
-            if (substr($v[0], 0, 13) == 'contribution_') {
+            if (str_starts_with($v[0], 'contribution_')) {
               $fldName = substr($v[0], 13);
             }
 
@@ -465,7 +465,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id'])) {
           $options[$field] = $entity;
           // Hack for when search field doesn't match db field - e.g. "country" instead of "country_id"
-          if (substr($field, -3) == '_id') {
+          if (str_ends_with($field, '_id')) {
             $options[substr($field, 0, -3)] = $entity;
           }
         }

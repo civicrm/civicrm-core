@@ -422,13 +422,13 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
               $additionalParticipantEmails = [];
               if (is_array($value)) {
                 foreach ($value as $key => $val) {
-                  if (substr($key, 0, 6) == 'email-' && $val) {
+                  if (str_starts_with($key, 'email-') && $val) {
                     $existingEmails[] = $val;
                   }
                 }
               }
               foreach ($fields as $key => $val) {
-                if (substr($key, 0, 6) == 'email-' && $val) {
+                if (str_starts_with($key, 'email-') && $val) {
                   $additionalParticipantEmails[] = $val;
                   $mailKey = $key;
                 }

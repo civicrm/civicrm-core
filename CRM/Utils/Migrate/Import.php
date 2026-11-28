@@ -406,7 +406,7 @@ AND        v.name = %1
         $this->copyData($profileField, $profileFieldXML, FALSE, 'field_name');
 
         // fix field name
-        if (substr($profileField->field_name, 0, 7) == 'custom.') {
+        if (str_starts_with($profileField->field_name, 'custom.')) {
           [$dontCare, $tableName, $columnName] = explode('.', $profileField->field_name);
           $sql = "
 SELECT     f.id

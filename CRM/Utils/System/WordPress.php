@@ -662,7 +662,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     // Is this a "back-end" AJAX call?
     $is_backend = FALSE;
-    if (wp_doing_ajax() && FALSE !== strpos(wp_get_referer(), admin_url())) {
+    if (wp_doing_ajax() && str_contains(wp_get_referer(), admin_url())) {
       $is_backend = TRUE;
     }
 

@@ -49,7 +49,7 @@ function civicrm_api3_custom_value_create($params) {
   // @todo it's not clear where the entity_table is used as  CRM_Core_BAO_CustomValueTable::setValues($create)
   // didn't seem to use it
   // so not clear if it's relevant
-  if (!empty($params['entity_table']) && substr($params['entity_table'], 0, 7) == 'civicrm') {
+  if (!empty($params['entity_table']) && str_starts_with($params['entity_table'], 'civicrm')) {
     $params['entity_table'] = substr($params['entity_table'], 8, 7);
   }
   $create = ['entityID' => $params['entity_id']];
@@ -122,7 +122,7 @@ function civicrm_api3_custom_value_get($params) {
   }
   unset($params['entity_id'], $params['entity_table']);
   foreach ($params as $id => $param) {
-    if ($param && substr($id, 0, 6) == 'return') {
+    if ($param && str_starts_with($id, 'return')) {
       $returnVal = $param;
       if (!empty(substr($id, 7))) {
         $returnVal = substr($id, 7);

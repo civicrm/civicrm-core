@@ -124,7 +124,7 @@ class CryptoJwt extends AutoService {
    *   Ex: 'HS256', 'HS384'
    */
   protected static function suiteToAlg($suite) {
-    if (substr($suite, 0, 4) === 'jwt-') {
+    if (str_starts_with($suite, 'jwt-')) {
       return strtoupper(substr($suite, 4));
     }
     else {

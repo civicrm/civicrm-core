@@ -11,7 +11,7 @@ namespace CiviMix\Schema;
 return new class() extends \CRM_Core_DAO {
 
   public function __construct() {
-    if (strpos(static::class, '@') !== FALSE) {
+    if (str_contains(static::class, '@')) {
       // Template instance. Fake news!
       return;
     }
@@ -134,7 +134,7 @@ return new class() extends \CRM_Core_DAO {
       if (!empty($fieldSpec['required'])) {
         $field['required'] = TRUE;
       }
-      if (strpos($fieldSpec['sql_type'], 'decimal(') === 0) {
+      if (str_starts_with($fieldSpec['sql_type'], 'decimal(')) {
         $precision = self::getFieldLength($fieldSpec['sql_type']);
         $field['precision'] = array_map('intval', explode(',', $precision));
       }
@@ -144,7 +144,7 @@ return new class() extends \CRM_Core_DAO {
           unset($fieldSpec['input_attrs'][$attr]);
         }
       }
-      if (strpos($fieldSpec['sql_type'], 'char(') !== FALSE) {
+      if (str_contains($fieldSpec['sql_type'], 'char(')) {
         $length = self::getFieldLength($fieldSpec['sql_type']);
         if (!isset($field['size'])) {
           $field['size'] = constant(static::getDefaultSize($length));

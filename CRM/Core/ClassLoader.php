@@ -170,7 +170,7 @@ class CRM_Core_ClassLoader {
       (0 === strncmp($class, 'CRM_', 4) || 0 === strncmp($class, 'CRMTraits', 9) || 0 === strncmp($class, 'api_v3_', 7) || 0 === strncmp($class, 'E2E_', 4)) &&
       // Do not load PHP 5.3 namespaced classes.
       // (in a future version, maybe)
-      FALSE === strpos($class, '\\')
+      !str_contains($class, '\\')
     ) {
       $file = strtr($class, '_', '/') . '.php';
       // There is some question about the best way to do this.

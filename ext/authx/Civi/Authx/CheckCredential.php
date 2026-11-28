@@ -88,7 +88,7 @@ class CheckCredential extends AutoService {
           // This is not an authx JWT. Proceed to check any other token sources.
           return;
         }
-        if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
+        if (empty($claims['sub']) || !str_starts_with($claims['sub'], 'cid:')) {
           $check->reject('Malformed JWT. Must specify the contact ID.');
         }
         else {

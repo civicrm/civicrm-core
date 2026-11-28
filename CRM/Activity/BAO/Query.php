@@ -148,7 +148,7 @@ class CRM_Activity_BAO_Query {
    */
   public static function where(&$query) {
     foreach (array_keys($query->_params) as $id) {
-      if (substr($query->_params[$id][0], 0, 9) === 'activity_') {
+      if (str_starts_with($query->_params[$id][0], 'activity_')) {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
@@ -315,7 +315,7 @@ class CRM_Activity_BAO_Query {
 
       case 'source_contact':
       case 'source_contact_id':
-        $columnName = strstr($name, '_id') ? 'id' : 'sort_name';
+        $columnName = str_contains($name, '_id') ? 'id' : 'sort_name';
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("source_contact.{$columnName}", $op, $value, CRM_Utils_Type::typeToString($fields[$name]['type']));
         [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Contact', $columnName, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [

@@ -302,7 +302,7 @@ abstract class AbstractAction implements \ArrayAccess {
       ];
       // For actions like "getFields" and "getActions" they are not getting the entity itself.
       // So generic docs will make more sense like this:
-      if (substr($vars['action'], 0, 3) === 'get' && substr($vars['action'], -1) === 's') {
+      if (str_starts_with($vars['action'], 'get') && str_ends_with($vars['action'], 's')) {
         $vars['entity'] = lcfirst(substr($vars['action'], 3, -1));
       }
       foreach ($this->reflect()->getProperties(\ReflectionProperty::IS_PROTECTED) as $property) {

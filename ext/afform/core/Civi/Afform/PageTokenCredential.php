@@ -90,7 +90,7 @@ class PageTokenCredential extends AutoService {
         if (empty($claims['exp'])) {
           $check->reject('Malformed JWT. Must specify an expiration time.');
         }
-        if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
+        if (empty($claims['sub']) || !str_starts_with($claims['sub'], 'cid:')) {
           $check->reject('Malformed JWT. Must specify the contact ID.');
         }
         else {

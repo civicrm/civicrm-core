@@ -243,13 +243,13 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    */
   public function stripPhone($phone): string {
     $newphone = preg_replace('/[^0-9x]/', '', $phone);
-    while (substr($newphone, 0, 1) == "1") {
+    while (str_starts_with($newphone, "1")) {
       $newphone = substr($newphone, 1);
     }
     while (str_contains($newphone, "xx")) {
       $newphone = str_replace("xx", "x", $newphone);
     }
-    while (substr($newphone, -1) == "x") {
+    while (str_ends_with($newphone, "x")) {
       $newphone = substr($newphone, 0, -1);
     }
     return (string) $newphone;

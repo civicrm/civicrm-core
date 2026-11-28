@@ -120,7 +120,7 @@ class CRM_Utils_Address {
     if (stristr(($formatted ?? ''), 'custom_')) {
       $customToken = array_keys($fields);
       foreach ($customToken as $value) {
-        if (substr($value, 0, 7) == 'custom_') {
+        if (str_starts_with($value, 'custom_')) {
           $replacements["contact.{$value}"] = $fields["{$value}"];
         }
       }
@@ -222,7 +222,7 @@ class CRM_Utils_Address {
     if (stristr(($formatted ?? ''), 'custom_')) {
       $customToken = array_keys($address);
       foreach ($customToken as $value) {
-        if (substr($value, 0, 7) == 'custom_') {
+        if (str_starts_with($value, 'custom_')) {
           $replacements["contact.{$value}"] = $address["{$value}"];
         }
       }

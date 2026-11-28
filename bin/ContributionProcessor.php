@@ -124,11 +124,11 @@ class CiviContributeProcessor {
 
       $keyArgs['method'] = 'GetTransactionDetails';
       foreach ($result as $name => $value) {
-        if (substr($name, 0, 15) == 'l_transactionid') {
+        if (str_starts_with($name, 'l_transactionid')) {
 
           // We don't/can't process subscription notifications, which appear
           // to be identified by transaction ids beginning with S-
-          if (substr($value, 0, 2) == 'S-') {
+          if (str_starts_with($value, 'S-')) {
             continue;
           }
 

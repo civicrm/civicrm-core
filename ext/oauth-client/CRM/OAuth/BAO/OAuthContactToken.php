@@ -113,7 +113,7 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
 
     $tag = $record['tag'] ?? NULL;
 
-    if ('linkContact:' === substr($tag, 0, 12)) {
+    if (str_starts_with($tag, 'linkContact:')) {
       $record['contact_id'] = substr($tag, 12);
     }
     elseif ('nullContactId' === $tag) {

@@ -415,7 +415,7 @@ class Kernel {
    * @return array
    */
   public function createError($msg, $data, $apiRequest) {
-    if ($msg === 'DB Error: constraint violation' || substr($msg, 0, 9) == 'DB Error:' || $msg == 'DB Error: already exists') {
+    if ($msg === 'DB Error: constraint violation' || str_starts_with($msg, 'DB Error:') || $msg == 'DB Error: already exists') {
       try {
         $fields = _civicrm_api3_api_getfields($apiRequest);
         _civicrm_api3_validate_foreign_keys($apiRequest['entity'], $apiRequest['action'], $apiRequest['params'], $fields);
