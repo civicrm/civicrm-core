@@ -32,6 +32,7 @@ class CRM_Upgrade_Incremental_php_SixTwentyTwo extends CRM_Upgrade_Incremental_B
     $this->addTask('Set "group_multiple_parents" setting if used', 'setMultipleGroupParents');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_mailing_recipients.index_mailing_id_contact_id']), 'addIndex', 'civicrm_mailing_recipients', [['mailing_id', 'contact_id']], 'index');
     $this->addTask('Add foreign keys from A/B tests to their mailings', 'addMailingABForeignKeys');
+    $this->addTask('Add Legal Name to the individual name fields in Display Preferences', 'addLegalNameEditOption');
   }
 
   /**
@@ -82,6 +83,21 @@ class CRM_Upgrade_Incremental_php_SixTwentyTwo extends CRM_Upgrade_Incremental_B
     finally {
       CRM_Utils_SQL::setSqlModes($sqlModes);
     }
+    return TRUE;
+  }
+
+  /**
+   * Add Legal Name as an individual name field that can be switched on in Display Preferences.
+   */
+  public static function addLegalNameEditOption(): bool {
+    \CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'contact_edit_options',
+      'name' => 'Legal Name',
+      'label' => ts('Legal Name'),
+      'value' => 18,
+      'filter' => 2,
+      'is_reserved' => 1,
+    ]);
     return TRUE;
   }
 

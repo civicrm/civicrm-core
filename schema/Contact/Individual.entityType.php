@@ -8,7 +8,6 @@ return [
   // Contact fields which are only for organizations or households
   'alterFields' => fn(array $fields) => [
     'organization_name' => FALSE,
-    'legal_name' => FALSE,
     'sic_code' => FALSE,
     'household_name' => FALSE,
     'primary_contact_id' => FALSE,

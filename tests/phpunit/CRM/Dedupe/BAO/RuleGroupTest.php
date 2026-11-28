@@ -177,6 +177,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
         'suffix_id' => 'Individual Suffix',
         'job_title' => 'Job Title',
         'last_name' => 'Last Name',
+        'legal_name' => 'Legal Name',
         'middle_name' => 'Middle Name',
       ],
       'Household' => [
