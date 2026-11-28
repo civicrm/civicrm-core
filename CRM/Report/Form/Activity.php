@@ -489,7 +489,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       else {
         unset($this->_params['fields'][$fieldName]);
       }
-    }    
+    }
 
     if ($recordType == 'final' && !empty($this->_nonDisplayFields)) {
       foreach ($this->_nonDisplayFields as $fieldName) {
