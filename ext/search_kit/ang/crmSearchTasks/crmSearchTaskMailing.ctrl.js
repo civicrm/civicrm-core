@@ -10,6 +10,8 @@
     this.mailing = {
       name: '',
       template_type: null,
+      // Workaround CRM-19756 w/template_options.nonce
+      template_options: {nonce: 1},
     };
     this.entityTitle = this.getEntityTitle();
 
