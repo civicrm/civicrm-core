@@ -662,14 +662,14 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       'multiple' => 1,
       'select' => ['minimumInputLength' => 0],
     ]);
-    $form->addEntityRef('event_type_id', ts('Event Type'), [
-      'entity' => 'OptionValue',
+    $form->addSelect('event_type_id', [
+      'entity' => 'Event',
+      'label' => ts('Event Type'),
       'placeholder' => ts('- any -'),
-      'select' => ['minimumInputLength' => 0],
-      'api' => [
-        'params' => ['option_group_id' => 'event_type'],
-      ],
+      'multiple' => 'multiple',
+      'context' => 'search',
     ]);
+
     $obj = new CRM_Report_Form_Event_ParticipantListing();
     $form->add('select', 'participant_fee_id',
        ts('Fee Level'),
